@@ -41,7 +41,7 @@ cd /opt/tyk-pump/
 
 echo "[INFO]Starting Tyk identity broker"
 cd /opt/tyk-identity-broker/
-/opt/tyk-identity-broker/tyk-identity-broker --conf /opt/tyk-tyk-identity-broker/tib.conf >> /var/log/tyk_identity_broker.log 2>&1 &
+/opt/tyk-identity-broker/tyk-identity-broker -c /opt/tyk-identity-broker/tib.conf >> /var/log/tyk_identity_broker.log 2>&1 &
 
 cd /
 echo "[INFO]Sandbox instance has started"
