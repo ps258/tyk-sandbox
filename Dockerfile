@@ -6,7 +6,6 @@ COPY assets /assets
 RUN chmod +x /assets/rpms/install \
 	&& /assets/rpms/install \
 	&& openssl genrsa -out /privkey.pem 2048 \
-	&& openssl rsa -in /privkey.pem -pubout -out /pubkey.pem \
 	&& mkdir -p /data/db
 
 COPY scripts /scripts

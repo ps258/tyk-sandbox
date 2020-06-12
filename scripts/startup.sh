@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
 echo "Image starting: $1"
 
 if [[ ! -f /initialised ]]
@@ -7,6 +9,7 @@ then
   echo "[INFO]Setting gateway host and port in tyk_analytics.conf"
   sed -i "s/TYK_GW_PORT/$TYK_GW_PORT/g" /opt/tyk-dashboard/tyk_analytics.conf
   sed -i "s/TYK_GW_HOST/$TYK_GW_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
+  openssl rsa -in /privkey.pem -pubout -out /pubkey.pem
 fi
 
 echo "[INFO]Starting Redis"
