@@ -9,6 +9,7 @@ then
   echo "[INFO]Setting gateway host and port in tyk_analytics.conf"
   sed -i "s/TYK_GW_PORT/$TYK_GW_PORT/g" /opt/tyk-dashboard/tyk_analytics.conf
   sed -i "s/TYK_GW_HOST/$TYK_GW_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
+  openssl genrsa -out /privkey.pem 2048
   openssl rsa -in /privkey.pem -pubout -out /pubkey.pem
 fi
 

@@ -5,11 +5,10 @@ COPY assets /assets
 
 RUN chmod +x /assets/rpms/install \
 	&& /assets/rpms/install \
-	&& openssl genrsa -out /privkey.pem 2048 \
 	&& mkdir -p /data/db
 
 COPY scripts /scripts
-COPY assets/tyk_analytics.conf /opt/tyk-dashboard/tyk_analytics.conf
+COPY assets/tyk_analytics.conf /opt/tyk-dashboard/
 COPY assets/tyk.conf /opt/tyk-gateway/
 COPY assets/pump.conf /opt/tyk-pump/
 COPY assets/tib.conf /opt/tyk-identity-broker/
