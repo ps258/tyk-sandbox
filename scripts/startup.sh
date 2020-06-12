@@ -5,8 +5,8 @@ echo "Image starting: $1"
 if [[ ! -f /initialised ]]
 then
   echo "[INFO]Setting gateway host and port in tyk_analytics.conf"
-  sed -i "s/TYK_API_PORT/$TYK_GW_PORT/g" /opt/tyk-dashboard/tyk_analytics.conf
-  sed -i "s/TYK_API_HOST/$TYK_GW_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
+  sed -i "s/TYK_GW_PORT/$TYK_GW_PORT/g" /opt/tyk-dashboard/tyk_analytics.conf
+  sed -i "s/TYK_GW_HOST/$TYK_GW_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
 fi
 
 echo "[INFO]Starting Redis"
@@ -15,16 +15,17 @@ echo "[INFO]Starting Redis"
 echo "[INFO]Starting mongoDB"
 /usr/bin/mongod --fork --logpath /var/log/mongod.log --smallfiles
 
+echo "[INFO]Starting Tyk dashboard"
+cd /opt/tyk-dashboard/
+/opt/tyk-dashboard/tyk-analytics --conf /opt/tyk-dashboard/tyk_analytics.conf >> /var/log/tyk_dashboard.log 2>&1 &
+sleep 5
+
+# once the dashboard is running, use the admin API to create users and upload a licence
 if [[ ! -f /initialised ]]
 then
   echo "[INFO]Initialising the dashboard"
   /scripts/init-dashboard.sh
 fi
-
-echo "[INFO]Starting Tyk dashboard"
-cd /opt/tyk-dashboard/
-/opt/tyk-dashboard/tyk-analytics --conf /opt/tyk-dashboard/tyk_analytics.conf >> /var/log/tyk_dashboard.log 2>&1 &
-sleep 5
 
 echo "[INFO]Starting Tyk gateway"
 cd /opt/tyk-gateway/
