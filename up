@@ -1,0 +1,32 @@
+#!/usr/bin/bash
+
+if [[ $# -lt 1 ]]
+then
+  echo "[FATAL]Must give index number"]
+  exit 1
+fi
+
+offset=$(($1-1))
+hostFQDN=192.168.1.182
+dashboardPort=$((3000+$offset))
+gatewayPort=$((8080+$offset))
+TIBPort=$((3010+$offset))
+tykVersion=2.9.4.2-1
+containerName=sandbox-$1
+label=$containerName
+dashboardURL=http://$hostFQDN:$dashboardPort/
+gatewayURL=http://$hostFQDN:$gatewayPort/
+tibURL=http://$hostFQDN:$TIBPort/
+docker container create --name $containerName \
+  --publish $dashboardPort:3000 \
+  --publish $TIBPort:3010 \
+  --publish $gatewayPort:8080 \
+  --env TYK_GW_PORT=$gatewayPort \
+  --env TYK_GW_HOST=$hostFQDN \
+  --label com.sandbox.label=$label \
+  --label com.sandbox.version=$tykVersion \
+  --label com.dashurl=$dashboardURL \
+  --label com.sandbox.gateurl=$gatewayURL \
+  --label com.tiburl=$tibURL \
+  tyk-sandbox:$tykVersion
+docker container start $containerName
