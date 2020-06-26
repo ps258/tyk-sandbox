@@ -1,25 +1,69 @@
 #!/usr/bin/bash
 
+SCRIPTNAME=$0
+
+function help {
+  echo "[USAGE] $SCRIPTNAME -v tyk-version -i index-number -h"
+  echo "        -v tyk version of sandbox image. Defaults to 'latest'"
+  echo "        -i index number"
+  echo "        -h print this help"
+}
+
 if [[ $# -lt 1 ]]
 then
-  echo "[FATAL]Must give index number"]
+  help
   exit 1
 fi
 
-offset=$(($1-1))
+while getopts :i:v: arg
+do
+  case $arg in
+    i)
+      index=$OPTARG
+      ;;
+    v)
+      tykVersion=$OPTARG
+      ;;
+    h)
+      help
+      exit 0;
+      ;;
+    :)
+      echo "Option -$OPTARG requires an arguement."
+      exit 1
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG"
+      exit 1
+      ;;
+  esac
+done
+
+if [[ -n $tykVersion ]]
+then
+  tykVersion=latest
+fi
+
+SandboxPluginDir=/home/pstubbs/tyk/plugins
+SandboxCertDir=/home/pstubbs/tyk/certs
+
+offset=$(($index-1))
 hostFQDN=192.168.1.182
 dashboardPort=$((3000+$offset))
 gatewayPort=$((8080+$offset))
-TIBPort=$((3010+$offset))
-tykVersion=2.9.4.2-1
-containerName=sandbox-$1
+#TIBPort=$((3010+$offset))
+containerName=sandbox-$index
 label=$containerName
 dashboardURL=http://$hostFQDN:$dashboardPort/
 gatewayURL=http://$hostFQDN:$gatewayPort/
-tibURL=http://$hostFQDN:$TIBPort/
+#tibURL=http://$hostFQDN:$TIBPort/
+if [[ $tykVersion != "latest" && ! -d $SandboxPluginDir/$tykVersion ]]
+then
+  echo "[WARN]Creating $SandboxPluginDir/$tykVersion: It will be empty"
+fi
+echo "[INFO]Creating container $containerName"
 docker container create --name $containerName \
   --publish $dashboardPort:3000 \
-  --publish $TIBPort:3010 \
   --publish $gatewayPort:8080 \
   --env TYK_GW_PORT=$gatewayPort \
   --env TYK_GW_HOST=$hostFQDN \
@@ -27,6 +71,11 @@ docker container create --name $containerName \
   --label com.sandbox.version=$tykVersion \
   --label com.dashurl=$dashboardURL \
   --label com.sandbox.gateurl=$gatewayURL \
-  --label com.tiburl=$tibURL \
+  --volume $SandboxPluginDir/$tykVersion:/opt/tyk-plugins \
+  --volume $SandboxCertDir:/opt/tyk-certificates \
   tyk-sandbox:$tykVersion
-docker container start $containerName
+if [[ $? -eq 0 ]]
+then
+  echo "[INFO]Starting container $containerName"
+  docker container start $containerName
+fi
