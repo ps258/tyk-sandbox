@@ -16,4 +16,3 @@ COPY assets/tib.conf /opt/tyk-identity-broker/
 RUN chmod +x /scripts/*
 
 ENTRYPOINT ["/scripts/startup.sh"]
-CMD ["--help"]

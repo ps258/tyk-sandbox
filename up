@@ -55,14 +55,15 @@ SandboxPluginDir=/home/pstubbs/tyk/plugins
 SandboxCertDir=/home/pstubbs/tyk/certs
 
 offset=$(($index-1))
-hostFQDN=192.168.1.182
+#hostFQDN=192.168.1.182
+hostFQDN=docker.home
 dashboardPort=$((3000+$offset))
 gatewayPort=$((8080+$offset))
 #TIBPort=$((3010+$offset))
 containerName=sandbox-$index
 label=$containerName
 dashboardURL=http://$hostFQDN:$dashboardPort/
-gatewayURL=http://$hostFQDN:$gatewayPort/
+gatewayURL=https://$hostFQDN:$gatewayPort/
 #tibURL=http://$hostFQDN:$TIBPort/
 if [[ $tykVersion != "latest" && ! -d $SandboxPluginDir/$tykVersion ]]
 then
@@ -75,6 +76,7 @@ docker container create --name $containerName \
   --publish $gatewayPort:8080 \
   --env TYK_GW_PORT=$gatewayPort \
   --env TYK_GW_HOST=$hostFQDN \
+  --env TYK_DSHB_HOST=$hostFQDN \
   --label sandbox.label=$label \
   --label sandbox.version=$tykVersion \
   --label sandbox.dashurl=$dashboardURL \
