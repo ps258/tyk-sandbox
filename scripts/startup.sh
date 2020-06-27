@@ -20,8 +20,9 @@ then
     ln -s /opt/tyk-certificates/dashboard-certificate.pem /opt/tyk-certificates/gateway-certificate.pem
     ln -s /opt/tyk-certificates/dashboard-key.pem /opt/tyk-certificates/gateway-key.pem
   fi
-  grep -q $TYK_GW_HOST /etc/hosts || echo "127.0.0.1 $TYK_GW_HOST" >> /etc/hosts
 fi
+
+grep -q $TYK_GW_HOST /etc/hosts || echo "127.0.0.1 $TYK_GW_HOST" >> /etc/hosts
 
 echo "[INFO]Starting Redis"
 /usr/bin/redis-server /etc/redis.conf --daemonize yes
