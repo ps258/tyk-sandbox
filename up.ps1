@@ -1,6 +1,9 @@
+# Script to start a sandbox container under Windows
+
 if ($args.count -lt 2) {
     $command = $MyInvocation.MyCommand.Name
-    Write-Host "Usage: $command docker tag index"
+    Write-Host "Usage: $command docker_tag index"
+    Write-Host "       Creates a instance of the docker image called tyk-sandbox with the docker tag given"
     exit 1
 }
 
@@ -27,26 +30,13 @@ $label=$containerName
 $dashboardURL="http://${hostFQDN}:$dashboardPort/"
 $gatewayURL="https://${hostFQDN}:$gatewayPort/"
 
-if (! (Test-Path "$SandboxPluginDir/$tykVersion")) {
+# Create a version specific plugin directory. Tyk plugins must be compiled specifically for each version
+if (! (Test-Path "$SandboxPluginDir/$tykVersion") -and $tykVersion -ne "latest") {
     New-Item -Path $SandboxPluginDir -ItemType "directory" -Name "$tykVersion" > $null
     Write-Host "Created plugin dir $SandboxPluginDir/$tykVersion. It will be empty."
 }
 
-#if [[ $tykVersion != "latest" && ! -d $SandboxPluginDir/$tykVersion ]]
-#then
-# echo "[WARN]Creating $SandboxPluginDir/$tykVersion: It will be empty"
-# mkdir -p $SandboxPluginDir/$tykVersion
-#fi
-
 Write-Host "[INFO]Creating container $containerName"
-Write-Host "docker container create --name $containerName --publish published=$dashboardPort,target=3000 `
---publish published=$gatewayPort,target=8080 --env TYK_GW_PORT=$gatewayPort `
---env TYK_GW_HOST=$hostFQDN --env TYK_DSHB_HOST=$hostFQDN --label sandbox.label=$label `
---label sandbox.version=$tykVersion --label sandbox.dashurl=$dashboardURL `
---label sandbox.gateurl=$gatewayURL --label sandbox.index=$index `
---volume "$SandboxPluginDir/${tykVersion}:/opt/tyk-plugins" `
---volume "${SandboxCertDir}:/opt/tyk-certificates" tyk-sandbox:$tykVersion"
-
 docker container create --name $containerName --publish published=$dashboardPort,target=3000 `
 --publish published=$gatewayPort,target=8080 --env TYK_GW_PORT=$gatewayPort `
 --env TYK_GW_HOST=$hostFQDN --env TYK_DSHB_HOST=$hostFQDN --label sandbox.label=$label `
@@ -55,6 +45,7 @@ docker container create --name $containerName --publish published=$dashboardPort
 --volume "$SandboxPluginDir/${tykVersion}:/opt/tyk-plugins" `
 --volume "${SandboxCertDir}:/opt/tyk-certificates" tyk-sandbox:$tykVersion
 
+# Start the container and print its details if it was created successfully
 if ($?) {
     Write-Host "[INFO]Starting container $containerName"
     docker container start $containerName
