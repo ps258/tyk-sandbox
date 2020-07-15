@@ -22,7 +22,7 @@ then
   fi
 fi
 
-grep -q $TYK_GW_HOST /etc/hosts || echo "127.0.0.1 $TYK_GW_HOST" >> /etc/hosts
+#grep -q $TYK_GW_HOST /etc/hosts || echo "127.0.0.1 $TYK_GW_HOST" >> /etc/hosts
 
 echo "[INFO]Starting Redis"
 /usr/bin/redis-server /etc/redis.conf --daemonize yes
