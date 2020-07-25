@@ -36,6 +36,16 @@ if (! (Test-Path "$SandboxPluginDir/$tykVersion") -and $tykVersion -ne "latest")
     Write-Host "Created plugin dir $SandboxPluginDir/$tykVersion. It will be empty."
 }
 
+Write-Host "[DEBUG]
+docker container create --name $containerName --publish published=$dashboardPort,target=3000 `
+--publish published=$gatewayPort,target=8080 --env TYK_GW_PORT=$gatewayPort `
+--env TYK_GW_HOST=$hostFQDN --env TYK_DSHB_HOST=$hostFQDN --label sandbox.label=$label `
+--label sandbox.version=$tykVersion --label sandbox.dashurl=$dashboardURL `
+--label sandbox.gateurl=$gatewayURL --label sandbox.index=$index `
+--volume "$SandboxPluginDir/${tykVersion}:/opt/tyk-plugins" `
+--volume "${SandboxCertDir}:/opt/tyk-certificates" tyk-sandbox:$tykVersion
+"
+
 Write-Host "[INFO]Creating container $containerName"
 docker container create --name $containerName --publish published=$dashboardPort,target=3000 `
 --publish published=$gatewayPort,target=8080 --env TYK_GW_PORT=$gatewayPort `
