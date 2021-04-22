@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use Socket;
+
+if (not $ARGV[0]) {
+  print "Usage: $0 hostname\n";
+  print "       Returns the hosts IP address within a container\n";
+}
+
+for $name (@ARGV) {
+  print inet_ntoa(inet_aton($name)) . "\n";
+}

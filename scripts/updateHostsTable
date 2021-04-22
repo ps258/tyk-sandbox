@@ -1,0 +1,16 @@
+#!/bin/bash
+
+PATH=/scripts:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+
+echo "### Everything from this line is rewritten at every boot by $0 ###" >> /etc/hosts
+
+# setup hosts table to have friendly names and aliases so that we can use aliases in the redis cluster areas of tyks json
+for dbcontainer in db1 db2 dashbaord
+do
+  echo $(host $dbcontainer) $dbcontainer ${dbcontainer}-alias1 >> /etc/hosts
+done
+# backup db servers run three redis so need three names
+for dbcontainer in budb1 budb2
+do
+  echo $(host $dbcontainer) $dbcontainer ${dbcontainer}-alias1 ${dbcontainer}-alias2 >> /etc/hosts
+done

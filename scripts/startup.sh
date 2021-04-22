@@ -31,8 +31,7 @@ echo "[INFO]Starting mongoDB"
 /usr/bin/mongod --fork --logpath /var/log/mongod.log --smallfiles
 
 echo "[INFO]Starting Tyk dashboard"
-cd /opt/tyk-dashboard/
-/opt/tyk-dashboard/tyk-analytics --conf /opt/tyk-dashboard/tyk_analytics.conf >> /var/log/tyk_dashboard.log 2>&1 &
+/scripts/start-dashboard.sh
 sleep 5
 
 # once the dashboard is running, use the admin API to create users and upload a licence
@@ -43,18 +42,14 @@ then
 fi
 
 echo "[INFO]Starting Tyk gateway"
-cd /opt/tyk-gateway/
-/opt/tyk-gateway/tyk --conf /opt/tyk-gateway/tyk.conf >> /var/log/tyk_gateway.log 2>&1 &
+/scripts/start-gateway.sh
 
 echo "[INFO]Starting Tyk pump"
-cd /opt/tyk-pump/
-/opt/tyk-pump/tyk-pump --conf /opt/tyk-pump/pump.conf >> /var/log/tyk_pump.log 2>&1 &
+/scripts/start-pump.sh
 
 echo "[INFO]Starting Tyk identity broker"
-cd /opt/tyk-identity-broker/
-/opt/tyk-identity-broker/tyk-identity-broker -c /opt/tyk-identity-broker/tib.conf >> /var/log/tyk_identity_broker.log 2>&1 &
+/scripts/start-tib.sh
 
 cd /
 echo "[INFO]Sandbox instance has started"
-sleep 5
-tail -f /var/log/tyk_gateway.log
+sleep infinity

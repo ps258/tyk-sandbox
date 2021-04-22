@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+# check if this container is the same as the name given in the arguments
+# Usage is like
+# if is_host $(uname -n) db1
+# then
+#   configure db1 to work
+# fi
+
+use Socket;
+
+$uname = $ARGV[0];
+$compareto = $ARGV[1];
+
+if (not $ARGV[1]) {
+  print "Usage : $0 hostname name_to_compare\n";
+  print "        exit 0 if they have the same IP, 1 if not\n";
+}
+
+$u_IP = inet_ntoa(inet_aton($uname));
+$compareto_IP = inet_ntoa(inet_aton($compareto));
+
+if ($u_IP eq $compareto_IP) {
+  print "$uname is $compareto ($u_IP)\n";
+  exit 0;
+} else {
+  print "$uname ($u_IP) is not $compareto ($compareto_IP)\n";
+  exit 1;
+}
