@@ -1,4 +1,4 @@
-FROM centos:tyk
+FROM centos:latest
 EXPOSE 3000
 EXPOSE 8080
 COPY assets /assets
