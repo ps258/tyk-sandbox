@@ -56,7 +56,7 @@ SandboxCertDir=/home/pstubbs/tyk/certs
 
 offset=$(($index-1))
 #hostFQDN=192.168.1.182
-hostFQDN=docker.home
+hostFQDN=docker.stubbs-family.org
 dashboardPort=$((3000+$offset))
 gatewayPort=$((8080+$offset))
 #TIBPort=$((3010+$offset))
