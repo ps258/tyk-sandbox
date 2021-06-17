@@ -1,0 +1,99 @@
+#!/usr/bin/bash
+
+SCRIPTNAME=$0
+
+function help {
+  echo "[USAGE] $SCRIPTNAME -g tyk-version -h"
+  echo "        -g tyk gateway version to pull download"
+  echo "        -d tyk dashboard version to pull download"
+  echo "        -t tyk identity broker version to pull download"
+  echo "        -p tyk pump version to pull download"
+  echo "        -h print this help"
+}
+
+function download {
+  rpm=$1
+  url=$2
+  if [[ ! -f $rpm ]]
+  then
+    wget --quiet $url -O $rpm
+    if [[ $? -gt 0 ]]
+    then
+      rm $rpm
+      echo "[WARN]Failed to pull $rpm"
+    else
+      echo "[INFO]Pulled $rpm"
+    fi
+  else
+    echo "[WARN]$rpm already exists"
+  fi
+}
+
+if [[ $# -lt 1 ]]
+then
+  help
+  exit 1
+fi
+
+while getopts :g:d:t:p: arg
+do
+  case $arg in
+    g)
+      tykVersion=$OPTARG
+      ;;
+    d)
+      dshbVersion=$OPTARG
+      ;;
+    t)
+      tibVersion=$OPTARG
+      ;;
+    p)
+      pumpVersion=$OPTARG
+      ;;
+    h)
+      help
+      exit 0;
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument."
+      exit 1
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG"
+      exit 1
+      ;;
+  esac
+done
+
+if [[ ! -n $dshbVersion ]]
+then
+  dshbVersion=$tykVersion
+fi
+
+if [[ -n $tykVersion ]]
+then
+  rpm="tyk-gateway-$tykVersion-1.x86_64.rpm"
+  url="https://packagecloud.io/tyk/tyk-gateway/packages/el/7/$rpm/download.rpm"
+  download $rpm $url
+fi
+
+if [[ -n $dshbVersion ]]
+then
+  rpm="tyk-dashboard-$dshbVersion-1.x86_64.rpm"
+  url="https://packagecloud.io/tyk/tyk-dashboard/packages/el/7/$rpm/download.rpm"
+  download $rpm $url
+fi
+
+if [[ -n $tibVersion ]]
+then
+  rpm="tyk-identity-broker-$tibVersion-1.x86_64.rpm"
+  url="https://packagecloud.io/tyk/tyk-identity-broker/packages/el/7/$rpm/download.rpm"
+  download $rpm $url
+fi
+
+if [[ -n $pumpVersion ]]
+then
+  rpm="tyk-pump-$pumpVersion-1.x86_64.rpm"
+  url="https://packagecloud.io/tyk/tyk-pump/packages/el/7/$rpm/download.rpm"
+  download $rpm $url
+fi
