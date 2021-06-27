@@ -1,19 +1,81 @@
 #!/usr/bin/bash
 
+if [[ $# -lt 1 ]]
+then
+  help
+  exit 1
+fi
+
 SCRIPTNAME=$0
+declare -A GATEWAY
+declare -A DASHBOARD
+declare -A TIB
+declare -A PUMP
 
 function help {
   echo "[USAGE] $SCRIPTNAME -g tyk-version -h"
   echo "        -g tyk gateway version to pull download"
-  echo "        -d tyk dashboard version to pull download"
-  echo "        -t tyk identity broker version to pull download"
-  echo "        -p tyk pump version to pull download"
+  echo "        -l list version of components that go with each GW version"
   echo "        -h print this help"
 }
 
+# load the version for each gateway
+# 3.2
+GATEWAY["3.2.1"]="3.2.1-1"
+DASHBOARD["3.2.1-1"]="3.2.1-1"
+PUMP["3.2.1-1"]="1.4.0-1"
+
+# 3.1
+GATEWAY["3.1.2"]="3.1.2-1"
+DASHBOARD["3.1.2-1"]="3.1.2-1"
+PUMP["3.1.2-1"]="1.3.0-1"
+
+# 3.0
+# 3.0.6
+GATEWAY["3.0.6"]="3.0.6-1"
+DASHBOARD["3.0.6-1"]="3.0.6-1"
+PUMP["3.0.6-1"]="1.3.0-1"
+# 3.0.5 (note that the 3.0.5 dashboard was pulled
+GATEWAY["3.0.5"]="3.0.5-1"
+DASHBOARD["3.0.5-1"]="3.0.4-1"
+PUMP["3.0.5-1"]="1.3.0-1"
+# 3.0.4
+GATEWAY["3.0.4"]="3.0.4-1"
+DASHBOARD["3.0.4-1"]="3.0.4-1"
+PUMP["3.0.4-1"]="1.3.0-1"
+# 3.0.3
+GATEWAY["3.0.3"]="3.0.3-1"
+DASHBOARD["3.0.3-1"]="3.0.3-1"
+PUMP["3.0.3-1"]="1.3.0-1"
+
+# 2.9
+# 2.9.4.3
+GATEWAY["2.9.4.3"]="2.9.4.3-1"
+DASHBOARD["2.9.4.3-1"]="1.9.4.3-1"
+TIB["2.9.4.3-1"]="0.7.2-1"
+PUMP["2.9.4.3-1"]="0.8.5.1-1"
+# 2.9.5
+GATEWAY["2.9.5"]="2.9.5-1"
+DASHBOARD["2.9.5-1"]="1.9.5-1"
+TIB["2.9.5-1"]="0.7.2-1"
+PUMP["2.9.5-1"]="0.8.5.1-1"
+
+function listversions {
+  local gwVersion
+  for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV)
+  do
+    gwVersion=${GATEWAY[$version]}
+    echo "Version:   $version"
+    echo "    Gateway:   $gwVersion"
+    [[ ${DASHBOARD[$gwVersion]+_} ]] && echo "    Dashboard: ${DASHBOARD[$gwVersion]}"
+    [[ ${TIB[$gwVersion]+_} ]] && echo "    TIB:       ${TIB[$gwVersion]}"
+    [[ ${PUMP[$gwVersion]+_} ]] && echo "    Pump:      ${PUMP[$gwVersion]}"
+  done
+}
+
 function download {
-  rpm=$1
-  url=$2
+  local rpm=$1
+  local url=$2
   if [[ ! -f $rpm ]]
   then
     wget --quiet $url -O $rpm
@@ -29,26 +91,15 @@ function download {
   fi
 }
 
-if [[ $# -lt 1 ]]
-then
-  help
-  exit 1
-fi
-
-while getopts :g:d:t:p: arg
+while getopts :g:hl arg
 do
   case $arg in
+    l)
+      listversions
+      exit 0
+      ;;
     g)
-      tykVersion=$OPTARG
-      ;;
-    d)
-      dshbVersion=$OPTARG
-      ;;
-    t)
-      tibVersion=$OPTARG
-      ;;
-    p)
-      pumpVersion=$OPTARG
+      version=$OPTARG
       ;;
     h)
       help
@@ -65,35 +116,42 @@ do
   esac
 done
 
-if [[ ! -n $dshbVersion ]]
+if [[ ${GATEWAY[$version]+_} ]]
 then
-  dshbVersion=$tykVersion
+  tykVersion=${GATEWAY[$version]}
+  dshbVersion=${DASHBOARD[$tykVersion]}
+  tibVersion=${TIB[$tykVersion]}
+  pumpVersion=${PUMP[$tykVersion]}
+else
+  echo "Unknown version"
+  help
+  exit 1
 fi
 
 if [[ -n $tykVersion ]]
 then
-  rpm="tyk-gateway-$tykVersion-1.x86_64.rpm"
+  rpm="tyk-gateway-$tykVersion.x86_64.rpm"
   url="https://packagecloud.io/tyk/tyk-gateway/packages/el/7/$rpm/download.rpm"
   download $rpm $url
 fi
 
 if [[ -n $dshbVersion ]]
 then
-  rpm="tyk-dashboard-$dshbVersion-1.x86_64.rpm"
+  rpm="tyk-dashboard-$dshbVersion.x86_64.rpm"
   url="https://packagecloud.io/tyk/tyk-dashboard/packages/el/7/$rpm/download.rpm"
   download $rpm $url
 fi
 
 if [[ -n $tibVersion ]]
 then
-  rpm="tyk-identity-broker-$tibVersion-1.x86_64.rpm"
+  rpm="tyk-identity-broker-$tibVersion.x86_64.rpm"
   url="https://packagecloud.io/tyk/tyk-identity-broker/packages/el/7/$rpm/download.rpm"
   download $rpm $url
 fi
 
 if [[ -n $pumpVersion ]]
 then
-  rpm="tyk-pump-$pumpVersion-1.x86_64.rpm"
+  rpm="tyk-pump-$pumpVersion.x86_64.rpm"
   url="https://packagecloud.io/tyk/tyk-pump/packages/el/7/$rpm/download.rpm"
   download $rpm $url
 fi
