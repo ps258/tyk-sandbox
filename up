@@ -1,12 +1,30 @@
 #!/usr/bin/bash
 
 SCRIPTNAME=$0
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
+
+#find the local IP address (use the interface of the default route)
+default_dev=$(ip route list | awk '$1 == "default" {print $5}')
+IP_addr=$(ip addr show dev $default_dev | awk '$1 == "inet" {print $2}' | cut -d/ -f1)
 
 function help {
   echo "[USAGE] $SCRIPTNAME -v tyk-version -i index-number -h"
   echo "        -v tyk version of sandbox image. Defaults to 'latest'"
   echo "        -i index number"
   echo "        -h print this help"
+}
+
+function nextFree {
+  existing=$(docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}')
+  for i in $(seq 1 1000) 
+  do
+    test="sandbox-$i"
+    if ! echo $existing | grep -qw $test
+    then
+      echo $i
+      break
+    fi
+  done
 }
 
 if [[ $# -lt 1 ]]
@@ -46,9 +64,7 @@ fi
 
 if [[ ! -n $index ]]
 then
-  echo "[FATAL]Must specify an index (-i)"
-  help
-  exit 1
+  index=$(nextFree)
 fi
 
 SandboxPluginDir=/home/pstubbs/tyk/plugins
@@ -56,7 +72,7 @@ SandboxCertDir=/home/pstubbs/tyk/certs
 
 offset=$(($index-1))
 #hostFQDN=192.168.1.182
-hostFQDN=docker.home
+hostFQDN=$IP_addr
 dashboardPort=$((3000+$offset))
 gatewayPort=$((8080+$offset))
 #TIBPort=$((3010+$offset))
