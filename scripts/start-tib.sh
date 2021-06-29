@@ -6,6 +6,12 @@ command=/opt/tyk-identity-broker/tyk-identity-broker
 conf=/opt/tyk-identity-broker/tib.conf
 log=/var/log/tyk_identity_broker.log
 
+if [[ ! -d /opt/tyk-identity-broker/ ]]
+then
+  echo "TIB not installed"
+  exit 0
+fi
+
 # refuse to start if its already running
 if pgrep -f $(basename $command) > /dev/null
 then

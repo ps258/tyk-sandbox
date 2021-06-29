@@ -47,8 +47,11 @@ echo "[INFO]Starting Tyk gateway"
 echo "[INFO]Starting Tyk pump"
 /scripts/start-pump.sh
 
-echo "[INFO]Starting Tyk identity broker"
-/scripts/start-tib.sh
+if [[ -d /opt/tyk-identity-broker/ ]]
+then
+  echo "[INFO]Starting Tyk identity broker"
+  /scripts/start-tib.sh
+fi
 
 cd /
 echo "[INFO]Sandbox instance has started"

@@ -5,6 +5,12 @@ PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 process=tyk-identity-broker
 count=0
 
+if [[ ! -d /opt/tyk-identity-broker/ ]]
+then
+  echo "TIB not installed"
+  exit 0
+fi
+
 while pgrep -f $process > /dev/null
 do
   if [[ $(( count % 5 )) == 0 ]]
