@@ -73,8 +73,12 @@ then
     docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName
     exit $?
   else
-    echo "[FATAL]Which container do you want the labels from?"
-    exit 1
+    for containerName in $(docker container list  --filter 'name=sandbox-' --format '{{.Names}}' | sort -V)
+    do
+      echo $containerName
+      docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName
+    done
+    exit $?
   fi
 fi
 
