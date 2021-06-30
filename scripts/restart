@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for service in $*
+do
+  for script in stop-${service}.sh start-${service}.sh
+  do
+    [[ -f /scripts/$script ]] && /scripts/$script
+  done
+done
