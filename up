@@ -45,7 +45,7 @@ do
       list='true'
       ;;
     t)
-      ticket=$OPTARG
+      ticket="$OPTARG"
       ;;
     v)
       tykVersion=$OPTARG
@@ -125,7 +125,7 @@ docker container create --name $containerName \
   --label sandbox.label=$label \
   --label sandbox.version=$tykVersion \
   --label sandbox.dashurl=$dashboardURL \
-  --label sandbox.ticket=$ticket \
+  --label sandbox.ticket="$ticket" \
   --label sandbox.gateurl=$gatewayURL \
   --label sandbox.index=$index \
   --volume $SandboxPluginDir/$tykVersion:/opt/tyk-plugins \
