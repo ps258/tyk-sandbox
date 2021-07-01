@@ -1,4 +1,4 @@
 #!/bin/bash
 cd $(dirname $0)
 yum --disablerepo=* localinstall -y deps/*.rpm tyk/*.rpm
-rm *.rpm
+rm deps/*.rpm tyk/*.rpm
