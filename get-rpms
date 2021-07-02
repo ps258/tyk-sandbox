@@ -95,11 +95,11 @@ function listversions {
 }
 
 function download {
-  local rpm=$1
-  local url=$2
+  typeset rpm=$1
+  typeset url=$2
   if [[ ! -f $rpm ]]
   then
-    wget --quiet $url -O $rpm
+    curl -sL $url --output $rpm
     if [[ $? -gt 0 ]]
     then
       rm $rpm
