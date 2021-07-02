@@ -3,9 +3,22 @@
 SCRIPTNAME=$0
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
+OS=$(uname -s)
+
+# directories shared into all sandboxes to allow for plugins and certs to be installed easily
+SandboxPluginDir=~/tyk/plugins
+SandboxCertDir=~/tyk/certs
+
 #find the local IP address (use the interface of the default route)
-default_dev=$(ip route list | awk '$1 == "default" {print $5}')
-IP_addr=$(ip addr show dev $default_dev | awk '$1 == "inet" {print $2}' | cut -d/ -f1)
+if [[ $OS == "Linux" ]]
+then
+  default_dev=$(ip route list | awk '$1 == "default" {print $5}')
+  IP_addr=$(ip addr show dev $default_dev | awk '$1 == "inet" {print $2}' | cut -d/ -f1)
+elif [[ $OS == "Darwin" ]]
+then
+  default_dev=$(netstat -rnf inet | awk '/^default/{print $NF}')
+  IP_addr=$(ipconfig getifaddr $default_dev)
+fi
 
 function help {
   echo "[USAGE] $SCRIPTNAME -v tyk-version -i index-number -h"
@@ -35,7 +48,7 @@ then
   exit 1
 fi
 
-while getopts :li:v:t: arg
+while getopts :lhi:v:t: arg
 do
   case $arg in
     i)
@@ -99,19 +112,29 @@ then
   index=$(nextFree)
 fi
 
-SandboxPluginDir=/home/pstubbs/tyk/plugins
-SandboxCertDir=/home/pstubbs/tyk/certs
+for dir in "$SandboxPluginDir" "$SandboxCertDir"
+do
+  if [[ ! -d "$dir" ]]
+  then
+    mkdir -p "$dir"
+  fi
+done
 
 offset=$(($index-1))
 hostFQDN=$IP_addr
 dashboardPort=$((3000+$offset))
 gatewayPort=$((8080+$offset))
-#TIBPort=$((3010+$offset))
 containerName=sandbox-$index
 label=$containerName
 dashboardURL=http://$hostFQDN:$dashboardPort/
 gatewayURL=https://$hostFQDN:$gatewayPort/
-#tibURL=http://$hostFQDN:$TIBPort/
+if ls -1 assets/rpms/tyk | grep tyk-identity-broker
+then
+  TIBPort=$((4010+$offset))
+  tibURL=http://$hostFQDN:$TIBPort/
+fi
+
+# Create a directory just for this version to hold plugins
 if [[ $tykVersion != "latest" && ! -d $SandboxPluginDir/$tykVersion ]]
 then
   echo "[WARN]Creating $SandboxPluginDir/$tykVersion: It will be empty"
