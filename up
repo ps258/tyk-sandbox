@@ -70,15 +70,17 @@ then
   if [[ -n $index ]]
   then
     containerName=sandbox-$index
-    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName
-    exit $?
+    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox
+    exit 0
+    echo
   else
     for containerName in $(docker container list  --filter 'name=sandbox-' --format '{{.Names}}' | sort -V)
     do
       echo $containerName
-      docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName
+      docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox
+      echo
     done
-    exit $?
+    exit 0
   fi
 fi
 
@@ -135,5 +137,5 @@ if [[ $? -eq 0 ]]
 then
   echo "[INFO]Starting container $containerName"
   docker container start $containerName
-  docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName
+  docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep -i sandbox
 fi
