@@ -105,7 +105,7 @@ function buildImage {
   fi
   if [[ -z $packageRev ]]
   then
-    packageRev="-1"
+    packageRev="1"
   fi
   if docker image list tyk-sandbox | grep -qw $tykVersion-$packageRev
   then
