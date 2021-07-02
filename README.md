@@ -1,6 +1,8 @@
 # tyk-sandbox
 
-# Quickly create a sandbox image that can be used to run different versions of tyk
+# Quickly create a sandbox image that can be used to run different versions of tyk.
+
+Should be really simple to get started on Linux and MacOS
 
 ## Quick start guide
 
@@ -20,3 +22,6 @@
     sandbox.label: sandbox-2
     sandbox.ticket: ticket-number
     sandbox.version: 3.1.2-1
+
+## Command help
+All commands have a -h for help on the options except for up.ps1 which is a window powershell script and needs work
