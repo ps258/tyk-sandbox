@@ -21,14 +21,18 @@ then
 fi
 
 function help {
-  echo "[USAGE] $SCRIPTNAME create -v tyk-version -i index-number -h"
+  echo "[USAGE]:"
+  echo "$SCRIPTNAME create -v tyk-version -i index-number -h"
   echo "        -i index number (skip for autoallocation of the next free)"
-  echo "        -l list the labels only"
   echo "        -t Ticket or comment field"
   echo "        -v tyk version of sandbox image. Defaults to 'latest'"
-  echo "        $SCRIPTNAME [start|stop|restart|rm] <index number...>"
+  echo "$SCRIPTNAME [start|stop|restart|rm] <index number...>"
   echo "        take the action named on the listed sandboxes"
-  echo "        $SCRIPTNAME list <index number...>"
+  echo "$SCRIPTNAME images"
+  echo "        lists the available docker images for creating sandboxes"
+  echo "$SCRIPTNAME build -v tyk-gateway-version-number"
+  echo "        builds a sandbox image for that version if its not already available"
+  echo "$SCRIPTNAME list <index number...>"
   echo "        gives details about the named sandbox or all"
 }
 
@@ -64,18 +68,60 @@ function nextFree {
   done
 }
 
+function buildImage {
+  typeset arg; typeset tykVersion; typeset tykVersion
+  typeset rpm
+  while getopts :v: arg
+  do
+    case $arg in 
+      v)
+        tykVersion=$OPTARG
+        ;;
+      :)
+        echo "Option -$OPTARG requires an arguement."
+        exit 1
+        ;;
+      \?)
+        echo "Invalid option: -$OPTARG"
+        exit 1
+        ;;
+    esac
+  done
+
+  if [[ -z $tykVersion ]]
+  then
+    echo "[FATAL]Must specify a version to build" 1>&2
+    exit 1
+  fi
+  if docker image list tyk-sandbox | grep -qw $tykVersion
+  then
+    echo "[FATAL]There is an image with that version already" 1>&2
+    exit 1
+  fi
+  cd assets/rpms/tyk
+  for rpm in tyk*.rpm
+  do
+    rm $rpm
+  done
+  ./get-rpms -g $tykVersion
+  if ! \ls -1 | grep tyk-gateway
+  then
+    echo "[FATAL]Unable to fetch version $tykVersion" 1>&2
+    exit 1
+  fi
+  cd -
+  docker image build --tag tyk-sandbox:$tykVersion .
+}
+
 function createSandbox {
   typeset index; typeset list; typeset ticket; typeset tykVersion
   typeset containerName; typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort
   typeset label; typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL
-  while getopts :li:v:t: arg
+  while getopts :i:v:t: arg
   do
     case $arg in
       i)
         index=$OPTARG
-        ;;
-      l)
-        list='true'
         ;;
       t)
         ticket="$OPTARG"
@@ -93,25 +139,6 @@ function createSandbox {
         ;;
     esac
   done
-
-  if [[ -n $list ]]
-  then
-    if [[ -n $index ]]
-    then
-      containerName=sandbox-$index
-      docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox
-      exit 0
-      echo
-    else
-      for containerName in $(docker container list  --filter 'name=sandbox-' --format '{{.Names}}' | sort -V)
-      do
-        echo $containerName
-        docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox
-        echo
-      done
-      exit 0
-    fi
-  fi
 
   if [[ -z $tykVersion ]]
   then
@@ -194,7 +221,10 @@ case $1 in
     do
       docker container $action sandbox-$index
     done
-    exit 0
+    ;;
+  build)
+    shift
+    buildImage "$@"
     ;;
   create)
     shift
@@ -211,10 +241,14 @@ case $1 in
     else
       getAllSandboxInfo
     fi
-    exit 0
+    ;;
+  image*)
+    docker image list tyk-sandbox
     ;;
   help)
     help
-    exit 0
     ;;
+  *)
+    echo "[FATAL]Unknown option \"$1\"" 1>&2
+    help
 esac
