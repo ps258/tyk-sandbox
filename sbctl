@@ -33,6 +33,7 @@ function help {
   echo "$SCRIPTNAME build -l | -v tyk-gateway-version-number"
   echo "        builds a sandbox image for that version if its not already available"
   echo "        -v specify the version to build"
+  echo "        -r specify the package revision"
   echo "        -l list versions know about"
   echo "$SCRIPTNAME list <index number...>"
   echo "        gives details about the named sandbox or all"
@@ -72,13 +73,16 @@ function nextFree {
 
 function buildImage {
   typeset arg; typeset tykVersion; typeset tykVersion
-  typeset rpm
-  while getopts :lv: arg
+  typeset rpm; typeset packageRev
+  while getopts :lv:r: arg
   do
     case $arg in 
       l)
         assets/rpms/tyk/get-rpms -l
         exit 0
+        ;;
+      r)
+        packageRev=$OPTARG
         ;;
       v)
         tykVersion=$OPTARG
@@ -99,7 +103,11 @@ function buildImage {
     echo "[FATAL]Must specify a version to build" 1>&2
     exit 1
   fi
-  if docker image list tyk-sandbox | grep -qw $tykVersion
+  if [[ -z $packageRev ]]
+  then
+    packageRev="-1"
+  fi
+  if docker image list tyk-sandbox | grep -qw $tykVersion-$packageRev
   then
     echo "[FATAL]There is an image with that version already" 1>&2
     exit 1
@@ -116,7 +124,7 @@ function buildImage {
     exit 1
   fi
   cd -
-  docker image build --tag tyk-sandbox:$tykVersion .
+  docker image build --tag tyk-sandbox:$tykVersion-$packageRev .
 }
 
 function createSandbox {
