@@ -1,0 +1,220 @@
+#!/bin/ksh
+
+SCRIPTNAME=$0
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
+
+OS=$(uname -s)
+
+# directories shared into all sandboxes to allow for plugins and certs to be installed easily
+SandboxPluginDir=~/tyk/plugins
+SandboxCertDir=~/tyk/certs
+
+#find the local IP address (use the interface of the default route)
+if [[ $OS == "Linux" ]]
+then
+  default_dev=$(ip route list | awk '$1 == "default" {print $5}')
+  IP_addr=$(ip addr show dev $default_dev | awk '$1 == "inet" {print $2}' | cut -d/ -f1)
+elif [[ $OS == "Darwin" ]]
+then
+  default_dev=$(netstat -rnf inet | awk '/^default/{print $NF}')
+  IP_addr=$(ipconfig getifaddr $default_dev)
+fi
+
+function help {
+  echo "[USAGE] $SCRIPTNAME create -v tyk-version -i index-number -h"
+  echo "        -i index number (skip for autoallocation of the next free)"
+  echo "        -l list the labels only"
+  echo "        -t Ticket or comment field"
+  echo "        -v tyk version of sandbox image. Defaults to 'latest'"
+  echo "        $SCRIPTNAME [start|stop|restart|rm] <index number...>"
+  echo "        take the action named on the listed sandboxes"
+  echo "        $SCRIPTNAME list <index number...>"
+  echo "        gives details about the named sandbox or all"
+}
+
+function getSandboxInfo {
+  typeset index
+  index=$1
+  containerName=sandbox-$index
+  echo $containerName
+  docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox
+  echo
+}
+
+function getAllSandboxInfo {
+  typeset existing
+  typeset index
+  existing=$(docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n)
+  for index in $existing
+  do
+    getSandboxInfo $index
+  done
+}
+
+function nextFree {
+  existing=$(docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}')
+  for i in $(seq 1 1000) 
+  do
+    test="sandbox-$i"
+    if ! echo $existing | grep -qw $test
+    then
+      echo $i
+      break
+    fi
+  done
+}
+
+function createSandbox {
+  typeset index; typeset list; typeset ticket; typeset tykVersion
+  typeset containerName; typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort
+  typeset label; typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL
+  while getopts :li:v:t: arg
+  do
+    case $arg in
+      i)
+        index=$OPTARG
+        ;;
+      l)
+        list='true'
+        ;;
+      t)
+        ticket="$OPTARG"
+        ;;
+      v)
+        tykVersion=$OPTARG
+        ;;
+      :)
+        echo "Option -$OPTARG requires an arguement."
+        exit 1
+        ;;
+      \?)
+        echo "Invalid option: -$OPTARG"
+        exit 1
+        ;;
+    esac
+  done
+
+  if [[ -n $list ]]
+  then
+    if [[ -n $index ]]
+    then
+      containerName=sandbox-$index
+      docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox
+      exit 0
+      echo
+    else
+      for containerName in $(docker container list  --filter 'name=sandbox-' --format '{{.Names}}' | sort -V)
+      do
+        echo $containerName
+        docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox
+        echo
+      done
+      exit 0
+    fi
+  fi
+
+  if [[ -z $tykVersion ]]
+  then
+    tykVersion=latest
+  fi
+
+  if [[ -z $ticket ]]
+  then
+    ticket="N/A"
+  fi
+
+  if [[ -z $index ]]
+  then
+    index=$(nextFree)
+  fi
+
+  for dir in "$SandboxPluginDir" "$SandboxCertDir"
+  do
+    if [[ ! -d "$dir" ]]
+    then
+      mkdir -p "$dir"
+    fi
+  done
+
+  offset=$(($index-1))
+  hostFQDN=$IP_addr
+  dashboardPort=$((3000+$offset))
+  gatewayPort=$((8080+$offset))
+  containerName=sandbox-$index
+  label=$containerName
+  dashboardURL=http://$hostFQDN:$dashboardPort/
+  gatewayURL=https://$hostFQDN:$gatewayPort/
+  if ls -1 assets/rpms/tyk | grep tyk-identity-broker
+  then
+    TIBPort=$((4010+$offset))
+    tibURL=http://$hostFQDN:$TIBPort/
+  fi
+
+  # Create a directory just for this version to hold plugins
+  if [[ $tykVersion != "latest" && ! -d $SandboxPluginDir/$tykVersion ]]
+  then
+    echo "[WARN]Creating $SandboxPluginDir/$tykVersion: It will be empty"
+    mkdir -p $SandboxPluginDir/$tykVersion
+  fi
+  echo "[INFO]Creating container $containerName"
+  docker container create --name $containerName \
+    --publish $dashboardPort:3000 \
+    --publish $gatewayPort:8080 \
+    --env TYK_GW_PORT=$gatewayPort \
+    --env TYK_GW_HOST=$hostFQDN \
+    --env TYK_DSHB_HOST=$hostFQDN \
+    --label sandbox.label=$label \
+    --label sandbox.version=$tykVersion \
+    --label sandbox.dashurl=$dashboardURL \
+    --label sandbox.ticket="$ticket" \
+    --label sandbox.gateurl=$gatewayURL \
+    --label sandbox.index=$index \
+    --volume $SandboxPluginDir/$tykVersion:/opt/tyk-plugins \
+    tyk-sandbox:$tykVersion
+  # --volume $SandboxCertDir:/opt/tyk-certificates
+  if [[ $? -eq 0 ]]
+  then
+    echo "[INFO]Starting container $containerName"
+    docker container start $containerName
+    getSandboxInfo $index
+  fi
+}
+
+if [[ $# -lt 1 ]]
+then
+  help
+  exit 1
+fi
+
+case $1 in
+  rm|stop|start|restart)
+    action=$1
+    shift
+    for index in $*
+    do
+      docker container $action sandbox-$index
+    done
+    exit 0
+    ;;
+  create)
+    shift
+    createSandbox "$@"
+    ;;
+  list)
+    if [[ $# -gt 1 ]]
+    then
+      shift
+      for index in $*
+      do
+        getSandboxInfo $index
+      done
+    else
+      getAllSandboxInfo
+    fi
+    exit 0
+    ;;
+  help)
+    help
+    exit 0
+    ;;
+esac
