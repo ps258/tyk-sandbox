@@ -30,8 +30,10 @@ function help {
   echo "        take the action named on the listed sandboxes"
   echo "$SCRIPTNAME images"
   echo "        lists the available docker images for creating sandboxes"
-  echo "$SCRIPTNAME build -v tyk-gateway-version-number"
+  echo "$SCRIPTNAME build -l | -v tyk-gateway-version-number"
   echo "        builds a sandbox image for that version if its not already available"
+  echo "        -v specify the version to build"
+  echo "        -l list versions know about"
   echo "$SCRIPTNAME list <index number...>"
   echo "        gives details about the named sandbox or all"
 }
@@ -71,9 +73,13 @@ function nextFree {
 function buildImage {
   typeset arg; typeset tykVersion; typeset tykVersion
   typeset rpm
-  while getopts :v: arg
+  while getopts :lv: arg
   do
     case $arg in 
+      l)
+        assets/rpms/tyk/get-rpms -l
+        exit 0
+        ;;
       v)
         tykVersion=$OPTARG
         ;;
