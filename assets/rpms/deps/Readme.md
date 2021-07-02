@@ -5,7 +5,6 @@
 
 ## Mongo, redis and dependencies
 
-    mongodb-org-3.0.15-1.el7.x86_64.rpm</a></li>
     mongodb-org-3.0.15-1.el7.x86_64.rpm
     mongodb-org-mongos-3.0.15-1.el7.x86_64.rpm
     mongodb-org-server-3.0.15-1.el7.x86_64.rpm
