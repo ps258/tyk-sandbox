@@ -1,6 +1,6 @@
 # tyk-sandbox
 
-# Quickly create a sandbox image that can be used to run different versions of tyk.
+# Quickly create a sandbox image that runs a specific version of tyk.
 
 Should be really simple to get started on Linux and MacOS
 
