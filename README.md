@@ -107,23 +107,23 @@ To remind ourselves of the details of this or other sandboxes later
 
 To get help on various options
 
-       % ./sbctl help
-       [USAGE]:
-       ./sbctl build -l | -v tyk-gateway-version-number [-r image version]
-               builds a sandbox image for that version if its not already available
-               -v version to build
-               -r package revision
-               -l list versions that images can be made for (incompatible with -v and -r)
-       ./sbctl create -v tyk-version [-t ticket no] [-i index-number]
-               -i index number (skip for autoallocation of the next free)
-               -t ticket or comment field
-               -v tyk version of sandbox image. Defaults to 'latest'
-       ./sbctl images
-               list the docker images for creating sandboxes
-       ./sbctl list <index number...>
-               details about the named sandbox or all
-       ./sbctl script <index number...>
-               run a shell in the sandboxes named
-       ./sbctl [start|stop|restart|rm] <index number...>
-               take the action named on the listed sandboxes
+      % ./sbctl help
+      [USAGE]:
+      ./sbctl build -l | -v tyk-gateway-version-number [-r image version]
+              builds a sandbox image for that version if its not already available
+              -v version to build
+              -r package revision
+              -l list versions that images can be made for (incompatible with -v and -r)
+      ./sbctl create -v tyk-version [-t ticket no] [-i index-number]
+              -i index number (skip for autoallocation of the next free)
+              -t ticket or comment field
+              -v tyk version of sandbox image. Defaults to 'latest'
+      ./sbctl images
+              list the docker images for creating sandboxes
+      ./sbctl list <index number...>
+              details about the named sandbox or all
+      ./sbctl script <index number...>
+              run a shell in the sandboxes named
+      ./sbctl [start|stop|restart|rm] <index number...>
+              take the action named on the listed sandboxes
 
