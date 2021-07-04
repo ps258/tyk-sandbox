@@ -22,21 +22,23 @@ fi
 
 function help {
   echo "[USAGE]:"
-  echo "$SCRIPTNAME create -v tyk-version -i index-number -h"
+  echo "$SCRIPTNAME build -l | -v tyk-gateway-version-number [-r image version]"
+  echo "        builds a sandbox image for that version if its not already available"
+  echo "        -v version to build"
+  echo "        -r package revision"
+  echo "        -l list versions that images can be made for (incompatible with -v and -r)"
+  echo "$SCRIPTNAME create -v tyk-version [-t ticket no] [-i index-number]"
   echo "        -i index number (skip for autoallocation of the next free)"
-  echo "        -t Ticket or comment field"
+  echo "        -t ticket or comment field"
   echo "        -v tyk version of sandbox image. Defaults to 'latest'"
+  echo "$SCRIPTNAME images"
+  echo "        list the docker images for creating sandboxes"
+  echo "$SCRIPTNAME list <index number...>"
+  echo "        details about the named sandbox or all"
+  echo "$SCRIPTNAME script <index number...>"
+  echo "        run a shell in the sandboxes named"
   echo "$SCRIPTNAME [start|stop|restart|rm] <index number...>"
   echo "        take the action named on the listed sandboxes"
-  echo "$SCRIPTNAME images"
-  echo "        lists the available docker images for creating sandboxes"
-  echo "$SCRIPTNAME build -l | -v tyk-gateway-version-number"
-  echo "        builds a sandbox image for that version if its not already available"
-  echo "        -v specify the version to build"
-  echo "        -r specify the package revision"
-  echo "        -l list versions know about"
-  echo "$SCRIPTNAME list <index number...>"
-  echo "        gives details about the named sandbox or all"
 }
 
 function getSandboxInfo {
@@ -238,25 +240,38 @@ case $1 in
     ;;
   build)
     shift
+    # Create a docker image with the given parameters
     buildImage "$@"
     ;;
   create)
     shift
+    # Create a docker sandbox with the given parameters
     createSandbox "$@"
     ;;
   list)
     if [[ $# -gt 1 ]]
     then
       shift
+      # Inspect the details of the given container
       for index in $*
       do
         getSandboxInfo $index
       done
     else
+      # Inspect the details of all exiting containers
       getAllSandboxInfo
     fi
     ;;
+  shell)
+    # Give a shell in the given container
+    shift
+    for index in $*
+    do
+      docker container exec -it sandbox-$index bash
+    done
+    ;;
   image*)
+    # list the tyk-sandbox docker images
     docker image list tyk-sandbox
     ;;
   help)
