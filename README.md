@@ -6,60 +6,103 @@ Should be really simple to get started on Linux and MacOS
 
 ## Quick start guide
 
-List available images
+Before creating a first sandbox image list the version the script knows about
 
-    % ./sbctl images
-    REPOSITORY    TAG       IMAGE ID       CREATED          SIZE
-    tyk-sandbox   3.2.1     7a5e51190570   38 seconds ago   961MB
-    tyk-sandbox   3.1.2-1   d78b2ca8c4a2   2 hours ago      974MB
+      % ./sbctl build -l
+      Version:   3.2.1
+          Gateway:   3.2.1-1
+          Dashboard: 3.2.1-1
+          Pump:      1.4.0-1
+      Version:   3.1.2
+          Gateway:   3.1.2-1
+          Dashboard: 3.1.2-1
+          Pump:      1.3.0-1
+      Version:   3.1.1
+          Gateway:   3.1.1-1
+          Dashboard: 3.1.1-1
+          Pump:      1.3.0-1
+      Version:   3.0.6
+          Gateway:   3.0.6-1
+          Dashboard: 3.0.6-1
+          Pump:      1.3.0-1
+      Version:   3.0.5
+          Gateway:   3.0.5-1
+          Dashboard: 3.0.4-1
+          Pump:      1.3.0-1
+      Version:   3.0.4
+          Gateway:   3.0.4-1
+          Dashboard: 3.0.4-1
+          Pump:      1.3.0-1
+      Version:   3.0.3
+          Gateway:   3.0.3-1
+          Dashboard: 3.0.3-1
+          Pump:      1.3.0-1
+      Version:   3.0.2
+          Gateway:   3.0.2-1
+          Dashboard: 3.0.2-1
+          Pump:      1.3.0-1
+      Version:   3.0.1
+          Gateway:   3.0.1-1
+          Dashboard: 3.0.1-1
+          Pump:      1.3.0-1
+      Version:   2.9.5
+          Gateway:   2.9.5-1
+          Dashboard: 1.9.5-1
+          TIB:       0.7.2-1
+          Pump:      0.8.5.1-1
+      Version:   2.9.4.3
+          Gateway:   2.9.4.3-1
+          Dashboard: 1.9.4.3-1
+          TIB:       0.7.2-1
+          Pump:      0.8.5.1-1
+      Version:   2.8.7
+          Gateway:   2.8.7-1
+          Dashboard: 1.8.6-1
+          TIB:       0.7.1-1
+          Pump:      0.6.0-1
 
-Create a sandbox to work on a ticket
+Create an image with for tyk 3.1.2
 
-    % ./sbctl create -v 3.2.1 -t ticket
-    [WARN]Creating ~/tyk/plugins/3.2.1: It will be empty
-    [INFO]Creating container sandbox-1
-    4ef23532f30969f1d08ab2b60a8c6a55dc0598f6dc11ab37e18360d3dcab8b1c
-    [INFO]Starting container sandbox-1
-    sandbox-1
-    sandbox.dashurl: http://192.168.0.79:3000/
-    sandbox.gateurl: https://192.168.0.79:8080/
-    sandbox.index: 1
-    sandbox.label: sandbox-1
-    sandbox.ticket: ticket
-    sandbox.version: 3.2.1
+      % ./sbctl build -v 3.1.2
+      [INFO]Pulled tyk-gateway-3.1.2-1.x86_64.rpm
+      [INFO]Pulled tyk-dashboard-3.1.2-1.x86_64.rpm
+      [INFO]Pulled tyk-pump-1.3.0-1.x86_64.rpm
+      tyk-gateway-3.1.2-1.x86_64.rpm
+      /Users/pstubbs/code/tyk-sandbox
+      [+] Building 1.1s (15/15) FINISHED
 
-Grab the details of the sandbox to remind ourselves of the URLs and version
+List the available images
 
-    % ./sbctl list 1
-    sandbox-1
-    sandbox.dashurl: http://192.168.0.79:3000/
-    sandbox.gateurl: https://192.168.0.79:8080/
-    sandbox.index: 1
-    sandbox.label: sandbox-1
-    sandbox.ticket: ticket
-    sandbox.version: 3.2.1
+      % ./sbctl images
+      REPOSITORY    TAG       IMAGE ID       CREATED      SIZE
+      tyk-sandbox   3.1.2-1   d78b2ca8c4a2   2 days ago   974MB
 
-Build a new sandbox image for gateway version 3.0.6
+Create a sanbdox from that image to begin testing/debugging
+This sandbox is ready to connect to via a web browser within seconds
 
-    % ./sbctl build -v 3.0.6
-    ...
-    => => writing image sha256:6cf6c207ceca1b9e431f7d87b67e551aa8035aa93fa12ab41f11ed13049da06d     0.0s
-    => => naming to docker.io/library/tyk-sandbox:3.0.6
+      % ./sbctl create -v 3.1.2-1 -t myticket_number
+      [INFO]Creating container sandbox-1
+      7371a8690b34a8a4cc34965a181e9ae43d880b6969e9923cbba3819cd87cd733
+      [INFO]Starting container sandbox-1
+      sandbox-1
+      sandbox-1
+      sandbox.dashurl: http://192.168.0.79:3000/
+      sandbox.gateurl: https://192.168.0.79:8080/
+      sandbox.index: 1
+      sandbox.label: sandbox-1
+      sandbox.ticket: myticket_number
+      sandbox.version: 3.1.2-1
 
-Read the fine help
 
-    % ./sbctl help
-    [USAGE]:
-    ./sbctl create -v tyk-version -i index-number -h
-            -i index number (skip for autoallocation of the next free)
-            -t Ticket or comment field
-            -v tyk version of sandbox image. Defaults to 'latest'
-    ./sbctl [start|stop|restart|rm] <index number...>
-            take the action named on the listed sandboxes
-    ./sbctl images
-            lists the available docker images for creating sandboxes
-    ./sbctl build -v tyk-gateway-version-number
-            builds a sandbox image for that version if its not already available
-    ./sbctl list <index number...>
-            gives details about the named sandbox or all
+To remind ourselves of the details of this or other sandboxes later
+
+      % ./sbctl list
+      sandbox-1
+      sandbox.dashurl: http://192.168.0.79:3000/
+      sandbox.gateurl: https://192.168.0.79:8080/
+      sandbox.index: 1
+      sandbox.label: sandbox-1
+      sandbox.ticket: myticket_number
+      sandbox.version: 3.1.2-1
+
 
