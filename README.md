@@ -77,7 +77,7 @@ List the available images
       REPOSITORY    TAG       IMAGE ID       CREATED      SIZE
       tyk-sandbox   3.1.2-1   d78b2ca8c4a2   2 days ago   974MB
 
-Create a sanbdox from that image to begin testing/debugging
+Create a sandbox from that image to begin testing/debugging
 This sandbox is ready to connect to via a web browser within seconds
 
       % ./sbctl create -v 3.1.2-1 -t myticket_number
@@ -105,4 +105,23 @@ To remind ourselves of the details of this or other sandboxes later
       sandbox.ticket: myticket_number
       sandbox.version: 3.1.2-1
 
+To get help on various options
+
+      % ./sbctl help
+      [USAGE]:
+      ./sbctl create -v tyk-version -i index-number -h
+              -i index number (skip for autoallocation of the next free)
+              -t Ticket or comment field
+              -v tyk version of sandbox image. Defaults to 'latest'
+      ./sbctl [start|stop|restart|rm] <index number...>
+              take the action named on the listed sandboxes
+      ./sbctl images
+              lists the available docker images for creating sandboxes
+      ./sbctl build -l | -v tyk-gateway-version-number
+              builds a sandbox image for that version if its not already available
+              -v specify the version to build
+              -r specify the package revision
+              -l list versions know about
+      ./sbctl list <index number...>
+              gives details about the named sandbox or all
 
