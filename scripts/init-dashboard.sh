@@ -1,12 +1,11 @@
 #!/bin/bash
 
-PROTOCOL=https
+PROTOCOL=http
 
 if [[ -n $TYK_LICENSE ]]
 then
   echo "[INFO]Adding dashboard license $TYK_LICENSE"
   curl -k -s -d "license=$TYK_LICENSE" -X POST $PROTOCOL://localhost:3000/license
-  sleep 5
 fi
 
 if [[ -n $TYK_USER && -n $TYK_PASSWORD ]]

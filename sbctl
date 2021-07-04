@@ -130,7 +130,7 @@ function buildImage {
 }
 
 function createSandbox {
-  typeset index; typeset list; typeset ticket; typeset tykVersion
+  typeset index; typeset list; typeset ticket; typeset tykVersion; typeset env_file
   typeset containerName; typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort
   typeset label; typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL
   while getopts :i:v:t: arg
@@ -199,13 +199,19 @@ function createSandbox {
     echo "[WARN]Creating $SandboxPluginDir/$tykVersion: It will be empty"
     mkdir -p $SandboxPluginDir/$tykVersion
   fi
+  if [[ -f ~/.tyk-sandbox ]]
+  then
+    env_file="--env-file $(\ls ~/.tyk-sandbox)"
+  else
+    env_file=""
+  fi
   echo "[INFO]Creating container $containerName"
   docker container create --name $containerName \
     --publish $dashboardPort:3000 \
     --publish $gatewayPort:8080 \
     --env TYK_GW_PORT=$gatewayPort \
     --env TYK_GW_HOST=$hostFQDN \
-    --env TYK_DSHB_HOST=$hostFQDN \
+    --env TYK_DSHB_HOST=$hostFQDN $env_file\
     --label sandbox.label=$label \
     --label sandbox.version=$tykVersion \
     --label sandbox.dashurl=$dashboardURL \
