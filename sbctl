@@ -283,7 +283,7 @@ case $1 in
       getAllSandboxInfo
     fi
     ;;
-  shell)
+  shell|bash)
     # Give a shell in the given container
     shift
     for index in $(listNames $*)
