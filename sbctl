@@ -27,8 +27,14 @@ function help {
   echo "        -v version to build"
   echo "        -r package revision"
   echo "        -l list versions that images can be made for (incompatible with -v and -r)"
-  echo "$SCRIPTNAME create -v tyk-version [-t ticket no] [-i index-number]"
+  echo "$SCRIPTNAME create -v tyk-version [-t ticket no] [-i index-number] [-n]"
   echo "        -i index number (skip for autoallocation of the next free)"
+  echo "        -n IGNORE ~/.tyk-sandbox even if it exists"
+  echo "           You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:"
+  echo "           These will be used when -n is NOT present"
+  echo "           TYK_LICENSE=licence string"
+  echo "           TYK_USER=user email"
+  echo "           TYK_PASSWORD=password"
   echo "        -t ticket or comment field"
   echo "        -v tyk version of sandbox image. Defaults to 'latest'"
   echo "$SCRIPTNAME images"
@@ -132,12 +138,15 @@ function buildImage {
 function createSandbox {
   typeset index; typeset list; typeset ticket; typeset tykVersion; typeset env_file
   typeset containerName; typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort
-  typeset label; typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL
-  while getopts :i:v:t: arg
+  typeset label; typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap
+  while getopts :ni:v:t: arg
   do
     case $arg in
       i)
         index=$OPTARG
+        ;;
+      n)
+        noBootstrap=1
         ;;
       t)
         ticket="$OPTARG"
@@ -199,7 +208,7 @@ function createSandbox {
     mkdir -p $SandboxPluginDir/$tykVersion
   fi
   # load username, password and licence if they stored in ~/.tyk-sandbox
-  if [[ -f ~/.tyk-sandbox ]]
+  if [[ -z $noBootstrap && -f ~/.tyk-sandbox ]]
   then
     env_file="--env-file $(\ls ~/.tyk-sandbox)"
   else
@@ -232,15 +241,20 @@ function createSandbox {
 function listNames {
   # list the names of sandboxes in a standard format.
   typeset name; typeset list
-  for name in $*
-  do
-    if echo $name | grep -iq sandbox-
-    then
-      name=$(echo $name | cut -d\- -f2)
-    fi
-    list="$list $name"
-  done
-  echo $list
+  if [[ $1 == "ALL" ]]
+  then
+    docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
+  else
+    for name in $*
+    do
+      if echo $name | grep -iq sandbox-
+      then
+        name=$(echo $name | cut -d\- -f2)
+      fi
+      list="$list $name"
+    done
+    echo $list
+  fi
 }
 
 
