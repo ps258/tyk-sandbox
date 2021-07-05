@@ -4,6 +4,8 @@ SCRIPTNAME=$0
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
 OS=$(uname -s)
+DashboardBasePort=3001
+GatewayBasePort=8081
 
 # directories shared into all sandboxes to allow for plugins and certs to be installed easily
 SandboxPluginDir=~/tyk/plugins
@@ -182,8 +184,8 @@ function createSandbox {
 
   offset=$(($index-1))
   hostFQDN=$IP_addr
-  dashboardPort=$((3000+$offset))
-  gatewayPort=$((8080+$offset))
+  dashboardPort=$(($DashboardBasePort+$offset))
+  gatewayPort=$(($GatewayBasePort+$offset))
   containerName=sandbox-$index
   label=$containerName
   dashboardURL=http://$hostFQDN:$dashboardPort/
