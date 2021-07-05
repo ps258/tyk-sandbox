@@ -1,7 +1,5 @@
 #!/bin/ksh
 
-set -x
-
 SCRIPTNAME=$0
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
@@ -132,7 +130,6 @@ function buildImage {
 }
 
 function createSandbox {
-  set -x
   typeset index; typeset list; typeset ticket; typeset tykVersion; typeset env_file
   typeset containerName; typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort
   typeset label; typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL
