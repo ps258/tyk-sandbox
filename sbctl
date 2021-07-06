@@ -6,6 +6,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 OS=$(uname -s)
 DashboardBasePort=3001
 GatewayBasePort=8081
+SCRIPTDIR=$(dirname "$SCRIPTNAME")
 
 # directories shared into all sandboxes to allow for plugins and certs to be installed easily
 SandboxPluginDir=~/tyk/plugins
@@ -88,7 +89,7 @@ function buildImage {
   do
     case $arg in 
       l)
-        assets/rpms/tyk/get-rpms -l
+        "$SCRIPTDIR/assets/rpms/tyk/get-rpms" -l
         exit 0
         ;;
       r)
