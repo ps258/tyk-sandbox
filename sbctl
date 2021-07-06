@@ -123,7 +123,7 @@ function buildImage {
     echo "[FATAL]There is an image with that version already" 1>&2
     exit 1
   fi
-  cd assets/rpms/tyk
+  cd "$SCRIPTDIR/assets/rpms/tyk"
   for rpm in tyk*.rpm
   do
     rm $rpm
