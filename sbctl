@@ -54,7 +54,7 @@ function getSandboxInfo {
   typeset index
   index=$1
   containerName=sandbox-$index
-  echo $containerName \( $(docker container inspect -f '{{ .State.Status }}' $containerName) \)
+  echo $containerName \($(docker container inspect -f '{{ .State.Status }}' $containerName)\)
   docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox
   echo
 }
