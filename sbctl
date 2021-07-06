@@ -69,7 +69,27 @@ function getAllSandboxInfo {
   done
 }
 
-function nextFree {
+# find the the highest image revision and add one
+function nextFreeImageRev {
+  typeset version
+  typeset existing
+  typeset biggest
+  version=$1
+  existing=$(docker image list tyk-sandbox | awk '$2 ~ /'$version'/ {print $2}' | sort -V | tail -1)
+  if [[ -z $existing ]]
+  then
+    echo 1
+  else
+    biggest=$(echo $existing | cut -d- -f2)
+    let biggest=biggest+1
+    echo $biggest
+  fi
+}
+
+# find the next container index that's unused
+function nextFreeContainer {
+  typeset existing
+  typeset i
   existing=$(docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}')
   for i in $(seq 1 1000) 
   do
@@ -116,7 +136,7 @@ function buildImage {
   fi
   if [[ -z $packageRev ]]
   then
-    packageRev="1"
+    packageRev=$( nextFreeImageRev $tykVersion )
   fi
   if docker image list tyk-sandbox | grep -qw $tykVersion-$packageRev
   then
@@ -180,7 +200,7 @@ function createSandbox {
 
   if [[ -z $index ]]
   then
-    index=$(nextFree)
+    index=$(nextFreeContainer)
   fi
 
   offset=$(($index-1))
