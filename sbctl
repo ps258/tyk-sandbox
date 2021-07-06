@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/ksh -x
 
 SCRIPTNAME=$0
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
@@ -15,7 +15,7 @@ SandboxCertDir=~/tyk/certs
 if [[ $OS == "Linux" ]]
 then
   default_dev=$(ip route list | sed 's/none //' | awk '/default/ {print $5}')
-  IP_addr=$(ip addr show dev $default_dev | awk '$1 == "inet" {print $2}' | cut -d/ -f1)
+  IP_addr=$(ip addr show dev $default_dev | awk '$1 == "inet" {print $2}' | head -1 | cut -d/ -f1)
 elif [[ $OS == "Darwin" ]]
 then
   default_dev=$(netstat -rnf inet | awk '/^default/{print $NF}')
@@ -166,6 +166,7 @@ function createSandbox {
         ;;
     esac
   done
+  set -x
 
   if [[ -z $tykVersion ]]
   then
