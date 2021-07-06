@@ -2,7 +2,7 @@
 
 ## Quickly create a sandbox image that runs a specific version of tyk.
 
-Should be really simple to get started on Linux and MacOS
+Should be really simple to get started on Linux and MacOS. Checkout this repo.
 
 ### Quick start guide
 
@@ -130,3 +130,4 @@ To get help on various options
 ## WSL setup
 
 * Follow [this to setup your WSL](https://nickjanetakis.com/blog/setting-up-docker-for-windows-and-wsl-to-work-flawlessly) to interface for docker desktop
+* Checkout this repo and read the quickstart
