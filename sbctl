@@ -129,12 +129,12 @@ function buildImage {
     rm $rpm
   done
   ./get-rpms -g $tykVersion
-  if ! \ls -1 | grep tyk-gateway
+  if ! \ls -1 | grep -q tyk-gateway
   then
     echo "[FATAL]Unable to fetch version $tykVersion" 1>&2
     exit 1
   fi
-  cd -
+  cd "$SCRIPTDIR"
   docker image build --tag tyk-sandbox:$tykVersion-$packageRev .
 }
 
