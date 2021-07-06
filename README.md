@@ -2,7 +2,8 @@
 
 ## Quickly create a sandbox image that runs a specific version of tyk.
 
-Should be really simple to get started on Linux and MacOS. Checkout this repo.
+* Should be really simple to get started on Linux and MacOS. 
+* Checkout this repo.
 
 ### Quick start guide
 
