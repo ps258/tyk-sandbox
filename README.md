@@ -5,6 +5,11 @@
 * Should be really simple to get started on Linux and MacOS. 
 * Checkout this repo.
 
+## WSL setup
+
+* Follow [this to setup your WSL](https://nickjanetakis.com/blog/setting-up-docker-for-windows-and-wsl-to-work-flawlessly) to interface for docker desktop
+* Checkout this repo and read the quickstart
+
 ### Quick start guide
 
 Before creating a first sandbox image list the version the script knows about
@@ -128,7 +133,4 @@ To get help on various options
       ./sbctl [start|stop|restart|rm] <index number...>
               take the action named on the listed sandboxes
 
-## WSL setup
 
-* Follow [this to setup your WSL](https://nickjanetakis.com/blog/setting-up-docker-for-windows-and-wsl-to-work-flawlessly) to interface for docker desktop
-* Checkout this repo and read the quickstart
