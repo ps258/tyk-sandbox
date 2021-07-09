@@ -146,7 +146,10 @@ function buildImage {
   cd "$SCRIPTDIR/assets/rpms/tyk"
   for rpm in tyk*.rpm
   do
-    rm $rpm
+    if [[ -e $rpm ]]
+    then
+      rm $rpm
+    fi
   done
   ./get-rpms -g $tykVersion
   if ! \ls -1 | grep -q tyk-gateway

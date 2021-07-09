@@ -3,8 +3,8 @@ EXPOSE 3000
 EXPOSE 8080
 COPY assets /assets
 
-RUN chmod +x /assets/ubi/os-setup \
-  && /assets/ubi/os-setup
+RUN chmod +x /assets/baseOS/os-setup \
+  && /assets/baseOS/os-setup
 
 RUN chmod +x /assets/rpms/install-tyk \
 	&& /assets/rpms/install-tyk \

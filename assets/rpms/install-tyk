@@ -1,5 +1,29 @@
 #!/bin/bash
 cd $(dirname $0)
-yum --disablerepo=* localinstall -y deps/*.rpm tyk/*.rpm
-rm deps/*.rpm tyk/*.rpm
-yum clean all
+
+dep_rpmlist=""
+for rpm in deps/*.rpm 
+do
+  if [[ -f $rpm ]]
+  then
+    dep_rpmlist="$dep_rpmlist $rpm"
+  fi
+done
+if [[ -n $dep_rpmlist ]]
+then
+  yum --disablerepo=* localinstall -y $dep_rpmlist
+fi
+
+tyk_rpmlist=""
+for rpm in tyk/*.rpm
+do
+  if [[ -f $rpm ]]
+  then
+    rpm=$(echo $(basename $rpm) | cut -dx -f1 | sed 's/\.$//')
+    tyk_rpmlist="$tyk_rpmlist $rpm"
+  fi
+done
+if [[ -n $tyk_rpmlist ]]
+then
+  yum install -y $tyk_rpmlist
+fi
