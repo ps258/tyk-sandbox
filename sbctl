@@ -309,7 +309,7 @@ case $1 in
     # Create a docker sandbox with the given parameters
     createSandbox "$@"
     ;;
-  list)
+  info|list)
     if [[ $# -gt 1 ]]
     then
       shift
