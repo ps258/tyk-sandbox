@@ -7,10 +7,17 @@ OS=$(uname -s)
 DashboardBasePort=3001
 GatewayBasePort=8081
 SCRIPTDIR=$(dirname "$SCRIPTNAME")
+VERSIONFILE=$SCRIPTDIR/tyk-versions.list
 
 # directories shared into all sandboxes to allow for plugins and certs to be installed easily
 SandboxPluginDir=~/tyk/plugins
 SandboxCertDir=~/tyk/certs
+
+typeset -A GATEWAY
+typeset -A DASHBOARD
+typeset -A TIB
+typeset -A PUMP
+typeset -A SYNC
 
 #find the local IP address (use the interface of the default route)
 if [[ $OS == "Linux" ]]
@@ -50,6 +57,82 @@ function help {
   echo "        take the action named on the listed sandboxes"
 }
 
+# touch files correspoinding to the versions that need to be installed so that the installer can install them
+function touchRPMs {
+  typeset version; typeset gwVers; typeset dshbVers; typeset pumpVers
+  typeset TIBvers; typeset syncVers; typeset oldFile
+  typeset rpmDir="$SCRIPTDIR"/assets/rpms/tyk
+  version=$1
+  if [[ ${GATEWAY[$version]+_} ]]
+  then
+    gwVers=${GATEWAY[$version]}
+    dshbVers=${DASHBOARD[$gwVers]}
+    TIBvers=${TIB[$gwVers]}
+    pumpVers=${PUMP[$gwVers]}
+    syncVers=${SYNC[$gwVers]}
+  else
+    echo "[FATAL]Gateway version $version isn't configured $VERSIONFILE"
+    exit 1
+  fi
+  for oldFile in "$rpmDir"/tyk-gateway-* "$rpmDir"/tyk-dashboard-* "$rpmDir"/tyk-pump-* "$rpmDir"/tyk-identity-broker-* "$rpmDir"/tyk-sync-*
+  do
+    if [[ -f "$oldFile" ]]
+    then
+      rm -f "$oldFile"
+    fi
+  done
+  touch "$rpmDir/tyk-gateway-$gwVers"
+  touch "$rpmDir/tyk-dashboard-$dshbVers"
+  touch "$rpmDir/tyk-pump-$pumpVers"
+  if [[ -n $TIBvers ]]
+  then
+    touch "$rpmDir/tyk-identity-broker-$TIBvers"
+  fi
+  if [[ -n $syncVers ]]
+  then
+    touch "$rpmDir/tyk-sync-$syncVers"
+  fi
+}
+
+
+# list the version relationships we know about
+function listversions {
+  typeset gwVers; typeset version
+  for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV)
+  do
+    gwVers=${GATEWAY[$version]}
+    echo "Version:   $version"
+    echo "    Gateway:   $gwVers"
+    [[ ${DASHBOARD[$gwVers]+_} ]] && echo "    Dashboard: ${DASHBOARD[$gwVers]}"
+    [[ ${TIB[$gwVers]+_} ]] && echo "    TIB:       ${TIB[$gwVers]}"
+    [[ ${PUMP[$gwVers]+_} ]] && echo "    Pump:      ${PUMP[$gwVers]}"
+  done
+}
+
+# isolated to keep IFS from leaking
+function loadVersions {
+  typeset line; typeset IFS; typeset gwVers; typeset dshbVers; typeset pumpVers
+  typeset TIBvers; typeset syncVers; typeset version
+  line=$1
+  IFS=,
+  echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers
+  GATEWAY[$version]=$gwVers
+  DASHBOARD[$gwVers]=$dshbVers
+  PUMP[$gwVers]=$pumpVers
+  TIB[$gwVers]=$TIBvers
+  SYNC[$gwVers]=$syncVers
+}
+
+# Load the versions of the products that go together
+function loadVersionFile {
+  typeset line; typeset versionFile
+  for line in $(awk 'NF && !/#/' $VERSIONFILE)
+  do
+    loadVersions "$line"
+  done
+}
+
+# Report the details of a sandbox container
 function getSandboxInfo {
   typeset index
   index=$1
@@ -59,6 +142,7 @@ function getSandboxInfo {
   echo
 }
 
+# Loop through all the sandboxes
 function getAllSandboxInfo {
   typeset existing
   typeset index
@@ -102,14 +186,15 @@ function nextFreeContainer {
   done
 }
 
+# invoke docker image build with all the right details
 function buildImage {
   typeset arg; typeset tykVersion; typeset tykVersion
-  typeset rpm; typeset packageRev
+  typeset rpm; typeset packageRev; typeset arg; typeset OPTARG
   while getopts :lv:r: arg
   do
     case $arg in 
       l)
-        "$SCRIPTDIR/assets/rpms/tyk/get-rpms" -l
+        listversions
         exit 0
         ;;
       r)
@@ -128,7 +213,6 @@ function buildImage {
         ;;
     esac
   done
-
   if [[ -z $tykVersion ]]
   then
     echo "[FATAL]Must specify a version to build" 1>&2
@@ -140,31 +224,27 @@ function buildImage {
   fi
   if docker image list tyk-sandbox | grep -qw $tykVersion-$packageRev
   then
-    echo "[FATAL]There is an image with that version already" 1>&2
+    echo "[FATAL]Image version $tykVersion-$packageRev aready built" 1>&2
     exit 1
   fi
-  cd "$SCRIPTDIR/assets/rpms/tyk"
-  for rpm in tyk*.rpm
+  for rpm in "$SCRIPTDIR"/assets/rpms/tyk/tyk*.rpm
   do
     if [[ -e $rpm ]]
     then
       rm $rpm
     fi
   done
-  ./get-rpms -g $tykVersion
-  if ! \ls -1 | grep -q tyk-gateway
-  then
-    echo "[FATAL]Unable to fetch version $tykVersion" 1>&2
-    exit 1
-  fi
   cd "$SCRIPTDIR"
+  touchRPMs $tykVersion
   docker image build --tag tyk-sandbox:$tykVersion-$packageRev .
 }
 
+# invoke docker container create and start with everything set
 function createSandbox {
   typeset index; typeset list; typeset ticket; typeset tykVersion; typeset env_file
   typeset containerName; typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort
   typeset label; typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap
+  typeset arg; typeset OPTARG
   while getopts :ni:v:t: arg
   do
     case $arg in
@@ -264,8 +344,8 @@ function createSandbox {
   fi
 }
 
+# list the sandboxes in a standard format.
 function listNames {
-  # list the names of sandboxes in a standard format.
   typeset name; typeset list
   if [[ $1 == "ALL" ]]
   then
@@ -283,12 +363,14 @@ function listNames {
   fi
 }
 
-
 if [[ $# -lt 1 ]]
 then
   help
   exit 1
 fi
+
+# load the details of what version of what goes with what
+loadVersionFile
 
 case $1 in
   rm|stop|start|restart)

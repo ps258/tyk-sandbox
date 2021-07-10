@@ -1,6 +1,8 @@
 #!/bin/ksh
 
 SCRIPTNAME=$0
+SCRIPTDIR=$(dirname "$SCRIPTNAME")
+VERSIONFILE=$SCRIPTDIR/tyk-versions.list
 
 function help {
   echo "[USAGE] $SCRIPTNAME -g tyk-version -h"
@@ -19,71 +21,28 @@ typeset -A GATEWAY
 typeset -A DASHBOARD
 typeset -A TIB
 typeset -A PUMP
+typeset -A SYNC
 
-# load the version for each gateway
-# 3.2
-GATEWAY["3.2.1"]="3.2.1-1"
-DASHBOARD["3.2.1-1"]="3.2.1-1"
-PUMP["3.2.1-1"]="1.4.0-1"
+function loadVersions {
+  typeset line; typeset IFS; typeset gwVers; typeset dshbVers; typeset pumpVers
+  typeset TIBvers; typeset syncVers
+  line=$1
+  IFS=,
+  echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers
+  GATEWAY[$version]=$gwVers
+  DASHBOARD[$gwVers]=$dshbVers
+  PUMP[$gwVers]=$pumpVers
+  TIB[$gwVers]=$TIBvers
+  SYNC[$gwVers]=$syncVers
+}
 
-# 3.1
-# 3.1.2
-GATEWAY["3.1.2"]="3.1.2-1"
-DASHBOARD["3.1.2-1"]="3.1.2-1"
-PUMP["3.1.2-1"]="1.3.0-1"
-# 3.1.1
-GATEWAY["3.1.1"]="3.1.1-1"
-DASHBOARD["3.1.1-1"]="3.1.1-1"
-PUMP["3.1.1-1"]="1.3.0-1"
-
-# 3.0
-# 3.0.7
-GATEWAY["3.0.7"]="3.0.7~rc22-1"
-DASHBOARD["3.0.7~rc22-1"]="3.0.6-1"
-PUMP["3.0.7~rc22-1"]="1.3.0-1"
-# 3.0.6
-GATEWAY["3.0.6"]="3.0.6-1"
-DASHBOARD["3.0.6-1"]="3.0.6-1"
-PUMP["3.0.6-1"]="1.3.0-1"
-# 3.0.5 (note that the 3.0.5 dashboard was pulled
-GATEWAY["3.0.5"]="3.0.5-1"
-DASHBOARD["3.0.5-1"]="3.0.4-1"
-PUMP["3.0.5-1"]="1.3.0-1"
-# 3.0.4
-GATEWAY["3.0.4"]="3.0.4-1"
-DASHBOARD["3.0.4-1"]="3.0.4-1"
-PUMP["3.0.4-1"]="1.3.0-1"
-# 3.0.3
-GATEWAY["3.0.3"]="3.0.3-1"
-DASHBOARD["3.0.3-1"]="3.0.3-1"
-PUMP["3.0.3-1"]="1.3.0-1"
-# 3.0.2
-GATEWAY["3.0.2"]="3.0.2-1"
-DASHBOARD["3.0.2-1"]="3.0.2-1"
-PUMP["3.0.2-1"]="1.3.0-1"
-# 3.0.1
-GATEWAY["3.0.1"]="3.0.1-1"
-DASHBOARD["3.0.1-1"]="3.0.1-1"
-PUMP["3.0.1-1"]="1.3.0-1"
-
-# 2.9
-# 2.9.4.3
-GATEWAY["2.9.4.3"]="2.9.4.3-1"
-DASHBOARD["2.9.4.3-1"]="1.9.4.3-1"
-TIB["2.9.4.3-1"]="0.7.2-1"
-PUMP["2.9.4.3-1"]="0.8.5.1-1"
-# 2.9.5
-GATEWAY["2.9.5"]="2.9.5-1"
-DASHBOARD["2.9.5-1"]="1.9.5-1"
-TIB["2.9.5-1"]="0.7.2-1"
-PUMP["2.9.5-1"]="0.8.5.1-1"
-
-# 2.8
-GATEWAY["2.8.7"]="2.8.7-1"
-DASHBOARD["2.8.7-1"]="1.8.6-1"
-TIB["2.8.7-1"]="0.7.1-1"
-PUMP["2.8.7-1"]="0.6.0-1"
-
+function loadVersionFile {
+  typeset line
+  for line in $(awk 'NF && !/#/' $VERSIONFILE)
+  do
+    loadVersions "$line"
+  done
+}
 
 function listversions {
   typeset gwVersion
@@ -97,15 +56,11 @@ function listversions {
     [[ ${PUMP[$gwVersion]+_} ]] && echo "    Pump:      ${PUMP[$gwVersion]}"
   done
 }
+
 function download {
   typeset rpm=$1
   typeset url=$2
-  touch $rpm
-}
-
-function Olddownload {
-  typeset rpm=$1
-  typeset url=$2
+  echo "[INFO]Downloading $rpm from $url"
   if [[ ! -f $rpm ]]
   then
     curl -sL $url --output $rpm
@@ -120,6 +75,8 @@ function Olddownload {
     echo "[WARN]$rpm already exists"
   fi
 }
+
+loadVersionFile
 
 while getopts :g:hl arg
 do
