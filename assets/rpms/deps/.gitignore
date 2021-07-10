@@ -1,4 +1,2 @@
-# Ignore everything in this directory
-*.rpm
 # Except this file
 !.gitignore

@@ -19,7 +19,7 @@ for rpm in tyk/*
 do
   if [[ -f $rpm ]]
   then
-    tyk_rpmlist="$tyk_rpmlist $rpm"
+    tyk_rpmlist="$tyk_rpmlist $(basename $rpm)"
   fi
 done
 if [[ -n $tyk_rpmlist ]]
