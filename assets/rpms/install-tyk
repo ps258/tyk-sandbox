@@ -15,11 +15,10 @@ then
 fi
 
 tyk_rpmlist=""
-for rpm in tyk/*.rpm
+for rpm in tyk/*
 do
   if [[ -f $rpm ]]
   then
-    rpm=$(echo $(basename $rpm) | cut -dx -f1 | sed 's/\.$//')
     tyk_rpmlist="$tyk_rpmlist $rpm"
   fi
 done
