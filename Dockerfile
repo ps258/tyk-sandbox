@@ -1,10 +1,7 @@
-FROM centos:7
+FROM tbi:latest
 EXPOSE 3000
 EXPOSE 8080
 COPY assets /assets
-
-RUN chmod +x /assets/baseOS/os-setup \
-  && /assets/baseOS/os-setup
 
 RUN chmod +x /assets/rpms/install-tyk \
 	&& /assets/rpms/install-tyk \
@@ -17,5 +14,6 @@ COPY assets/pump.conf /opt/tyk-pump/
 COPY assets/tib.conf /opt/tyk-identity-broker/
 
 RUN chmod +x /scripts/*
+RUN rm /tbi.sh
 
 ENTRYPOINT ["/scripts/startup.sh"]

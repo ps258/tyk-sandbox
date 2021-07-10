@@ -1,0 +1,22 @@
+#!/bin/bash
+
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
+cp /assets/baseOS/vimrc /root/.vimrc
+# copy repos into place
+for repo in /assets/baseOS/repos/*.repo
+do
+  if [[ -f $repo ]]
+  then
+    cp $repo /etc/yum.repos.d/
+  fi
+done
+
+useradd -c 'Tyk service user' -m -s /sbin/nologin tyk
+# make directories for the volumes
+mkdir -m 750 -p /opt/tyk-plugins /opt/tyk-certificates
+chown tyk:tyk /opt/tyk-plugins /opt/tyk-certificates
+yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm deltarpm
+yum install -y procps-ng iputils net-tools.x86_64 vim-enhanced.x86_64 wget curl python3 # golang.x86_64
+pip3 install --upgrade pip
+yum install -y jemalloc.x86_64 logrotate.x86_64 make.x86_64 openssl.x86_64 mongodb-org.x86_64 redis
