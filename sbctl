@@ -251,7 +251,7 @@ function buildImage {
   touchRPMs $tykVersion
   if ! docker image list tbi | grep -qw latest
   then
-    cd tbi
+    cd "$SCRIPTDIR/tbi"
     docker image build --tag tbi:latest .
   fi
   cd "$SCRIPTDIR"
