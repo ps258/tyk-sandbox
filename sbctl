@@ -434,7 +434,8 @@ case $1 in
     ;;
   image*)
     # list the tyk-sandbox docker images
-    docker image list tyk-sandbox
+    # note the almost magical pipe feature of awk used here.
+    docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
     ;;
   help)
     help

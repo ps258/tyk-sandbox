@@ -3,9 +3,8 @@ EXPOSE 3000
 EXPOSE 8080
 COPY assets /assets
 
-RUN chmod +x /assets/rpms/install-tyk \
-	&& /assets/rpms/install-tyk \
-	&& mkdir -p /data/db
+RUN chmod +x /assets/rpms/install-tyk && mkdir -p /data/db
+RUN /assets/rpms/install-tyk
 
 COPY scripts /scripts
 COPY assets/tyk_analytics.conf /opt/tyk-dashboard/
