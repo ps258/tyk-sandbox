@@ -6,7 +6,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 OS=$(uname -s)
 DashboardBasePort=3001
 GatewayBasePort=8081
-SCRIPTDIR=$(dirname "$SCRIPTNAME")
+SCRIPTDIR=$(cd $(dirname $SCRIPTNAME);echo $PWD)
 VERSIONFILE=$SCRIPTDIR/tyk-versions.list
 
 # directories shared into all sandboxes to allow for plugins and certs to be installed easily
@@ -241,20 +241,13 @@ function buildImage {
     echo "[FATAL]Image version $tykVersion-$packageRev aready built" 1>&2
     return
   fi
-  for rpm in "$SCRIPTDIR"/assets/rpms/tyk/tyk*.rpm
-  do
-    if [[ -e $rpm ]]
-    then
-      rm $rpm
-    fi
-  done
-  touchRPMs $tykVersion
   if ! docker image list tbi | grep -qw latest
   then
     cd "$SCRIPTDIR/tbi"
     docker image build --tag tbi:latest .
   fi
   cd "$SCRIPTDIR"
+  touchRPMs $tykVersion
   docker image build --tag tyk-sandbox:$tykVersion-$packageRev .
 }
 
