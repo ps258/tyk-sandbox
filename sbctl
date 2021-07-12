@@ -313,12 +313,12 @@ function createSandbox {
   label=$containerName
   dashboardURL=http://$hostFQDN:$dashboardPort/
   gatewayURL=https://$hostFQDN:$gatewayPort/
-  if ls -1 assets/rpms/tyk | grep -qw tyk-identity-broker
+  # only configure TIB if gateway version is in the 2 series
+  if echo $tykVersion | egrep -q '^2'
   then
     TIBPort=$((4010+$offset))
     tibURL=http://$hostFQDN:$TIBPort/
   fi
-
   # Create a directory just for this version to hold plugins
   for dir in "$SandboxPluginDir" "$SandboxCertDir"
   do
