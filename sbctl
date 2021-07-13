@@ -403,7 +403,7 @@ case $1 in
     # Create a docker sandbox with the given parameters
     createSandbox "$@"
     ;;
-  info|list)
+  info|list|status)
     if [[ $# -gt 1 ]]
     then
       shift

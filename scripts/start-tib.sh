@@ -6,9 +6,9 @@ command=/opt/tyk-identity-broker/tyk-identity-broker
 conf=/opt/tyk-identity-broker/tib.conf
 log=/var/log/tyk_identity_broker.log
 
-if [[ ! -d /opt/tyk-identity-broker/ ]]
+if [[ ! -e $command ]]
 then
-  echo "TIB not installed"
+  echo "TIB not installed in $command"
   exit 0
 fi
 

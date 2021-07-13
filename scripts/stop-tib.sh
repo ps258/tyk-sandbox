@@ -6,9 +6,9 @@ process=tyk-identity-broker
 count=0
 maxWait=11
 
-if [[ ! -d /opt/tyk-identity-broker/ ]]
+if [[ ! -e $command ]]
 then
-  echo "TIB not installed"
+  echo "TIB not installed in $command"
   exit 0
 fi
 
