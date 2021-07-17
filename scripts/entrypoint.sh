@@ -25,10 +25,10 @@ fi
 #grep -q $TYK_GW_HOST /etc/hosts || echo "127.0.0.1 $TYK_GW_HOST" >> /etc/hosts
 
 echo "[INFO]Starting Redis"
-/usr/bin/redis-server /etc/redis.conf --daemonize yes
+/scripts/start-redis.sh
 
 echo "[INFO]Starting mongoDB"
-/usr/bin/mongod --fork --logpath /var/log/mongod.log --smallfiles
+/scripts/start-mongo.sh
 
 echo "[INFO]Starting Tyk dashboard"
 /scripts/start-dashboard.sh
