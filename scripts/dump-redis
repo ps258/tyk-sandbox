@@ -1,0 +1,31 @@
+#!/bin/bash
+
+REDIS_KEY_PATTERN="${REDIS_KEY_PATTERN:-*}"
+for key in $(redis-cli --scan --pattern "$REDIS_KEY_PATTERN")
+do
+    type=$(redis-cli type $key)
+    echo "$key ($type) => "
+    case $type in
+      list)
+        redis-cli lrange $key 0 -1 | sed 's/^/  /'
+        ;;
+      hash)
+        redis-cli hgetall $key | sed 's/^/  /'
+        ;;
+      zset)
+        redis-cli zrange $key 0 -1 withscores| sed 's/^/  /'
+        ;;
+      string)
+        if redis-cli get $key | egrep -q '^{'
+        then
+          redis-cli get $key | jq .
+        else
+          redis-cli get $key
+        fi
+        ;;
+      *)
+        echo "[WARN]Unknown type $type"
+        redis-cli get $key
+        ;;
+    esac
+done
