@@ -7,9 +7,9 @@ echo "Image starting: $1"
 if [[ ! -f /initialised ]]
 then
   echo "[INFO]Setting gateway host and port in tyk_analytics.conf"
-  sed -i "s/TYK_GW_PORT/$TYK_GW_PORT/g" /opt/tyk-dashboard/tyk_analytics.conf
-  sed -i "s/TYK_GW_HOST/$TYK_GW_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
-  sed -i "s/TYK_DSHB_HOST/$TYK_DSHB_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
+  sed -i "s/SBX_GW_PORT/$SBX_GW_PORT/g" /opt/tyk-dashboard/tyk_analytics.conf
+  sed -i "s/SBX_GW_HOST/$SBX_GW_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
+  sed -i "s/SBX_DSHB_HOST/$SBX_DSHB_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
   echo "[INFO]Generating tyk private keys"
   openssl genrsa -out /privkey.pem 2048
   openssl rsa -in /privkey.pem -pubout -out /pubkey.pem
@@ -22,7 +22,7 @@ then
   fi
 fi
 
-#grep -q $TYK_GW_HOST /etc/hosts || echo "127.0.0.1 $TYK_GW_HOST" >> /etc/hosts
+#grep -q $SBX_GW_HOST /etc/hosts || echo "127.0.0.1 $SBX_GW_HOST" >> /etc/hosts
 
 echo "[INFO]Starting Redis"
 /scripts/start-redis.sh

@@ -31,29 +31,33 @@ then
 fi
 
 function help {
+  typeset name
+  name=$(basename $SCRIPTNAME)
   echo "[USAGE]:"
-  echo "$SCRIPTNAME build -l | -v tyk-gateway-version-number [-r image version]"
+  echo "$name build -l | -v tyk-gateway-version-number [-r image version]"
   echo "        builds a sandbox image for that version if its not already available"
   echo "        -v version to build"
   echo "        -r package revision"
   echo "        -l list versions that images can be made for (incompatible with -v and -r)"
-  echo "$SCRIPTNAME create -v tyk-version [-t ticket no] [-i index-number] [-n]"
+  echo "$name create -v tyk-version [-t ticket no] [-i index-number] [-n]"
   echo "        -i index number (skip for autoallocation of the next free)"
   echo "        -n IGNORE ~/.tyk-sandbox even if it exists"
   echo "           You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:"
   echo "           These will be used when -n is NOT present"
-  echo "           TYK_LICENSE=licence string"
-  echo "           TYK_USER=user email"
-  echo "           TYK_PASSWORD=password"
+  echo "           SBX_LICENSE=licence string"
+  echo "           SBX_USER=user email"
+  echo "           SBX_PASSWORD=rotated_password"
+  echo "           Note: create a rotated password with:"
+  echo "               echo password | tr '\!-~' 'P-~\!-O'"
   echo "        -t ticket or comment field"
   echo "        -v tyk version of sandbox image. Defaults to 'latest'"
-  echo "$SCRIPTNAME images"
+  echo "$name images"
   echo "        list the docker images for creating sandboxes"
-  echo "$SCRIPTNAME list <index number...>"
+  echo "$name list <index number...>"
   echo "        details about the named sandbox or all"
-  echo "$SCRIPTNAME script <index number...>"
+  echo "$name script <index number...>"
   echo "        run a shell in the sandboxes named"
-  echo "$SCRIPTNAME [start|stop|restart|rm] <index number...>"
+  echo "$name [start|stop|restart|rm] <index number...>"
   echo "        take the action named on the listed sandboxes"
 }
 
@@ -336,9 +340,9 @@ function createSandbox {
   docker container create --name $containerName \
     --publish $dashboardPort:3000 \
     --publish $gatewayPort:8080 \
-    --env TYK_GW_PORT=$gatewayPort \
-    --env TYK_GW_HOST=$hostFQDN \
-    --env TYK_DSHB_HOST=$hostFQDN $env_file\
+    --env SBX_GW_PORT=$gatewayPort \
+    --env SBX_GW_HOST=$hostFQDN \
+    --env SBX_DSHB_HOST=$hostFQDN $env_file\
     --label sandbox.label=$label \
     --label sandbox.version=$tykVersion \
     --label sandbox.dashurl=$dashboardURL \
