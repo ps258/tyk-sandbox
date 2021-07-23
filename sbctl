@@ -319,7 +319,7 @@ function createSandbox {
   if echo $tykVersion | egrep -q '^2'
   then
     TIBPort="--publish $(($TIBBasePort+$offset)):3010"
-    tibURL="--label sandbox.tiburl=http://$hostFQDN:$TIBPort/"
+    tibURL="--label sandbox.tiburl=http://$hostFQDN:$(($TIBBasePort+$offset))/"
   fi
   # Create a directory just for this version to hold plugins
   for dir in "$SandboxPluginDir" "$SandboxCertDir"
