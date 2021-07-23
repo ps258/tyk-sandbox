@@ -5,7 +5,10 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
 OS=$(uname -s)
 DashboardBasePort=3001
-GatewayBasePort=8081
+TIBBasePort=4001
+GatewayBasePort=5001
+RedisBasePort=6001
+MongoBasePort=7001
 SCRIPTDIR=$(cd $(dirname $SCRIPTNAME);echo $PWD)
 VERSIONFILE=$SCRIPTDIR/tyk-versions.list
 
@@ -260,7 +263,7 @@ function createSandbox {
   typeset index; typeset list; typeset ticket; typeset tykVersion; typeset env_file
   typeset containerName; typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort
   typeset label; typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap
-  typeset arg; typeset OPTARG
+  typeset arg; typeset OPTARG; typeset redisPort; typeset mongoPort
   while getopts :ni:v:t: arg
   do
     case $arg in
@@ -306,6 +309,8 @@ function createSandbox {
   hostFQDN=$IP_addr
   dashboardPort=$(($DashboardBasePort+$offset))
   gatewayPort=$(($GatewayBasePort+$offset))
+  redisPort=$(($RedisBasePort+$offset))
+  mongoPort=$(($MongoBasePort+$offset))
   containerName=sandbox-$index
   label=$containerName
   dashboardURL=http://$hostFQDN:$dashboardPort/
@@ -313,8 +318,8 @@ function createSandbox {
   # only configure TIB if gateway version is in the 2 series
   if echo $tykVersion | egrep -q '^2'
   then
-    TIBPort=$((4010+$offset))
-    tibURL=http://$hostFQDN:$TIBPort/
+    TIBPort="--publish $(($TIBBasePort+$offset)):3010"
+    tibURL="--label sandbox.tiburl=http://$hostFQDN:$TIBPort/"
   fi
   # Create a directory just for this version to hold plugins
   for dir in "$SandboxPluginDir" "$SandboxCertDir"
@@ -340,14 +345,21 @@ function createSandbox {
   docker container create --name $containerName \
     --publish $dashboardPort:3000 \
     --publish $gatewayPort:8080 \
+    --publish $redisPort:6379 \
+    --publish $mongoPort:27017 \
+    $TIBPort \
     --env SBX_GW_PORT=$gatewayPort \
     --env SBX_GW_HOST=$hostFQDN \
-    --env SBX_DSHB_HOST=$hostFQDN $env_file\
+    --env SBX_DSHB_HOST=$hostFQDN \
+    $env_file \
     --label sandbox.label=$label \
     --label sandbox.version=$tykVersion \
     --label sandbox.dashurl=$dashboardURL \
     --label sandbox.ticket="$ticket" \
     --label sandbox.gateurl=$gatewayURL \
+    --label sandbox.redis="redis-cli -h $hostFQDN -p $redisPort" \
+    --label sandbox.mongo="mongo --quiet --host $hostFQDN --port $mongoPort" \
+    $tibURL \
     --label sandbox.index=$index \
     --volume $SandboxPluginDir/$tykVersion:/opt/tyk-plugins \
     tyk-sandbox:$tykVersion

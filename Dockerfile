@@ -1,6 +1,8 @@
 FROM tbi:latest
 EXPOSE 3000
 EXPOSE 8080
+EXPOSE 6379
+EXPOSE 27017
 COPY assets /assets
 
 RUN chmod +x /assets/rpms/install-tyk && mkdir -p /data/db
