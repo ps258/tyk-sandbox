@@ -1,9 +1,9 @@
 FROM centos:7
 
-COPY assets /assets
+COPY baseOS /baseOS
 COPY tbi.sh /tbi.sh
 
-RUN chmod +x /assets/baseOS/os-setup /tbi.sh \
-  && /assets/baseOS/os-setup
+RUN chmod +x /baseOS/os-setup /tbi.sh \
+  && /baseOS/os-setup
 
 ENTRYPOINT ["/tbi.sh"]
