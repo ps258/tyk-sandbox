@@ -2,9 +2,9 @@
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
-cp /assets/baseOS/vimrc /root/.vimrc
+cp /baseOS/vimrc /root/.vimrc
 # copy repos into place
-for repo in /assets/baseOS/repos/*.repo
+for repo in /baseOS/repos/*.repo
 do
   if [[ -f $repo ]]
   then
