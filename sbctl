@@ -110,9 +110,9 @@ function listversions {
     gwVers=${GATEWAY[$version]}
     echo "Version:   $version"
     echo "    Gateway:   $gwVers"
-    [[ ${DASHBOARD[$gwVers]+_} ]] && echo "    Dashboard: ${DASHBOARD[$gwVers]}"
-    [[ ${TIB[$gwVers]+_} ]] && echo "    TIB:       ${TIB[$gwVers]}"
-    [[ ${PUMP[$gwVers]+_} ]] && echo "    Pump:      ${PUMP[$gwVers]}"
+    [[ -n ${DASHBOARD[$gwVers]} ]] && echo "    Dashboard: ${DASHBOARD[$gwVers]}"
+    [[ -n ${TIB[$gwVers]} ]] && echo "    TIB:       ${TIB[$gwVers]}"
+    [[ -n ${PUMP[$gwVers]} ]] && echo "    Pump:      ${PUMP[$gwVers]}"
   done
 }
 
@@ -260,7 +260,7 @@ function buildImage {
 
 # invoke docker container create and start with everything set
 function createSandbox {
-  typeset index; typeset list; typeset ticket; typeset tykVersion; typeset env_file
+  typeset index; typeset list; typeset ticket; typeset imageVersion; typeset env_file
   typeset containerName; typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort
   typeset label; typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap
   typeset arg; typeset OPTARG; typeset redisPort; typeset mongoPort
@@ -277,7 +277,7 @@ function createSandbox {
         ticket="$OPTARG"
         ;;
       v)
-        tykVersion=$OPTARG
+        imageVersion=$OPTARG
         ;;
       :)
         echo "Option -$OPTARG requires an arguement."
@@ -290,9 +290,14 @@ function createSandbox {
     esac
   done
 
-  if [[ -z $tykVersion ]]
+  if [[ -z $imageVersion ]]
   then
-    tykVersion=latest
+    imageVersion=latest
+  fi
+  if ! docker image inspect tyk-sandbox:$imageVersion > /dev/null 2>&1
+  then
+    echo "[WARN]tyk-sandbox:$imageVersion does not exist. Did you intend to build and image not create a container?"
+    exit 1
   fi
 
   if [[ -z $ticket ]]
@@ -316,7 +321,7 @@ function createSandbox {
   dashboardURL=http://$hostFQDN:$dashboardPort/
   gatewayURL=https://$hostFQDN:$gatewayPort/
   # only configure TIB if gateway version is in the 2 series
-  if echo $tykVersion | egrep -q '^2'
+  if echo $imageVersion | egrep -q '^2'
   then
     TIBPort="--publish $(($TIBBasePort+$offset)):3010"
     tibURL="--label sandbox.tiburl=http://$hostFQDN:$(($TIBBasePort+$offset))/"
@@ -329,10 +334,10 @@ function createSandbox {
       mkdir -p "$dir"
     fi
   done
-  if [[ $tykVersion != "latest" && ! -d $SandboxPluginDir/$tykVersion ]]
+  if [[ $imageVersion != "latest" && ! -d $SandboxPluginDir/$imageVersion ]]
   then
-    echo "[WARN]Creating $SandboxPluginDir/$tykVersion: It will be empty"
-    mkdir -p $SandboxPluginDir/$tykVersion
+    echo "[WARN]Creating $SandboxPluginDir/$imageVersion: It will be empty"
+    mkdir -p $SandboxPluginDir/$imageVersion
   fi
   # load username, password and licence if they stored in ~/.tyk-sandbox
   if [[ -z $noBootstrap && -f ~/.tyk-sandbox ]]
@@ -354,7 +359,7 @@ function createSandbox {
     --env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/scripts:/opt/tyk-sync \
     $env_file \
     --label sandbox.label=$label \
-    --label sandbox.version=$tykVersion \
+    --label sandbox.version=$imageVersion \
     --label sandbox.dashurl=$dashboardURL \
     --label sandbox.ticket="$ticket" \
     --label sandbox.gateurl=$gatewayURL \
@@ -362,8 +367,8 @@ function createSandbox {
     --label sandbox.mongo="mongo --quiet --host $hostFQDN --port $mongoPort" \
     $tibURL \
     --label sandbox.index=$index \
-    --volume $SandboxPluginDir/$tykVersion:/opt/tyk-plugins \
-    tyk-sandbox:$tykVersion
+    --volume $SandboxPluginDir/$imageVersion:/opt/tyk-plugins \
+    tyk-sandbox:$imageVersion
   # --volume $SandboxCertDir:/opt/tyk-certificates
   if [[ $? -eq 0 ]]
   then
