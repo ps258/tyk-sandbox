@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REDIS_KEY_PATTERN="${REDIS_KEY_PATTERN:-*}"
+REDIS_KEY_PATTERN="${1:-*}"
 for key in $(redis-cli --scan --pattern "$REDIS_KEY_PATTERN")
 do
     type=$(redis-cli type $key)
