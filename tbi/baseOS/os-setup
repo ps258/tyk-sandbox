@@ -20,5 +20,7 @@ yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarc
 yum install -y procps-ng iputils net-tools.x86_64 vim-enhanced.x86_64 wget curl python3 jq # golang.x86_64
 pip3 install --upgrade pip
 yum install -y jemalloc.x86_64 logrotate.x86_64 make.x86_64 openssl.x86_64 mongodb-org.x86_64 redis
-# make mongodb listen on all interfaces
+# open redis and mongo up to the world! Beware!!!
 sed -i 's/bindIp/#bindIp/' /etc/mongod.conf
+sed -i 's/^protected-mode yes/protected-mode no/' /etc/redis.conf
+sed -i 's/^bind 127.0.0.1/#bind 127.0.0.1/' /etc/redis.conf
