@@ -310,6 +310,7 @@ function createSandbox {
   fi
 
   if [[ -z $logLevel ]]
+  then
     logLevel="debug"
   fi
 
