@@ -44,6 +44,7 @@ function help {
   echo "        -l list versions that images can be made for (incompatible with -v and -r)"
   echo "$name create -v tyk-version [-t ticket no] [-i index-number] [-n]"
   echo "        -i index number (skip for autoallocation of the next free)"
+  echo "        -l log level. Set to debug, info, error. Defaults to debug"
   echo "        -n IGNORE ~/.tyk-sandbox even if it exists"
   echo "           You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:"
   echo "           These will be used when -n is NOT present"
@@ -264,7 +265,7 @@ function createSandbox {
   typeset containerName; typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort
   typeset label; typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap
   typeset arg; typeset OPTARG; typeset redisPort; typeset mongoPort
-  while getopts :ni:v:t: arg
+  while getopts :ni:v:t:l: arg
   do
     case $arg in
       i)
@@ -278,6 +279,14 @@ function createSandbox {
         ;;
       v)
         imageVersion=$OPTARG
+        ;;
+      l)
+        logLevel=$OPTARG
+        if [[ $logLevel != "debug" && $logLevel != "warn" && $logLevel != "error" ]]
+        then
+          echo "loglevel must be one of 'debug', 'warn', 'error'"
+          exit 1
+        fi
         ;;
       :)
         echo "Option -$OPTARG requires an arguement."
@@ -298,6 +307,10 @@ function createSandbox {
   then
     echo "[WARN]tyk-sandbox:$imageVersion does not exist. Did you intend to build and image not create a container?"
     exit 1
+  fi
+
+  if [[ -z $logLevel ]]
+    logLevel="debug"
   fi
 
   if [[ -z $ticket ]]
@@ -353,6 +366,7 @@ function createSandbox {
     --publish $redisPort:6379 \
     --publish $mongoPort:27017 \
     $TIBPort \
+    --env TYK_LOGLEVEL=$logLevel \
     --env SBX_GW_PORT=$gatewayPort \
     --env SBX_GW_HOST=$hostFQDN \
     --env SBX_DSHB_HOST=$hostFQDN \
