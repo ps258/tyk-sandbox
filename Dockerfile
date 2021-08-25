@@ -5,8 +5,7 @@ EXPOSE 6379
 EXPOSE 27017
 COPY assets /assets
 
-RUN chmod +x /assets/rpms/install-tyk && mkdir -p /data/db
-RUN /assets/rpms/install-tyk
+RUN chmod +x /assets/rpms/install-tyk && mkdir -p /data/db && /assets/rpms/install-tyk
 
 COPY scripts /scripts
 COPY assets/tyk_analytics.conf /opt/tyk-dashboard/
@@ -14,7 +13,6 @@ COPY assets/tyk.conf /opt/tyk-gateway/
 COPY assets/pump.conf /opt/tyk-pump/
 COPY assets/tib.conf /opt/tyk-identity-broker/
 
-RUN chmod +x /scripts/*
-RUN rm /tbi.sh
+RUN chmod +x /scripts/* && rm /tbi.sh
 
 ENTRYPOINT ["/scripts/entrypoint.sh"]
