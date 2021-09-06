@@ -1,6 +1,5 @@
 syntax on
 set directory=/tmp
-set expandtab
 set hlsearch
 set tabstop=2 shiftwidth=2
 set incsearch
