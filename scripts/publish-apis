@@ -1,0 +1,53 @@
+#!/bin/bash
+
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
+function admin_access_key {
+	typeset key
+	typeset type
+	for key in $(redis-cli --scan --pattern "tyk-admin-api-*")
+	do
+		type=$(redis-cli type $key)
+		case $type in
+			string)
+				if redis-cli get $key | egrep -q '^{'
+				then
+					redis-cli get $key | jq .UserData.access_key | tr -d '"'
+					return
+				fi
+				;;
+		esac
+	done
+}
+
+function create_defn {
+	typeset APIfile
+	APIfile=$1
+	echo '  {'
+	echo '    "api_model": {},'
+	echo '	  "api_definition":' $(<$APIfile) ','
+	echo '	  "hook_references": [],'
+	echo '	  "is_site": false,'
+	echo '	  "sort_by": 0'
+	echo '}'
+}
+
+access_key=$(admin_access_key)
+
+for API in "$@"
+do
+	if grep -q api_definition $API
+	then
+		# deal with the files that are a copy and paste of the API JSON from the dashboard
+		echo curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$API
+		curl -X POST "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$API
+		echo
+	else
+		# deal with the files that are exported APIs from the dashboard
+		APIfilename=$(mktemp /tmp/$(basename $API).XXXXXX)
+		create_defn $API > $APIfilename
+		echo curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$APIfilename
+		curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$APIfilename
+		echo
+	fi
+done

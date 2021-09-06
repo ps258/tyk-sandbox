@@ -18,4 +18,6 @@ then
   echo Initial admin Password: $SBX_PASSWORD >> /initial_credentials.txt
 fi
 
+/scripts/publish-apis /assets/APIs/*.json
+
 touch /initialised 
