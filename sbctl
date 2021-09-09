@@ -305,7 +305,7 @@ function createSandbox {
   fi
   if ! docker image inspect tyk-sandbox:$imageVersion > /dev/null 2>&1
   then
-    echo "[WARN]tyk-sandbox:$imageVersion does not exist. Did you intend to build and image not create a container?"
+    echo "[WARN]tyk-sandbox:$imageVersion does not exist. Did you intend to 'build' an image not 'create' a container?"
     exit 1
   fi
 
