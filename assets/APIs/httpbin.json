@@ -1,6 +1,7 @@
 {
     "name": "httpbin",
     "use_keyless": true,
+		"auth": {},
     "version_data": {
       "not_versioned": true,
       "versions": {
