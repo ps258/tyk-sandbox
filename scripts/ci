@@ -1,4 +1,4 @@
-#!/bin/ksh -u
+#!/bin/bash -u
 
 # poor man's revision control. It makes a .revisions directory
 # and keeps a time stamped copy of the file there.
