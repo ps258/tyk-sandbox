@@ -161,13 +161,25 @@ function getAllSandboxInfo {
   done
 }
 
+# find the highest image rev
+function latestImageRev {
+  typeset version
+  typeset existing
+  version=$1
+  existing=$(docker image list tyk-sandbox | awk '$2 ~ /'$version'/ {print $2}' | sort -V | tail -1)
+  if [[ ! -z $existing ]]
+  then
+    echo $existing | cut -d- -f2
+  fi
+}
+
 # find the the highest image revision and add one
 function nextFreeImageRev {
   typeset version
   typeset existing
   typeset biggest
   version=$1
-  existing=$(docker image list tyk-sandbox | awk '$2 ~ /'$version'/ {print $2}' | sort -V | tail -1)
+  existing=$(latestImageRev $version)
   if [[ -z $existing ]]
   then
     echo 1
@@ -302,6 +314,12 @@ function createSandbox {
   if [[ -z $imageVersion ]]
   then
     imageVersion=latest
+    echo "[FATAL]Must specify a tyk-sandbox version"
+    exit 1
+  fi
+  if ! echo $imageVersion | grep -q -- - 
+  then
+    imageVersion=$imageVersion-$(latestImageRev $imageVersion)
   fi
   if ! docker image inspect tyk-sandbox:$imageVersion > /dev/null 2>&1
   then
