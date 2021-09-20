@@ -104,7 +104,7 @@ function touchRPMs {
 
 
 # list the version relationships we know about
-function listversions {
+function listVersions {
   typeset gwVers; typeset version
   for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV)
   do
@@ -146,7 +146,7 @@ function getSandboxInfo {
   index=$1
   containerName=sandbox-$index
   echo $containerName \($(docker container inspect -f '{{ .State.Status }}' $containerName)\)
-  docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox
+  docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label'
   echo
 }
 
@@ -224,7 +224,7 @@ function buildImage {
   do
     case $arg in 
       l)
-        listversions
+        listVersions
         exit 0
         ;;
       r)
