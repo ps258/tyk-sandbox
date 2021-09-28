@@ -5,6 +5,7 @@ PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 command=/opt/tyk-pump/tyk-pump
 conf=/opt/tyk-pump/pump.conf
 log=/var/log/tyk_pump.log
+ci $conf
 
 # refuse to start if its already running
 if pgrep -x $(basename $command) > /dev/null

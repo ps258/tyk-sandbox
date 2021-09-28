@@ -11,6 +11,7 @@ then
   echo "TIB not installed in $command"
   exit 0
 fi
+ci $conf
 
 # refuse to start if its already running
 if pgrep -f $(basename $command) > /dev/null

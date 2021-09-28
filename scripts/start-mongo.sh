@@ -6,6 +6,7 @@ command=/usr/bin/mongod
 conf=/etc/mongod.conf
 log=/var/log/mongod.log
 lock=/var/lib/mongo/mongod.lock
+ci $conf
 
 # refuse to start if its already running
 if pgrep -x $(basename $command) > /dev/null
