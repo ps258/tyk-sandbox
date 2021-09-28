@@ -26,3 +26,11 @@ if [[ -n $tyk_rpmlist ]]
 then
   yum install -y $tyk_rpmlist
 fi
+if [[ -f /assets/schema.json ]]
+then
+	mkdir -p /opt/tyk-gateway/cli/linter && cp /assets/schema.json /opt/tyk-gateway/cli/linter
+elif [[ -f /assets/schema.json.default ]]
+then
+	mkdir -p /opt/tyk-gateway/cli/linter && cp /assets/schema.json.default /opt/tyk-gateway/cli/linter/
+	ln -s /opt/tyk-gateway/cli/linter/schema.json.default /opt/tyk-gateway/cli/linter/schema.json
+fi

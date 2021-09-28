@@ -69,7 +69,8 @@ function help {
 function touchRPMs {
   typeset version; typeset gwVers; typeset dshbVers; typeset pumpVers
   typeset TIBvers; typeset syncVers; typeset oldFile
-  typeset rpmDir="$SCRIPTDIR"/assets/rpms/tyk
+  typeset assetDir="$SCRIPTDIR"/assets
+  typeset rpmDir="$assetDir"/rpms/tyk
   version=$1
   if [[ ${GATEWAY[$version]+_} ]]
   then
@@ -82,6 +83,13 @@ function touchRPMs {
     echo "[FATAL]Gateway version $version isn't configured $VERSIONFILE"
     exit 1
   fi
+	# get the schema file
+	if [[ -f "$assetDir/schema.json" ]]
+	then
+		\rm -f "$assetDir/schema.json"
+	fi
+	wget -q https://raw.githubusercontent.com/TykTechnologies/tyk/v$version/cli/linter/schema.json -O "$assetDir/schema.json"
+	# remove the existing install files so we can create new ones
   for oldFile in "$rpmDir"/tyk-gateway-* "$rpmDir"/tyk-dashboard-* "$rpmDir"/tyk-pump-* "$rpmDir"/tyk-identity-broker-* "$rpmDir"/tyk-sync-*
   do
     if [[ -f "$oldFile" ]]
@@ -372,6 +380,7 @@ function createSandbox {
     mkdir -p $SandboxPluginDir/$imageVersion
   fi
   # load username, password and licence if they stored in ~/.tyk-sandbox
+	# varaible names are SBX_LICENSE, SBX_USER, SBX_PASSWORD
   if [[ -z $noBootstrap && -f ~/.tyk-sandbox ]]
   then
     env_file="--env-file $(\ls ~/.tyk-sandbox)"
