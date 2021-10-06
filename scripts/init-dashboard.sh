@@ -16,6 +16,7 @@ then
   curl -k -s -d "email_address=$SBX_USER&first_name=Tyk&last_name=Admin&password=$SBX_PASSWORD&confirm_password=$SBX_PASSWORD" -X POST $PROTOCOL://localhost:3000/bootstrap
   echo Initial admin User: $SBX_USER >> /initial_credentials.txt
   echo Initial admin Password: $SBX_PASSWORD >> /initial_credentials.txt
+	echo Initial admin key: $(/scripts/admin-auth) >> /initial_credentials.txt
 fi
 
 /scripts/publish-apis /assets/APIs/*.json

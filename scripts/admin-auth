@@ -1,0 +1,14 @@
+#!/bin/bash
+
+PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
+
+
+for user in $(redis-cli --scan --pattern tyk-admin-api-*-*)
+do
+	if [[ "admin" == $(redis-cli get $user | jq .UserData.user_permissions.IsAdmin | xargs) ]]
+	then
+		#redis-cli get $user | jq .UserData.email_address,.UserData.access_key | xargs echo
+		redis-cli get $user | jq .UserData.access_key | xargs echo
+		exit 0
+	fi
+done
