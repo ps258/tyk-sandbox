@@ -6,10 +6,10 @@ cp /baseOS/vimrc /root/.vimrc
 # copy repos into place
 for repo in /baseOS/repos/*.repo
 do
-  if [[ -f $repo ]]
-  then
-    cp $repo /etc/yum.repos.d/
-  fi
+	if [[ -f $repo ]]
+	then
+		cp $repo /etc/yum.repos.d/
+	fi
 done
 
 useradd -c 'Tyk service user' -m -s /sbin/nologin tyk
