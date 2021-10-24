@@ -24,3 +24,4 @@ yum install -y jemalloc.x86_64 logrotate.x86_64 make.x86_64 openssl.x86_64 mongo
 sed -i 's/bindIp/#bindIp/' /etc/mongod.conf
 sed -i 's/^protected-mode yes/protected-mode no/' /etc/redis.conf
 sed -i 's/^bind 127.0.0.1/#bind 127.0.0.1/' /etc/redis.conf
+yum clean all

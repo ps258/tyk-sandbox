@@ -38,3 +38,5 @@ then
 	mkdir -p /opt/tyk-gateway/cli/linter && cp /assets/schema.json.default /opt/tyk-gateway/cli/linter/
 	ln -s /opt/tyk-gateway/cli/linter/schema.json.default /opt/tyk-gateway/cli/linter/schema.json
 fi
+
+yum clean all
