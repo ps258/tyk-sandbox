@@ -1,27 +1,33 @@
 #!/bin/bash
 
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
+# setup vimrc for the way I like it
 cp /baseOS/vimrc /root/.vimrc
+
 # copy repos into place
-for repo in /baseOS/repos/*.repo
-do
-	if [[ -f $repo ]]
-	then
+for repo in /baseOS/repos/*.repo; do
+	if [[ -f $repo ]]; then
 		cp $repo /etc/yum.repos.d/
 	fi
 done
 
 useradd -c 'Tyk service user' -m -s /sbin/nologin tyk
-# make directories for the volumes
+
+# make directories for the docker volumes
 mkdir -m 750 -p /opt/tyk-plugins /opt/tyk-certificates
 chown tyk:tyk /opt/tyk-plugins /opt/tyk-certificates
 yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm deltarpm
+
+# skipping golang here because it's huge!
 yum install -y procps-ng iputils net-tools.x86_64 vim-enhanced.x86_64 wget curl python3 jq # golang.x86_64
 pip3 install --upgrade pip
 yum install -y jemalloc.x86_64 logrotate.x86_64 make.x86_64 openssl.x86_64 mongodb-org.x86_64 redis
+
 # open redis and mongo up to the world! Beware!!!
 sed -i 's/bindIp/#bindIp/' /etc/mongod.conf
 sed -i 's/^protected-mode yes/protected-mode no/' /etc/redis.conf
 sed -i 's/^bind 127.0.0.1/#bind 127.0.0.1/' /etc/redis.conf
+
+# tidyup to reduce the image size. Saves 200-300 MB
 yum clean all

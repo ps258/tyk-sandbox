@@ -1,5 +1,10 @@
 #!/bin/ksh
 
+# Not used but left as an example.
+# Only looks at release versions in package cloud so is inferior to adding the repos into yum's config
+
+PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
+
 SCRIPTNAME=$0
 SCRIPTDIR=$(dirname "$SCRIPTNAME")
 VERSIONFILE=$SCRIPTDIR/tyk-versions.list
@@ -11,8 +16,7 @@ function help {
   echo "        -h print this help"
 }
 
-if [[ $# -lt 1 ]]
-then
+if [[ $# -lt 1 ]]; then
   help
   exit 1
 fi
@@ -24,8 +28,13 @@ typeset -A PUMP
 typeset -A SYNC
 
 function loadVersions {
-  typeset line; typeset IFS; typeset gwVers; typeset dshbVers; typeset pumpVers
-  typeset TIBvers; typeset syncVers
+  typeset line
+  typeset IFS
+  typeset gwVers
+  typeset dshbVers
+  typeset pumpVers
+  typeset TIBvers
+  typeset syncVers
   line=$1
   IFS=,
   echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers
@@ -38,16 +47,14 @@ function loadVersions {
 
 function loadVersionFile {
   typeset line
-  for line in $(awk 'NF && !/#/' $VERSIONFILE)
-  do
+  for line in $(awk 'NF && !/#/' $VERSIONFILE); do
     loadVersions "$line"
   done
 }
 
 function listversions {
   typeset gwVersion
-  for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV)
-  do
+  for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
     gwVersion=${GATEWAY[$version]}
     echo "Version:   $version"
     echo "    Gateway:   $gwVersion"
@@ -61,11 +68,9 @@ function download {
   typeset rpm=$1
   typeset url=$2
   echo "[INFO]Downloading $rpm from $url"
-  if [[ ! -f $rpm ]]
-  then
+  if [[ ! -f $rpm ]]; then
     curl -sL $url --output $rpm
-    if [[ $? -gt 0 ]]
-    then
+    if [[ $? -gt 0 ]]; then
       rm $rpm
       echo "[WARN]Failed to pull $rpm"
     else
@@ -78,33 +83,31 @@ function download {
 
 loadVersionFile
 
-while getopts :g:hl arg
-do
+while getopts :g:hl arg; do
   case $arg in
-    l)
-      listversions
-      exit 0
-      ;;
-    g)
-      version=$OPTARG
-      ;;
-    h)
-      help
-      exit 0;
-      ;;
-    :)
-      echo "Option -$OPTARG requires an argument."
-      exit 1
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG"
-      exit 1
-      ;;
+  l)
+    listversions
+    exit 0
+    ;;
+  g)
+    version=$OPTARG
+    ;;
+  h)
+    help
+    exit 0
+    ;;
+  :)
+    echo "Option -$OPTARG requires an argument."
+    exit 1
+    ;;
+  \?)
+    echo "Invalid option: -$OPTARG"
+    exit 1
+    ;;
   esac
 done
 
-if [[ ${GATEWAY[$version]+_} ]]
-then
+if [[ ${GATEWAY[$version]+_} ]]; then
   tykVersion=${GATEWAY[$version]}
   dshbVersion=${DASHBOARD[$tykVersion]}
   tibVersion=${TIB[$tykVersion]}
@@ -115,29 +118,25 @@ else
   exit 1
 fi
 
-if [[ -n $tykVersion ]]
-then
+if [[ -n $tykVersion ]]; then
   rpm="tyk-gateway-$tykVersion.x86_64.rpm"
   url="https://packagecloud.io/tyk/tyk-gateway/packages/el/7/$rpm/download.rpm"
   download $rpm $url
 fi
 
-if [[ -n $dshbVersion ]]
-then
+if [[ -n $dshbVersion ]]; then
   rpm="tyk-dashboard-$dshbVersion.x86_64.rpm"
   url="https://packagecloud.io/tyk/tyk-dashboard/packages/el/7/$rpm/download.rpm"
   download $rpm $url
 fi
 
-if [[ -n $tibVersion ]]
-then
+if [[ -n $tibVersion ]]; then
   rpm="tyk-identity-broker-$tibVersion.x86_64.rpm"
   url="https://packagecloud.io/tyk/tyk-identity-broker/packages/el/7/$rpm/download.rpm"
   download $rpm $url
 fi
 
-if [[ -n $pumpVersion ]]
-then
+if [[ -n $pumpVersion ]]; then
   rpm="tyk-pump-$pumpVersion.x86_64.rpm"
   url="https://packagecloud.io/tyk/tyk-pump/packages/el/7/$rpm/download.rpm"
   download $rpm $url

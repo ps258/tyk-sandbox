@@ -1,31 +1,35 @@
 #!/bin/bash
 
+# Script to dump all the key/value pairs out of redis and formats them with jq if that seems appropriate
+# handy to poke around but will alto take an arguement which is the pattern to search for
+# use "api-key*" for example
+
+PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
+
 REDIS_KEY_PATTERN="${1:-*}"
-for key in $(redis-cli --scan --pattern "$REDIS_KEY_PATTERN")
-do
-    type=$(redis-cli type $key)
-    echo "$key ($type) => "
-    case $type in
-      list)
-        redis-cli lrange $key 0 -1 | sed 's/^/  /'
-        ;;
-      hash)
-        redis-cli hgetall $key | sed 's/^/  /'
-        ;;
-      zset)
-        redis-cli zrange $key 0 -1 withscores| sed 's/^/  /'
-        ;;
-      string)
-        if redis-cli get $key | egrep -q '^{'
-        then
-          redis-cli get $key | jq .
-        else
-          redis-cli get $key
-        fi
-        ;;
-      *)
-        echo "[WARN]Unknown type $type"
-        redis-cli get $key
-        ;;
-    esac
+for key in $(redis-cli --scan --pattern "$REDIS_KEY_PATTERN"); do
+  type=$(redis-cli type $key)
+  echo -n "$key ($type) => "
+  case $type in
+  list)
+    redis-cli lrange $key 0 -1 | sed 's/^/  /'
+    ;;
+  hash)
+    redis-cli hgetall $key | sed 's/^/  /'
+    ;;
+  zset)
+    redis-cli zrange $key 0 -1 withscores | sed 's/^/  /'
+    ;;
+  string)
+    if redis-cli get $key | egrep -q '^{'; then
+      redis-cli get $key | jq .
+    else
+      redis-cli get $key
+    fi
+    ;;
+  *)
+    echo "[WARN]Unknown type $type"
+    redis-cli get $key
+    ;;
+  esac
 done

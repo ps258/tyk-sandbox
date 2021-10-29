@@ -1,63 +1,59 @@
 #!/bin/bash -u
 
-# poor man's revision control. It makes a .revisions directory
-# and keeps a time stamped copy of the file there.
+# poor man's revision control. It makes a .revisions directory in the same directory and the file given
+# and keeps a time stamped copy of the file there as well as some links to 'latest' and 'previous' to make
+# it easy to do diffs
+
+PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 [[ $# -lt 1 ]] && print "[FATAL]Must specify file" && exit 1
 BACKUP_DIR=.revisions
 CWD=$PWD
 
-# get rid of legacy RCS directory
-if [[ -d RCS && ! -d $BACKUP_DIR && $BACKUP_DIR != "RCS" ]]
-then
-  mv RCS $BACKUP_DIR
-fi
-
-for _source_file in "$@"
-do
+for _source_file in "$@"; do
   DIR=$(dirname "$_source_file")
   _source_file=$(basename "$_source_file")
-  if [[ -d "$DIR" ]]
-  then
-    if cd "$DIR"
-    then
-      if [[ -f "$_source_file" ]]
-      then
+  if [[ -d "$DIR" ]]; then
+    if cd "$DIR"; then
+      if [[ -f "$_source_file" ]]; then
         DATE=$(stat -c %y "$_source_file" | awk '{printf("%s_%s\n",$1,$2)}')
         BACKUP_FILE_NAME="$BACKUP_DIR/${_source_file}_$DATE"
-        if [[ ! -d "$BACKUP_DIR" ]]
-        then
+        if [[ ! -d "$BACKUP_DIR" ]]; then
           mkdir "$BACKUP_DIR"
         fi
 
-        if [[ -f "$BACKUP_FILE_NAME"  ]]
-        then
+        if [[ -f "$BACKUP_FILE_NAME" ]]; then
           # print $BACKUP_FILE_NAME already exists, not copying
           continue
         else
-          LATEST=$(ls -tr "$BACKUP_DIR/${_source_file}"_* 2> /dev/null | tail -1)
-          if [[ -n "$LATEST" ]]
-          then
-            if diff "$_source_file" "$LATEST" > /dev/null 2>&1 -eq 0
-            then
+          LATEST=$(ls -tr "$BACKUP_DIR/${_source_file}"_* 2>/dev/null | tail -1)
+          if [[ -n "$LATEST" ]]; then
+            if diff "$_source_file" "$LATEST" -eq 0 >/dev/null 2>&1; then
               # print $_source_file unchanged from $LATEST, not copying
               continue
             else
               cp -v -p "$_source_file" "$BACKUP_FILE_NAME"
               # make .latest and .previous links so they're easy to find
               rm -f "$BACKUP_DIR/${_source_file}.previous" "$BACKUP_DIR/${_source_file}.latest"
-              ( cd $BACKUP_DIR ; ln -s $(basename "$LATEST") "${_source_file}.previous" ; ln -s $(basename "$BACKUP_FILE_NAME") "${_source_file}.latest" )
+              (
+                cd $BACKUP_DIR
+                ln -s $(basename "$LATEST") "${_source_file}.previous"
+                ln -s $(basename "$BACKUP_FILE_NAME") "${_source_file}.latest"
+              )
             fi
           else
             # must be the first ci, just copy it into place
             cp -v -p "$_source_file" "$BACKUP_FILE_NAME"
-            ( cd $BACKUP_DIR ; ln -s $(basename "$BACKUP_FILE_NAME") "${_source_file}.latest" )
+            (
+              cd $BACKUP_DIR
+              ln -s $(basename "$BACKUP_FILE_NAME") "${_source_file}.latest"
+            )
           fi
         fi
       else
         print Skipping non-file \'"$_source_file"\'
       fi
-      cd "$CWD" || exit;
+      cd "$CWD" || exit
     else
       print Unable to cd to \'"$DIR"\'
     fi

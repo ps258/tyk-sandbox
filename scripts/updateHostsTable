@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH=/scripts:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
+PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 echo "### Everything from this line is rewritten at every boot by $0 ###" >> /etc/hosts
 
