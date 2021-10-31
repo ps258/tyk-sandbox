@@ -48,7 +48,7 @@ sleep 5
 # once the dashboard is running, use the admin API to create users and upload a licence
 if [[ ! -f /initialised ]]; then
   echo "[INFO]Initialising the dashboard"
-  /scripts/init-dashboard.sh
+  /scripts/init-dashboard.sh > /var/log/init-dashboard.log 2>&1
 fi
 
 echo "[INFO]Starting Tyk gateway"
