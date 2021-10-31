@@ -1,7 +1,9 @@
 {
   "name": "echo",
   "use_keyless": true,
-  "auth": {},
+  "auth": {
+    "auth_header_name": "authorization"
+	},
   "version_data": {
     "not_versioned":true,
     "versions": {
