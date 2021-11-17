@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # if SBX_LICENSE is set, install the licence
 # if SBX_USER and SBC_PASSWORD are set, create an admin user with those credentials
