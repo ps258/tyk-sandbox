@@ -12,6 +12,9 @@ set showmatch
 set ignorecase
 set diffopt=filler,context:15,iwhite
 set laststatus=2
+" disable save-unders
+set t_ti=
+set t_te=
 filetype on
 filetype plugin on
 filetype indent on
