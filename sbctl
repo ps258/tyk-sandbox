@@ -59,8 +59,10 @@ function help {
 	echo "        list the docker images for creating sandboxes"
 	echo "$name list <index number...>"
 	echo "        details about the named sandbox or all"
-	echo "$name script <index number...>"
-	echo "        run a shell in the sandboxes named"
+	echo "$name publish api.json <index number...>"
+	echo "         publish the API in api.json into the sandbox"
+	echo "$name shell <index number...>"
+	echo "        Open a bash shell in the sandboxes named"
 	echo "$name [start|stop|restart|rm] <index number...>"
 	echo "        take the action named on the listed sandboxes"
 }
@@ -394,7 +396,7 @@ function createSandbox {
 	fi
 }
 
-# list the sandboxes in a standard format.
+# list the sandboxes in a standard format, which is just the numbers.
 function listNames {
 	typeset name
 	typeset list
@@ -437,6 +439,11 @@ create)
 	# Create a docker sandbox with the given parameters
 	createSandbox "$@"
 	;;
+image*)
+	# list the tyk-sandbox docker images
+	# note the almost magical pipe feature of awk used here. It sorts the versions but not the header
+	docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
+	;;
 info | list | status)
 	if [[ $# -gt 1 ]]; then
 		shift
@@ -449,17 +456,28 @@ info | list | status)
 		getAllSandboxInfo
 	fi
 	;;
-shell | bash)
+shell | bash | script)
 	# Give a shell in the given container
 	shift
 	for index in $(listNames $*); do
 		docker container exec -it sandbox-$index bash
 	done
 	;;
-image*)
-	# list the tyk-sandbox docker images
-	# note the almost magical pipe feature of awk used here. It sorts the versions but not the header
-	docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
+publish )
+	# first parameter will be the file, rest will be the sandboxes
+	shift
+	APIFILE="$1"
+	shift
+	if [[ -f "$APIFILE" ]]; then
+		for index in $(listNames $*); do
+			docker container cp "$APIFILE" sandbox-$index:/
+			docker container exec -t sandbox-$index bash -c "/scripts/publish-apis '/$APIFILE'"
+		done
+	else
+		echo "[FATAL]API file '$APIFILE' does not exist or is unreadable"
+		echo "[Usage]publish API.json <list of sandboxes>"
+		exit 1
+	fi
 	;;
 help)
 	help
