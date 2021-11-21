@@ -112,6 +112,7 @@ if [[ ${GATEWAY[$version]+_} ]]; then
   dshbVersion=${DASHBOARD[$tykVersion]}
   tibVersion=${TIB[$tykVersion]}
   pumpVersion=${PUMP[$tykVersion]}
+  syncVersion=${SYNC[$tykVersion]}
 else
   echo "Unknown version"
   help
@@ -141,3 +142,10 @@ if [[ -n $pumpVersion ]]; then
   url="https://packagecloud.io/tyk/tyk-pump/packages/el/7/$rpm/download.rpm"
   download $rpm $url
 fi
+
+if [[ -n $syncVersion ]]; then
+  rpm="tyk-pump-$syncVersion.x86_64.rpm"
+  url="https://packagecloud.io/tyk/tyk-sync/packages/el/7/$rpm/download.rpm"
+  download $rpm $url
+fi
+

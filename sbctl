@@ -230,7 +230,7 @@ function buildImage {
 	typeset tykVersion
 	typeset tykVersion
 	typeset rpm
-	typeset packageRev
+	typeset imageRev
 	typeset arg
 	typeset OPTARG
 	while getopts :lv:r: arg; do
@@ -259,14 +259,14 @@ function buildImage {
 		buildAllImages
 		return
 	fi
-	packageRev=$(nextFreeImageRev $tykVersion)
-	if ! docker image list tbi | grep -qw latest; then
-		cd "$SCRIPTDIR/tbi"
-		docker image build --tag tbi:latest .
-	fi
-	cd "$SCRIPTDIR"
+	imageRev=$(nextFreeImageRev $tykVersion)
+	#if ! docker image list tbi | grep -qw latest; then
+	#	cd "$SCRIPTDIR/tbi"
+	#	docker image build --tag tbi:latest .
+	#fi
+	#cd "$SCRIPTDIR"
 	touchRPMs $tykVersion
-	docker image build --tag tyk-sandbox:$tykVersion-$packageRev .
+	docker image build --tag tyk-sandbox:$tykVersion-$imageRev .
 }
 
 # invoke docker container create and start with everything set

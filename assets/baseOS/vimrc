@@ -1,5 +1,9 @@
 syntax on
+" mouse the way I like it
+set mouse=v
 set directory=/tmp
+" change tabs into spaces
+" set expandtab
 set hlsearch
 set tabstop=2 shiftwidth=2
 set incsearch

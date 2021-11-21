@@ -3,11 +3,11 @@
 PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 # setup vimrc for the way I like it
-cp /baseOS/vimrc /root/.vimrc
-cp /baseOS/curlc /root/.curlc
+cp /assets/baseOS/vimrc /root/.vimrc
+cp /assets/baseOS/curlc /root/.curlc
 
 # copy repos into place
-for repo in /baseOS/repos/*.repo; do
+for repo in /assets/baseOS/repos/*.repo; do
 	if [[ -f $repo ]]; then
 		cp $repo /etc/yum.repos.d/
 	fi
