@@ -1,7 +1,7 @@
 #refNo,tyk-gateway,tyk-dashboard,tyk-pump,tyk-identity-broker,tyk-sync
 
-# 4.0 release candidates
-4.0.0.rc7,4.0.0~rc7,4.0.0~rc7,1.5.0-1,,1.2.1-1
+# 4.0 release candidates (doesn't work with centos 7)
+#4.0.0.rc7,4.0.0~rc7,4.0.0~rc7,1.5.0-1,,1.2.1-1
 
 # 3.2.x 
 3.2.2,3.2.2-1,3.2.2-1,1.5.0-1,,1.2.1-1
