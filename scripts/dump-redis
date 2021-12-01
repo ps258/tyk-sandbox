@@ -17,6 +17,9 @@ for key in $(redis-cli --scan --pattern "$REDIS_KEY_PATTERN"); do
   hash)
     redis-cli hgetall $key | sed 's/^/  /'
     ;;
+  set)
+    redis-cli smembers $key 
+    ;;
   zset)
     redis-cli zrange $key 0 -1 withscores | sed 's/^/  /'
     ;;
