@@ -179,7 +179,7 @@ function latestImageRev {
 	typeset version
 	typeset existing
 	version=$1
-	existing=$(docker image list tyk-sandbox | awk '$2 ~ /'$version'/ {print $2}' | sort -V | tail -1)
+	existing=$(docker image list tyk-sandbox | awk '$2 ~ /'$version-'/ {print $2}' | sort -V | tail -1)
 	if [[ ! -z $existing ]]; then
 		echo $existing | cut -d- -f2
 	fi
