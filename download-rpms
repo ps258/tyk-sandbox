@@ -144,7 +144,7 @@ if [[ -n $pumpVersion ]]; then
 fi
 
 if [[ -n $syncVersion ]]; then
-  rpm="tyk-pump-$syncVersion.x86_64.rpm"
+  rpm="tyk-sync-$syncVersion.x86_64.rpm"
   url="https://packagecloud.io/tyk/tyk-sync/packages/el/7/$rpm/download.rpm"
   download $rpm $url
 fi
