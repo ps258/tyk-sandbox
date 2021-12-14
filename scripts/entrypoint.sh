@@ -35,6 +35,9 @@ fi
 
 #grep -q $SBX_GW_HOST /etc/hosts || echo "127.0.0.1 $SBX_GW_HOST" >> /etc/hosts
 
+echo "[INFO]Starting plugin server"
+scripts/serve-plugins.sh >> /var/log/plugin-server.log 2>&1 &
+
 echo "[INFO]Starting Redis"
 /scripts/start-redis.sh
 
