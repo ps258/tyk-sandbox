@@ -14,6 +14,7 @@ SCRIPTDIR=$(
 	echo $PWD
 )
 VERSIONFILE=$SCRIPTDIR/tyk-versions.list
+cd $SCRIPTDIR
 
 # directories shared into all sandboxes to allow for plugins and certs to be installed easily
 SandboxPluginDir=~/tyk/plugins
