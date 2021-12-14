@@ -7,7 +7,7 @@
 PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 REDIS_KEY_PATTERN="${1:-*}"
-for key in $(redis-cli --scan --pattern "$REDIS_KEY_PATTERN"); do
+for key in $(redis-cli --scan --pattern "$REDIS_KEY_PATTERN" | sort); do
   type=$(redis-cli type $key)
   echo -n "$key ($type) => "
   case $type in
