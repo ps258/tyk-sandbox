@@ -18,13 +18,26 @@ useradd -c 'Tyk service user' -m -s /sbin/nologin tyk
 # make directories for the docker volumes
 mkdir -m 750 -p /opt/tyk-plugins /opt/tyk-certificates
 chown tyk:tyk /opt/tyk-plugins /opt/tyk-certificates
-yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm deltarpm
+if grep -q 'release 7' /etc/redhat-release; then
+	# centos 7
+	yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm deltarpm
+fi
+if grep -q 'release 8' /etc/redhat-release; then
+	# centos 8
+	yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm deltarpm
+fi
 
 # skipping golang here because it's huge!
 yum install -y procps-ng iputils net-tools.x86_64 vim-enhanced.x86_64 wget curl python3 jq # golang.x86_64
 pip3 install --upgrade pip
-#yum install -y jemalloc.x86_64 logrotate.x86_64 make.x86_64 openssl.x86_64 mongodb-org.x86_64 redis
-yum install -y logrotate.x86_64 make.x86_64 openssl.x86_64 mongodb-org.x86_64 redis
+if grep -q 'release 7' /etc/redhat-release; then
+	# centos 7
+	yum install -y jemalloc.x86_64 logrotate.x86_64 make.x86_64 openssl.x86_64 mongodb-org.x86_64 redis
+fi
+if grep -q 'release 8' /etc/redhat-release; then
+	# centos 8
+	yum install -y logrotate.x86_64 make.x86_64 openssl.x86_64 mongodb-org.x86_64 redis
+fi
 
 # open redis and mongo up to the world! Beware!!!
 sed -i 's/bindIp/#bindIp/' /etc/mongod.conf
