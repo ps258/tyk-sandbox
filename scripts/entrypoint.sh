@@ -7,7 +7,7 @@ unalias cp
 echo "Image starting: $1"
 
 if [[ ! -f /initialised ]]; then
-  # copy the config files into place
+
   echo "[INFO]Copying the config files into place"
   if [[ -d /opt/tyk-identity-broker ]]; then
     # TIB is installed, we need to use the tib enabled tyk_analytics.conf
@@ -18,16 +18,20 @@ if [[ ! -f /initialised ]]; then
   fi
   cp -f /assets/tyk.conf /opt/tyk-gateway/
   cp -p /assets/pump.conf /opt/tyk-pump/
+
   echo "[INFO]Setting gateway host and port in tyk_analytics.conf"
   sed -i "s/SBX_GW_PORT/$SBX_GW_PORT/g" /opt/tyk-dashboard/tyk_analytics.conf
   sed -i "s/SBX_GW_HOST/$SBX_GW_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
   sed -i "s/SBX_DSHB_HOST/$SBX_DSHB_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
+
   echo "[INFO]Generating tyk private keys"
   openssl genrsa -out /privkey.pem 2048
   openssl rsa -in /privkey.pem -pubout -out /pubkey.pem
+
+	# create a local cert if one isn't already present
   if [[ ! -e /opt/tyk-certificates/dashboard-certificate.pem ]]; then
     echo "[INFO]Creating certificate for the dashboard and gateway"
-    openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout /opt/tyk-certificates/dashboard-key.pem -out /opt/tyk-certificates/dashboard-certificate.pem -subj '/emailAddress=ps258@hotmail.com/C=GB/ST=Mid Lothian/L=Home Office/O=Garage/OU=Desk/CN=example.com'
+    openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout /opt/tyk-certificates/dashboard-key.pem -out /opt/tyk-certificates/dashboard-certificate.pem -subj '/emailAddress=email@company.com/C=GB/ST=Mid Lothian/L=Home Office/O=Garage/OU=Desk/CN=tyk-sandbox.com'
     ln -s /opt/tyk-certificates/dashboard-certificate.pem /opt/tyk-certificates/gateway-certificate.pem
     ln -s /opt/tyk-certificates/dashboard-key.pem /opt/tyk-certificates/gateway-key.pem
   fi
@@ -36,7 +40,7 @@ fi
 #grep -q $SBX_GW_HOST /etc/hosts || echo "127.0.0.1 $SBX_GW_HOST" >> /etc/hosts
 
 echo "[INFO]Starting plugin server"
-scripts/serve-plugins.sh >> /var/log/plugin-server.log 2>&1 &
+/scripts/serve-plugins.sh >> /var/log/plugin-server.log 2>&1 &
 
 echo "[INFO]Starting Redis"
 /scripts/start-redis.sh
