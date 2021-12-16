@@ -18,7 +18,6 @@ cd $SCRIPTDIR
 
 # directories shared into all sandboxes to allow for plugins and certs to be installed easily
 SandboxPluginDir=~/tyk/plugins
-SandboxCertDir=~/tyk/certs
 
 typeset -A GATEWAY
 typeset -A DASHBOARD
@@ -349,11 +348,12 @@ function createSandbox {
 		tibURL="--label sandbox.tiburl=http://$hostFQDN:$(($TIBBasePort + $offset))/"
 	fi
 	# Create a directory just for this version to hold plugins
-	for dir in "$SandboxPluginDir" "$SandboxCertDir"; do
-		if [[ ! -d "$dir" ]]; then
-			mkdir -p "$dir"
+	if [[ ! -d "$SandboxPluginDir" ]]; then
+		if ! mkdir -p "$SandboxPluginDir"; then
+			echo "[FATAL]Unable to create '$SandboxPluginDir'"
+			exit 1
 		fi
-	done
+	fi
 	if [[ $imageVersion != "latest" && ! -d $SandboxPluginDir/$imageVersion ]]; then
 		echo "[WARN]Creating $SandboxPluginDir/$imageVersion: It will be empty"
 		mkdir -p $SandboxPluginDir/$imageVersion
@@ -389,7 +389,6 @@ function createSandbox {
 		--label sandbox.index=$index \
 		--volume $SandboxPluginDir/$imageVersion:/opt/tyk-plugins \
 		tyk-sandbox:$imageVersion
-	# --volume $SandboxCertDir:/opt/tyk-certificates
 	if [[ $? -eq 0 ]]; then
 		echo "[INFO]Starting container $containerName"
 		docker container start $containerName
