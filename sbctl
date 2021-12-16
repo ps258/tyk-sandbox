@@ -14,7 +14,6 @@ SCRIPTDIR=$(
 	echo $PWD
 )
 VERSIONFILE=$SCRIPTDIR/tyk-versions.list
-cd $SCRIPTDIR
 
 # directories shared into all sandboxes to allow for plugins and certs to be installed easily
 SandboxPluginDir=~/tyk/plugins
@@ -54,7 +53,7 @@ function help {
 	echo "           Note: create a base64 encoded password with:"
 	echo "               echo password | base64"
 	echo "        -t ticket or comment field"
-	echo "        -v tyk version of sandbox image. Defaults to 'latest'"
+	echo "        -v tyk version of sandbox image. Required"
 	echo "$name images"
 	echo "        list the docker images for creating sandboxes"
 	echo "$name list <index number...>"
@@ -260,11 +259,7 @@ function buildImage {
 		return
 	fi
 	imageRev=$(nextFreeImageRev $tykVersion)
-	#if ! docker image list tbi | grep -qw latest; then
-	#	cd "$SCRIPTDIR/tbi"
-	#	docker image build --tag tbi:latest .
-	#fi
-	#cd "$SCRIPTDIR"
+	cd "$SCRIPTDIR"
 	touchRPMs $tykVersion
 	docker image build --tag tyk-sandbox:$tykVersion-$imageRev .
 }
@@ -308,8 +303,8 @@ function createSandbox {
 	done
 
 	if [[ -z $imageVersion ]]; then
-		imageVersion=latest
 		echo "[FATAL]Must specify a tyk-sandbox version"
+		sbctl images
 		exit 1
 	fi
 	if ! echo $imageVersion | grep -q -- -; then
