@@ -8,7 +8,7 @@ PLUGINDIR=${1:-/opt/tyk-plugins}
 if [[ -d "$PLUGINDIR" ]]; then
 	echo "[INFO]Serving from '$PLUGINDIR'"
 	# python 3.9 allows this invocation
-  #python3 -m http.server --bind 127.0.0.1 --directory "$PLUGINDIR" 8000
+  	#python3 -m http.server --bind 127.0.0.1 --directory "$PLUGINDIR" 8000
 
 	# python 3.6 is doesn't have --directory
 	cd "$PLUGINDIR" && python3 -m http.server --bind 127.0.0.1 8000

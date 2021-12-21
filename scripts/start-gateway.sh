@@ -4,7 +4,7 @@ PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 command=/opt/tyk-gateway/tyk
 conf=/opt/tyk-gateway/tyk.conf
-log=/var/log/tyk_gateway.log
+log=/var/log/tyk-gateway.log
 ci $conf
 
 # refuse to start if its already running

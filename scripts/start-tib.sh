@@ -4,7 +4,7 @@ PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 command=/opt/tyk-identity-broker/tyk-identity-broker
 conf=/opt/tyk-identity-broker/tib.conf
-log=/var/log/tyk_identity_broker.log
+log=/var/log/tyk-identity-broker.log
 
 if [[ ! -e $command ]]
 then

@@ -4,7 +4,7 @@ PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 command=/opt/tyk-dashboard/tyk-analytics
 conf=/opt/tyk-dashboard/tyk_analytics.conf
-log=/var/log/tyk_dashboard.log
+log=/var/log/tyk-dashboard.log
 ci $conf
 
 # refuse to start if its already running
