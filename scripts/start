@@ -1,0 +1,14 @@
+#!/bin/bash
+
+PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
+
+for service in $*; do
+  for script in start-${service}.sh; do
+    if [[ -f /scripts/$script ]]; then
+      echo /scripts/$script
+      /scripts/$script
+    else
+      echo "[FATAL]No such script '/scripts/$script'"
+    fi
+  done
+done
