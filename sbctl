@@ -286,8 +286,8 @@ function createSandbox {
 			;;
 		l)
 			logLevel=$OPTARG
-			if [[ $logLevel != "debug" && $logLevel != "warn" && $logLevel != "error" ]]; then
-				echo "loglevel must be one of 'debug', 'warn', 'error'"
+			if [[ $logLevel != "debug" && $logLevel != "info" && $logLevel != "warn" && $logLevel != "error" ]]; then
+				echo "loglevel must be one of 'debug', 'info', 'warn' or 'error'"
 				exit 1
 			fi
 			;;
