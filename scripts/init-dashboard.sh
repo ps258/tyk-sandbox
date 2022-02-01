@@ -29,6 +29,7 @@ then
     http://localhost:3000/admin/organisations)
 
   ORG_ID=$(echo $ORG_DATA | jq -r .Meta)
+  echo Org ID: $ORG_ID >> /initial_credentials.txt
   USER_JSON=$(curl --silent \
     --header "admin-auth: $ADMIN_SECRET" \
     --header "Content-Type:application/json" \

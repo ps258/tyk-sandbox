@@ -6,6 +6,7 @@ command=/opt/tyk-sink/tyk-sink
 conf=/opt/tyk-sink/tyk_sink.conf
 log=/var/log/tyk-sink.log
 ci $conf
+flags=""
 
 # refuse to start if its already running
 if pgrep -x $(basename $command) > /dev/null
@@ -14,8 +15,12 @@ then
   exit 1
 fi
 
+if [[ -n $TYK_LOGLEVEL && $TYK_LOGLEVEL == 'debug' ]]; then
+  flags="$flags -debug"
+fi
+
 # startup
-$command -conf $conf &>> $log &
+$command -conf $conf $flags &>> $log &
 err=$?
 sleep 1
 
