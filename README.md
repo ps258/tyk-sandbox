@@ -102,7 +102,8 @@ This sandbox is ready to connect to via a web browser within seconds
 
 To remind ourselves of the details of this or other sandboxes later
 
-      $ sandbox-1 (running)
+				$ sbctl info 1
+				sandbox-1 (running)
 				sandbox.dashurl: http://10.0.0.21:3001/
 				sandbox.gateurl: https://10.0.0.21:5001/
 				sandbox.mongo: mongo --quiet --host 10.0.0.21 --port 7001
@@ -112,7 +113,8 @@ To remind ourselves of the details of this or other sandboxes later
 
 To get help on various options
 
-      $ [USAGE]:
+			$ sbctl -h
+			[USAGE]:
 				sbctl build -l | -v tyk-gateway-version-number [-r image version]
 								builds a sandbox image for that version if its not already available
 								-v version to build ('ALL' to build all versions)
