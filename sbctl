@@ -43,7 +43,7 @@ function help {
 	echo "        -l list versions that images can be made for (incompatible with -v and -r)"
 	echo "$name create -v tyk-version [-t ticket no] [-i index-number] [-n]"
 	echo "        -i index number (skip for autoallocation of the next free)"
-	echo "        -l log level. Set to debug, info, error. Defaults to debug"
+	echo "        -l log level. Set to debug, info, warn or error. Defaults to debug"
 	echo "        -n IGNORE ~/.tyk-sandbox even if it exists"
 	echo "           You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:"
 	echo "           These will be used when -n is NOT present"
@@ -60,6 +60,8 @@ function help {
 	echo "        details about the named sandbox or all"
 	echo "$name publish api.json <index number...>"
 	echo "         publish the API in api.json into the sandbox"
+	echo "$name script scriptfile <index number...>"
+	echo "        copy the script into the container and run it"
 	echo "$name shell <index number...>"
 	echo "        Open a bash shell in the sandboxes named"
 	echo "$name [start|stop|restart|rm] <index number...>"
@@ -408,6 +410,26 @@ function listNames {
 	fi
 }
 
+# list the currently running sandboxes in a standard format, which is just the numbers.
+function listRunningNames {
+	typeset name
+	typeset list
+	if [[ $1 == "ALL" ]]; then
+		docker container list | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
+	else
+		for name in $*; do
+			if echo $name | grep -iq sandbox-; then
+				name=$(echo $name | cut -d\- -f2)
+			fi
+			list="$list $name"
+		done
+		echo $list
+	fi
+}
+
+##########################
+# BEGINNING OF MAIN SCRIPT
+##########################
 if [[ $# -lt 1 ]]; then
 	help
 	exit 1
@@ -417,68 +439,84 @@ fi
 loadVersionFile
 
 case $1 in
-rm | stop | start | restart)
-	action=$1
-	shift
-	for index in $(listNames $*); do
-		docker container $action sandbox-$index
-	done
-	;;
-build)
-	shift
-	# Create a docker image with the given parameters
-	buildImage "$@"
-	;;
-create)
-	shift
-	# Create a docker sandbox with the given parameters
-	createSandbox "$@"
-	;;
-image*)
-	# list the tyk-sandbox docker images
-	# note the almost magical pipe feature of awk used here. It sorts the versions but not the header
-	docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
-	;;
-info | list | status)
-	if [[ $# -gt 1 ]]; then
+	rm | stop | start | restart)
+		action=$1
 		shift
-		# Inspect the details of the given container
 		for index in $(listNames $*); do
-			getSandboxInfo $index
+			docker container $action sandbox-$index
 		done
-	else
-		# Inspect the details of all exiting containers
-		getAllSandboxInfo
-	fi
-	;;
-shell | bash | script)
-	# Give a shell in the given container
-	shift
-	for index in $(listNames $*); do
-		docker container exec -it sandbox-$index bash
-	done
-	;;
-publish )
-	# first parameter will be the file, rest will be the sandboxes
-	shift
-	APIFILE="$1"
-	shift
-	if [[ -f "$APIFILE" ]]; then
-		for index in $(listNames $*); do
-			docker container cp "$APIFILE" sandbox-$index:/
-			docker container exec -t sandbox-$index bash -c "/scripts/publish-apis '/$APIFILE'"
+		;;
+	build)
+		shift
+		# Create a docker image with the given parameters
+		buildImage "$@"
+		;;
+	create)
+		shift
+		# Create a docker sandbox with the given parameters
+		createSandbox "$@"
+		;;
+	image*)
+		# list the tyk-sandbox docker images
+		# note the almost magical pipe feature of awk used here. It sorts the versions but not the header
+		docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
+		;;
+	info | list | status)
+		if [[ $# -gt 1 ]]; then
+			shift
+			# Inspect the details of the given container
+			for index in $(listNames $*); do
+				getSandboxInfo $index
+			done
+		else
+			# Inspect the details of all exiting containers
+			getAllSandboxInfo
+		fi
+		;;
+	shell | bash)
+		# Give a shell in the given container
+		shift
+		for index in $(listRunningNames $*); do
+			docker container exec -it sandbox-$index bash
 		done
-	else
-		echo "[FATAL]API file '$APIFILE' does not exist or is unreadable"
-		echo "[Usage]publish API.json <list of sandboxes>"
-		exit 1
-	fi
-	;;
-help)
-	help
-	;;
-*)
-	echo "[FATAL]Unknown option \"$1\"" 1>&2
-	help
-	;;
+		;;
+	script)
+		# copy a script into the container and execute it
+		shift
+		SCRIPTFILE="$1"
+		shift
+		if [[ -r "$SCRIPTFILE" ]]; then
+			for index in $(listRunningNames $*); do
+				docker container cp $SCRIPTFILE sandbox-$index:/
+			  docker container exec -t sandbox-$index /$SCRIPTFILE
+			done
+		else
+			echo "[FATAL]Scipt '$SCRIPTFILE' does not exist or is unreadable"
+			echo "[Usage]scipt scriptname <list of sandboxes>"
+			exit 1
+		fi
+		;;
+	publish )
+		# first parameter will be the file, rest will be the sandboxes
+		shift
+		APIFILE="$1"
+		shift
+		if [[ -f "$APIFILE" ]]; then
+			for index in $(listRunningNames $*); do
+				docker container cp "$APIFILE" sandbox-$index:/
+				docker container exec -t sandbox-$index bash -c "/scripts/publish-apis '/$APIFILE'"
+			done
+		else
+			echo "[FATAL]API file '$APIFILE' does not exist or is unreadable"
+			echo "[Usage]publish API.json <list of sandboxes>"
+			exit 1
+		fi
+		;;
+	help)
+		help
+		;;
+	*)
+		echo "[FATAL]Unknown option \"$1\"" 1>&2
+		help
+		;;
 esac
