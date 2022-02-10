@@ -24,7 +24,7 @@ if [[ -n $access_key ]]; then
 		if grep -q api_definition $API; then
 			# deal with the files that are a copy and paste of the API JSON from the dashboard
 			echo curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$API
-			curl -X POST "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$API
+			curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$API
 			echo
 		else
 			# deal with the files that are exported APIs from the dashboard
