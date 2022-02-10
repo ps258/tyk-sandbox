@@ -14,6 +14,7 @@ fi
 # startup
 mkdir -p /var/lib/redis/
 conf=/etc/redis.conf
+ci $conf
 $command $conf --daemonize yes
 
 # check if its running
