@@ -24,7 +24,7 @@ if grep -q 'release 7' /etc/redhat-release; then
 fi
 if grep -q 'release 8' /etc/redhat-release; then
 	# centos 8
-	yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm deltarpm
+	yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm deltarpm
 fi
 
 # skipping golang here because it's huge!
