@@ -82,10 +82,10 @@ function touchRPMs {
 	version=$1
 	if [[ ${GATEWAY[$version]+_} ]]; then
 		gwVers=${GATEWAY[$version]}
-		dshbVers=${DASHBOARD[$gwVers]}
-		TIBvers=${TIB[$gwVers]}
-		pumpVers=${PUMP[$gwVers]}
-		syncVers=${SYNC[$gwVers]}
+		dshbVers=${DASHBOARD[$vesion]}
+		TIBvers=${TIB[$vesion]}
+		pumpVers=${PUMP[$vesion]}
+		syncVers=${SYNC[$vesion]}
 	else
 		echo "[FATAL]Gateway version $version isn't configured $VERSIONFILE"
 		exit 1
@@ -120,9 +120,9 @@ function listVersions {
 		gwVers=${GATEWAY[$version]}
 		echo "Version:   $version"
 		echo "    Gateway:   $gwVers"
-		[[ -n ${DASHBOARD[$gwVers]} ]] && echo "    Dashboard: ${DASHBOARD[$gwVers]}"
-		[[ -n ${TIB[$gwVers]} ]] && echo "    TIB:       ${TIB[$gwVers]}"
-		[[ -n ${PUMP[$gwVers]} ]] && echo "    Pump:      ${PUMP[$gwVers]}"
+		[[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
+		[[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
+		[[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
 	done
 }
 
@@ -140,10 +140,10 @@ function loadVersions {
 	IFS=,
 	echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers
 	GATEWAY[$version]=$gwVers
-	DASHBOARD[$gwVers]=$dshbVers
-	PUMP[$gwVers]=$pumpVers
-	TIB[$gwVers]=$TIBvers
-	SYNC[$gwVers]=$syncVers
+	DASHBOARD[$version]=$dshbVers
+	PUMP[$version]=$pumpVers
+	[[ -n $TIBvers ]] && TIB[$version]=$TIBvers
+	SYNC[$version]=$syncVers
 }
 
 # Load the versions of the products that go together
