@@ -39,10 +39,10 @@ function loadVersions {
   IFS=,
   echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers
   GATEWAY[$version]=$gwVers
-  DASHBOARD[$gwVers]=$dshbVers
-  PUMP[$gwVers]=$pumpVers
-  TIB[$gwVers]=$TIBvers
-  SYNC[$gwVers]=$syncVers
+  DASHBOARD[$version]=$dshbVers
+  PUMP[$version]=$pumpVers
+  [[ -n $TIBvers ]] && TIB[$version]=$TIBvers
+  SYNC[$version]=$syncVers
 }
 
 function loadVersionFile {
@@ -58,9 +58,9 @@ function listversions {
     gwVersion=${GATEWAY[$version]}
     echo "Version:   $version"
     echo "    Gateway:   $gwVersion"
-    [[ ${DASHBOARD[$gwVersion]+_} ]] && echo "    Dashboard: ${DASHBOARD[$gwVersion]}"
-    [[ ${TIB[$gwVersion]+_} ]] && echo "    TIB:       ${TIB[$gwVersion]}"
-    [[ ${PUMP[$gwVersion]+_} ]] && echo "    Pump:      ${PUMP[$gwVersion]}"
+    [[ ${DASHBOARD[$version]+_} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
+    [[ ${TIB[$version]+_} ]] && echo "    TIB:       ${TIB[$version]}"
+    [[ ${PUMP[$version]+_} ]] && echo "    Pump:      ${PUMP[$version]}"
   done
 }
 
@@ -109,10 +109,10 @@ done
 
 if [[ ${GATEWAY[$version]+_} ]]; then
   tykVersion=${GATEWAY[$version]}
-  dshbVersion=${DASHBOARD[$tykVersion]}
-  tibVersion=${TIB[$tykVersion]}
-  pumpVersion=${PUMP[$tykVersion]}
-  syncVersion=${SYNC[$tykVersion]}
+  dshbVersion=${DASHBOARD[$version]}
+  tibVersion=${TIB[$version]}
+  pumpVersion=${PUMP[$version]}
+  syncVersion=${SYNC[$version]}
 else
   echo "Unknown version"
   help
