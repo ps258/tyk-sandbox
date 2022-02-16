@@ -28,6 +28,7 @@ do
 done
 if [[ -n $tyk_rpmlist ]]
 then
+	echo "yum install -y $tyk_rpmlist"
 	yum install -y $tyk_rpmlist
 fi
 if [[ -f /assets/schema.json ]]

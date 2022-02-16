@@ -1,6 +1,6 @@
 {
   "listen_address": "",
-  "listen_port": 8080,
+  "listen_port": 8081,
   "secret": "Secret",
   "node_secret": "shared_node_secret",
   "template_path": "/opt/tyk-gateway/templates",
