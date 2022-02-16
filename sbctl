@@ -82,10 +82,10 @@ function touchRPMs {
 	version=$1
 	if [[ ${GATEWAY[$version]+_} ]]; then
 		gwVers=${GATEWAY[$version]}
-		dshbVers=${DASHBOARD[$vesion]}
-		TIBvers=${TIB[$vesion]}
-		pumpVers=${PUMP[$vesion]}
-		syncVers=${SYNC[$vesion]}
+		dshbVers=${DASHBOARD[$version]}
+		TIBvers=${TIB[$version]}
+		pumpVers=${PUMP[$version]}
+		syncVers=${SYNC[$version]}
 	else
 		echo "[FATAL]Gateway version $version isn't configured $VERSIONFILE"
 		exit 1
