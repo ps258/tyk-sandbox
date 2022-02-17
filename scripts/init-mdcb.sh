@@ -17,7 +17,8 @@ if [[ ! -f $1 ]]; then
 	exit 1
 fi
 
-yum -y install $1
+#yum -y install $1
+rpm --install $1
 
 # setup MDCB config 
 if [[ -d /opt/tyk-sink ]]; then
