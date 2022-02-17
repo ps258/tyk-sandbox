@@ -1,4 +1,4 @@
-FROM centos:7
+FROM registry.access.redhat.com/ubi7/ubi:latest
 EXPOSE 3000
 EXPOSE 8080
 EXPOSE 6379
