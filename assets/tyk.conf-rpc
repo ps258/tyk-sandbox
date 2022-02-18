@@ -120,5 +120,6 @@
   "enable_bundle_downloader": true,
   "bundle_base_url": "http://localhost:8000",
   "disable_ports_whitelist": true,
+	"enable_http_profiler": true,
   "max_idle_connections_per_host": 50
 }
