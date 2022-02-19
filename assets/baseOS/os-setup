@@ -46,5 +46,8 @@ sed -i 's/bindIp/#bindIp/' /etc/mongod.conf
 sed -i 's/^protected-mode yes/protected-mode no/' /etc/redis.conf
 sed -i 's/^bind 127.0.0.1/#bind 127.0.0.1/' /etc/redis.conf
 
+# creqate mongo database directory
+mkdir -p /data/db
+
 # tidyup to reduce the image size. Saves 200-300 MB
 yum clean all
