@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi7/ubi:latest
+FROM centos:7
 EXPOSE 3000
 EXPOSE 8080
 EXPOSE 6379
@@ -6,8 +6,15 @@ EXPOSE 27017
 
 COPY assets /assets
 
+ARG SBX_GATEWAY_VERS=""
+ARG SBX_DASHBOARD_VERS=""
+ARG SBX_PUMP_VERS=""
+ARG SBX_TIB_VERS=""
+ARG SBX_SYNC_VERS=""
+ARG SBX_SCHEMA_URL=""
+
 RUN chmod +x /assets/baseOS/os-setup && /assets/baseOS/os-setup
-RUN chmod +x /assets/rpms/install-tyk && mkdir -p /data/db && /assets/rpms/install-tyk
+RUN chmod +x /assets/rpms/install-tyk && /assets/rpms/install-tyk 
 
 COPY scripts /scripts
 RUN chmod +x /scripts/*

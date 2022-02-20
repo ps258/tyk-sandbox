@@ -69,6 +69,7 @@ function help {
 }
 
 # touch files correspoinding to the versions that need to be installed so that the installer can install them
+# deprecated in favour of echoBuildArgs and using --build-arg docker options which allows parallel builds
 function touchRPMs {
 	typeset version
 	typeset gwVers
@@ -87,7 +88,7 @@ function touchRPMs {
 		pumpVers=${PUMP[$version]}
 		syncVers=${SYNC[$version]}
 	else
-		echo "[FATAL]Gateway version $version isn't configured $VERSIONFILE"
+		echo "[FATAL]Gateway version '$version' isn't configured in $VERSIONFILE"
 		exit 1
 	fi
 	# get the schema file
@@ -110,6 +111,38 @@ function touchRPMs {
 	if [[ -n $syncVers ]]; then
 		touch "$rpmDir/tyk-sync-$syncVers"
 	fi
+}
+
+# Echo the build versions for each component in a format ready for docker build to swallow
+function echoBuildArgs {
+	typeset version; typeset gwVers; typeset dshbVers; typeset pumpVers; typeset TIBvers
+	typeset syncVers; typeset assetDir="$SCRIPTDIR"/assets
+	typeset SBX_SCHEMA_URL; typeset SBX_GATEWAY_VERS; typeset SBX_DASHBOARD_VERS;
+	typeset SBX_PUMP_VERS; typeset SBX_TIB_VERS; typeset SBX_SYNC_VERS
+	version=$1
+	if [[ ${GATEWAY[$version]+_} ]]; then
+		gwVers=${GATEWAY[$version]}
+		dshbVers=${DASHBOARD[$version]}
+		TIBvers=${TIB[$version]}
+		pumpVers=${PUMP[$version]}
+		syncVers=${SYNC[$version]}
+	else
+		echo "[FATAL]Gateway version '$version' isn't configured in $VERSIONFILE"
+		exit 1
+	fi
+	# store the URL for the schema
+	SBX_SCHEMA_URL="--build-arg SBX_SCHEMA_URL=https://raw.githubusercontent.com/TykTechnologies/tyk/v$version/cli/linter/schema.json"
+	# set the env vars for the build
+	SBX_GATEWAY_VERS="--build-arg SBX_GATEWAY_VERS=tyk-gateway-$gwVers"
+	SBX_DASHBOARD_VERS="--build-arg SBX_DASHBOARD_VERS=tyk-dashboard-$dshbVers"
+	SBX_PUMP_VERS="--build-arg SBX_PUMP_VERS=tyk-pump-$pumpVers"
+	if [[ -n $TIBvers ]]; then
+		SBX_TIB_VERS="--build-arg SBX_TIB_VERS=tyk-identity-broker-$TIBvers"
+	fi
+	if [[ -n $syncVers ]]; then
+		SBX_SYNC_VERS="--build-arg SBX_SYNC_VERS=tyk-sync-$syncVers"
+	fi
+	echo $SBX_SCHEMA_URL $SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS
 }
 
 # list the version relationships we know about
@@ -262,8 +295,9 @@ function buildImage {
 	fi
 	imageRev=$(nextFreeImageRev $tykVersion)
 	cd "$SCRIPTDIR"
-	touchRPMs $tykVersion
-	docker image build --tag tyk-sandbox:$tykVersion-$imageRev .
+	#touchRPMs $tykVersion
+	#echo docker image build $(echoBuildArgs $tykVersion) --tag tyk-sandbox:$tykVersion-$imageRev .
+	docker image build $(echoBuildArgs $tykVersion) --tag tyk-sandbox:$tykVersion-$imageRev .
 }
 
 # invoke docker container create and start with everything set

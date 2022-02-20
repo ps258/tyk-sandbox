@@ -4,6 +4,7 @@ PATH=/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 
 cd $(dirname $0)
 
+# Install any dependency RPMs fro the 'deps' directory
 dep_rpmlist=""
 for rpm in deps/*.rpm 
 do
@@ -17,27 +18,23 @@ then
 	yum --disablerepo=* localinstall -y $dep_rpmlist
 fi
 
-tyk_rpmlist=""
-for rpm in tyk/*
-do
-	if [[ -f $rpm ]]
-	then
-		tyk_rpmlist="$tyk_rpmlist $(basename $rpm)"
-		rm -f $rpm
-	fi
-done
-if [[ -n $tyk_rpmlist ]]
-then
+# install tyk
+tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS"
+if [[ -n $tyk_rpmlist ]]; then
 	echo "yum install -y $tyk_rpmlist"
 	yum install -y $tyk_rpmlist
-fi
-if [[ -f /assets/schema.json ]]
-then
-	mkdir -p /opt/tyk-gateway/cli/linter && \mv /assets/schema.json /opt/tyk-gateway/cli/linter
-elif [[ -f /assets/schema.json.default ]]
-then
-	mkdir -p /opt/tyk-gateway/cli/linter && cp /assets/schema.json.default /opt/tyk-gateway/cli/linter/
-	ln -s /opt/tyk-gateway/cli/linter/schema.json.default /opt/tyk-gateway/cli/linter/schema.json
+else
+	echo "[FATAL]No rpms to install"
 fi
 
+# get the tyk.conf schema so 'tyk lint' works
+if [[ -n $SBX_SCHEMA_URL ]]; then
+	wget -q $SBX_SCHEMA_URL -O /assets/schema.json
+fi
+if [[ -s /assets/schema.json ]]
+then
+	mkdir -p /opt/tyk-gateway/cli/linter && \mv /assets/schema.json /opt/tyk-gateway/cli/linter
+fi
+
+# tidy up the yum repos to reduce the image size
 yum clean all
