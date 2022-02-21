@@ -19,10 +19,18 @@ if [[ ! -f /initialised ]]; then
   cp -f /assets/tyk.conf /opt/tyk-gateway/
   cp -f /assets/pump.conf /opt/tyk-pump/
 
+	if [[ -n $SBX_GW_CNAME ]]; then
+		SBX_GW_HOST=$SBX_GW_CNAME
+	fi
+	if [[ -n $SBX_DSHB_CNAME ]]; then
+		SBX_DSHB_HOST=$SBX_DSHB_CNAME
+	fi
+
   echo "[INFO]Setting gateway host and port in tyk_analytics.conf"
   sed -i "s/SBX_GW_PORT/$SBX_GW_PORT/g" /opt/tyk-dashboard/tyk_analytics.conf
   sed -i "s/SBX_GW_HOST/$SBX_GW_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
   sed -i "s/SBX_DSHB_HOST/$SBX_DSHB_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
+  sed -i "s/SBX_DSHB_PORT/$SBX_DSHB_PORT/g" /opt/tyk-dashboard/tyk_analytics.conf
 
 	# setup MDCB config if it's /opt/tyk-sink
 	if [[ -d /opt/tyk-sink ]]; then
@@ -62,12 +70,15 @@ echo "[INFO]Starting mongoDB"
 
 echo "[INFO]Starting Tyk dashboard"
 /scripts/start-dashboard.sh
-sleep 5
+sleep 1
 
 # once the dashboard is running, use the admin API to create users and upload a licence
 if [[ ! -f /initialised ]]; then
   echo "[INFO]Initialising the dashboard"
   /scripts/init-dashboard.sh > /var/log/init-dashboard.log 2>&1
+	sleep 1
+	restart dashboard
+	sleep 1
 fi
 
 echo "[INFO]Starting Tyk gateway"

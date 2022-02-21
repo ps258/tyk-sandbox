@@ -22,10 +22,15 @@ then
 
   # this method is reliable for 2.8.x -> 3.2.x
   ADMIN_SECRET=$(jq -r .admin_secret /opt/tyk-dashboard/tyk_analytics.conf)
+	if [[ -n $SBX_PTL_CNAME ]]; then
+		PORTAL_CNAME="$SBX_PTL_CNAME:$SBX_DSHB_PORT"
+	else
+		PORTAL_CNAME=""
+	fi
   ORG_DATA=$(curl --silent \
     --header "admin-auth: $ADMIN_SECRET" \
     --header "Content-Type:application/json" \
-    --data '{"owner_name": "Default Org.","owner_slug": "default", "cname_enabled": true, "cname": ""}' \
+    --data '{"owner_name": "Default Org.","owner_slug": "default", "cname_enabled": true, "cname": "'$PORTAL_CNAME'"}' \
     http://localhost:3000/admin/organisations)
 
   ORG_ID=$(echo $ORG_DATA | jq -r .Meta)
