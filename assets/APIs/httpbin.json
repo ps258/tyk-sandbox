@@ -15,7 +15,7 @@
   },
   "proxy": {
     "listen_path": "/httpbin/",
-    "target_url": "http://httpbin.org/",
+    "target_url": "http://httpbin.org/anything",
     "strip_listen_path": true
   },
   "active": true
