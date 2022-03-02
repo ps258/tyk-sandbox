@@ -408,6 +408,7 @@ function createSandbox {
 		--env SBX_GW_HOST=$hostFQDN \
 		--env SBX_DSHB_HOST=$hostFQDN \
 		--env SBX_DSHB_PORT=$dashboardPort \
+		--env PS1='[\u@'sanbox-$index' \W]\$ ' \
 		--env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/scripts:/opt/tyk-sync \
 		$env_file \
 		--label sandbox.label=$label \
