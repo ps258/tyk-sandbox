@@ -249,17 +249,27 @@ function nextFreeContainer {
 	done
 }
 
+# build the TBI to save build time with lots of images
+function buildTykBaseImage {
+	existing=$(docker image list tbi:latest | awk '/tbi/')
+  if [[ -z $existing ]]; then
+    cd tbi
+	  docker image build --tag tbi:latest .
+    cd -
+  fi
+}
+
 # build all images
 function buildAllImages {
 	typeset version
 	for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
 		echo "[INFO]Building $version"
-		buildImage -v $version
+		buildSandboxImage -v $version
 	done
 }
 
 # invoke docker image build with all the right details
-function buildImage {
+function buildSandboxImage {
 	typeset arg
 	typeset tykVersion
 	typeset tykVersion
@@ -289,7 +299,10 @@ function buildImage {
 	if [[ -z $tykVersion ]]; then
 		echo "[FATAL]Must specify a version to build" 1>&2
 		exit 1
-	elif [[ $tykVersion == "ALL" ]]; then
+  fi
+  # build the base image if it's not present
+  buildTykBaseImage
+	if [[ $tykVersion == "ALL" ]]; then
 		buildAllImages
 		return
 	fi
@@ -485,7 +498,7 @@ case $1 in
 	build)
 		shift
 		# Create a docker image with the given parameters
-		buildImage "$@"
+		buildSandboxImage "$@"
 		;;
 	create)
 		shift

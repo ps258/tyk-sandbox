@@ -1,13 +1,14 @@
 #!/bin/bash
 
 PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
+SOURCE_DIR=/baseOS
 
 # setup vimrc for the way I like it
-cp /assets/baseOS/vimrc /root/.vimrc
-cp /assets/baseOS/curlc /root/.curlc
+cp $SOURCE_DIR/vimrc /root/.vimrc
+cp $SOURCE_DIR/curlc /root/.curlc
 
 # copy repos into place
-for repo in /assets/baseOS/repos/*.repo; do
+for repo in $SOURCE_DIR/repos/*.repo; do
 	if [[ -f $repo ]]; then
 		cp $repo /etc/yum.repos.d/
 	fi

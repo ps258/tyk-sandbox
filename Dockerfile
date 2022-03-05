@@ -1,4 +1,4 @@
-FROM centos:7
+FROM tbi:latest
 EXPOSE 3000
 EXPOSE 8080
 EXPOSE 6379
@@ -13,7 +13,6 @@ ARG SBX_TIB_VERS=""
 ARG SBX_SYNC_VERS=""
 ARG SBX_SCHEMA_URL=""
 
-RUN chmod +x /assets/baseOS/os-setup && /assets/baseOS/os-setup
 RUN chmod +x /assets/rpms/install-tyk && /assets/rpms/install-tyk 
 
 COPY scripts /scripts
