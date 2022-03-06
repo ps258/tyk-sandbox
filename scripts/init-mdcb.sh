@@ -17,19 +17,16 @@ if [[ ! -f $1 ]]; then
 	exit 1
 fi
 
-#yum -y install $1
 rpm --install $1
 
 # setup MDCB config 
-if [[ -d /opt/tyk-sink ]]; then
-	cp -f /assets/tyk_sink.conf /opt/tyk-sink/
-	if [[ -f /opt/tyk-sink/tyk_sink.conf ]]; then
-		if [[ -n $SBX_MDCB_LICENSE ]]; then
-			sed -i "s/SBX_MDCB_LICENSE/$SBX_MDCB_LICENSE/g" /opt/tyk-sink/tyk_sink.conf
-		else
-			echo "[WARN]/opt/tyk-sink/tyk_sink.conf is present but SBX_MDCB_LICENSE is not defined."
-		fi
-	fi
+cp -f /assets/tyk_sink.conf /opt/tyk-sink/
+if [[ -f /opt/tyk-sink/tyk_sink.conf ]]; then
+  if [[ -n $SBX_MDCB_LICENSE ]]; then
+    sed -i "s/SBX_MDCB_LICENSE/$SBX_MDCB_LICENSE/g" /opt/tyk-sink/tyk_sink.conf
+  else
+    echo "[WARN]/opt/tyk-sink/tyk_sink.conf is present but SBX_MDCB_LICENSE is not defined."
+  fi
 fi
 
 # setup another redis
@@ -46,5 +43,11 @@ if [[ -f /assets/tyk.conf-rpc ]]; then
 	sed -i "s/SBX_ADMIN_API_KEY/$SBX_ADMIN_API_KEY/g" /opt/tyk-gateway/tyk.conf-rpc
 fi
 
-# enable hybrid mode
+# enable hybrid mode in all orgs
 /scripts/enable-hybrid.sh
+
+# dashboard needs to restart to get the updated org
+restart dashboard
+
+# now start mdcb
+start mdcb
