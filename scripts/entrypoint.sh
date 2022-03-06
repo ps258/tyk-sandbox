@@ -32,18 +32,6 @@ if [[ ! -f /initialised ]]; then
   sed -i "s/SBX_DSHB_HOST/$SBX_DSHB_HOST/g" /opt/tyk-dashboard/tyk_analytics.conf
   sed -i "s/SBX_DSHB_PORT/$SBX_DSHB_PORT/g" /opt/tyk-dashboard/tyk_analytics.conf
 
-	# setup MDCB config if it's /opt/tyk-sink
-	if [[ -d /opt/tyk-sink ]]; then
-		cp -f /assets/tyk_sink.conf /opt/tyk-sink/
-		if [[ -f /opt/tyk-sink/tyk_sink.conf ]]; then
-			if [[ -n $SBX_MDCB_LICENSE ]]; then
-				sed -i "s/SBX_MDCB_LICENSE/$SBX_MDCB_LICENSE/g" /opt/tyk-sink/tyk_sink.conf
-			else
-				echo "[WARN]/opt/tyk-sink/tyk_sink.conf is present but SBX_MDCB_LICENSE is not defined."
-			fi
-		fi
-	fi
-
   echo "[INFO]Generating tyk private keys"
   openssl genrsa -out /privkey.pem 2048
   openssl rsa -in /privkey.pem -pubout -out /pubkey.pem
