@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/usr/bin/bash
 
 # Not used but left as an example.
 # Only looks at release versions in package cloud so is inferior to adding the repos into yum's config
@@ -149,3 +149,6 @@ if [[ -n $syncVersion ]]; then
   download $rpm $url
 fi
 
+echo SBX_GATEWAY_VERS=tyk-gateway-$tykVersion
+echo SBX_DASHBOARD_VERS=tyk-dashboard-$dshbVersion
+echo SBX_PUMP_VERS=tyk-pump-$pumpVersion
