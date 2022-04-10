@@ -277,6 +277,7 @@ function buildSandboxImage {
 	typeset imageRev
 	typeset arg
 	typeset OPTARG
+	cd "$SCRIPTDIR"
 	while getopts :lv:r: arg; do
 		case $arg in
 		l)
@@ -307,7 +308,6 @@ function buildSandboxImage {
 		return
 	fi
 	imageRev=$(nextFreeImageRev $tykVersion)
-	cd "$SCRIPTDIR"
 	#touchRPMs $tykVersion
 	#echo docker image build $(echoBuildArgs $tykVersion) --tag tyk-sandbox:$tykVersion-$imageRev .
 	docker image build $(echoBuildArgs $tykVersion) --tag tyk-sandbox:$tykVersion-$imageRev .
