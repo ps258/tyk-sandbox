@@ -10,10 +10,10 @@ GatewayBasePort=5001
 RedisBasePort=6001
 MongoBasePort=7001
 SCRIPTDIR=$(
-	cd $(dirname $SCRIPTNAME)
+	cd "$(dirname $SCRIPTNAME)"
 	echo $PWD
 )
-VERSIONFILE=$SCRIPTDIR/tyk-versions.list
+VERSIONFILE="$SCRIPTDIR/tyk-versions.list"
 
 # directories shared into all sandboxes to allow for plugins and certs to be installed easily
 SandboxPluginDir=~/tyk/plugins
@@ -78,7 +78,7 @@ function touchRPMs {
 	typeset TIBvers
 	typeset syncVers
 	typeset oldFile
-	typeset assetDir="$SCRIPTDIR"/assets
+	typeset assetDir="$SCRIPTDIR/assets"
 	typeset rpmDir="$assetDir"/rpms/tyk
 	version=$1
 	if [[ ${GATEWAY[$version]+_} ]]; then
@@ -116,7 +116,7 @@ function touchRPMs {
 # Echo the build versions for each component in a format ready for docker build to swallow
 function echoBuildArgs {
 	typeset version; typeset gwVers; typeset dshbVers; typeset pumpVers; typeset TIBvers
-	typeset syncVers; typeset assetDir="$SCRIPTDIR"/assets
+	typeset syncVers; typeset assetDir="$SCRIPTDIR/assets"
 	typeset SBX_SCHEMA_URL; typeset SBX_GATEWAY_VERS; typeset SBX_DASHBOARD_VERS;
 	typeset SBX_PUMP_VERS; typeset SBX_TIB_VERS; typeset SBX_SYNC_VERS
 	version=$1
