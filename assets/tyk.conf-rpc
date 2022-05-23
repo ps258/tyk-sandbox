@@ -57,7 +57,7 @@
     "enable_detailed_recording": true
   },
   "health_check": {
-    "enable_health_checks": true,
+    "enable_health_checks": false,
     "health_check_value_timeouts": 60
   },
   "optimisations_use_async_session_write": true,
@@ -111,6 +111,11 @@
   "coprocess_options": {
     "enable_coprocess": true,
     "python_path_prefix": "/opt/tyk-gateway"
+  },
+  "dns_cache": {
+    "enabled": true,
+    "ttl": 60,
+    "multiple_ips_handle_strategy": "random"
   },
   "public_key_path": "/pubkey.pem",
   "proxy_ssl_insecure_skip_verify": true,
