@@ -411,6 +411,7 @@ function createSandbox {
 	fi
 	echo "[INFO]Creating container $containerName"
 	docker container create --name $containerName \
+		--hostname $label \
 		--publish $dashboardPort:3000 \
 		--publish $gatewayPort:8080 \
 		--publish $redisPort:6379 \
