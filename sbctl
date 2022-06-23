@@ -410,6 +410,7 @@ function createSandbox {
 		env_file=""
 	fi
 	echo "[INFO]Creating container $containerName"
+	# this is needed to make golang plugins work on an M1 Mac 'DOCKER_DEFAULT_PLATFORM=linux/amd64'
 	docker container create --name $containerName \
 		--hostname $label \
 		--publish $dashboardPort:3000 \
@@ -417,6 +418,7 @@ function createSandbox {
 		--publish $redisPort:6379 \
 		--publish $mongoPort:27017 \
 		$TIBPort \
+		--env DOCKER_DEFAULT_PLATFORM=linux/amd64 \
 		--env TYK_LOGLEVEL=$logLevel \
 		--env SBX_GW_PORT=$gatewayPort \
 		--env SBX_GW_HOST=$hostFQDN \
