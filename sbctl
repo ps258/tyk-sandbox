@@ -539,8 +539,8 @@ case $1 in
 		shift
 		if [[ -r "$SCRIPTFILE" ]]; then
 			for index in $(listRunningNames $*); do
-				docker container cp $SCRIPTFILE sandbox-$index:/
-			  docker container exec -t sandbox-$index /$SCRIPTFILE
+				docker container cp $SCRIPTFILE sandbox-$index:/$(basename $SCRIPTFILE)
+				docker container exec -t sandbox-$index /$(basename $SCRIPTFILE)
 			done
 		else
 			echo "[FATAL]Scipt '$SCRIPTFILE' does not exist or is unreadable"
@@ -555,8 +555,8 @@ case $1 in
 		shift
 		if [[ -f "$APIFILE" ]]; then
 			for index in $(listRunningNames $*); do
-				docker container cp "$APIFILE" sandbox-$index:/
-				docker container exec -t sandbox-$index bash -c "/scripts/publish-apis '/$APIFILE'"
+				docker container cp "$APIFILE" sandbox-$index:/$(basename $APIFILE)
+				docker container exec -t sandbox-$index bash -c "/scripts/publish-apis '/$(basename $APIFILE)'"
 			done
 		else
 			echo "[FATAL]API file '$APIFILE' does not exist or is unreadable"
