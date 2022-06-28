@@ -254,7 +254,7 @@ function buildTykBaseImage {
 	existing=$(docker image list tbi:latest | awk '/tbi/')
   if [[ -z $existing ]]; then
     cd tbi
-	  docker image build --tag tbi:latest .
+	  docker image build --progress=plain --tag tbi:latest .
     cd -
   fi
 }
@@ -310,7 +310,7 @@ function buildSandboxImage {
 	imageRev=$(nextFreeImageRev $tykVersion)
 	#touchRPMs $tykVersion
 	#echo docker image build $(echoBuildArgs $tykVersion) --tag tyk-sandbox:$tykVersion-$imageRev .
-	docker image build $(echoBuildArgs $tykVersion) --tag tyk-sandbox:$tykVersion-$imageRev .
+	docker image build $(echoBuildArgs $tykVersion) --progress=plain --tag tyk-sandbox:$tykVersion-$imageRev .
 }
 
 # invoke docker container create and start with everything set
