@@ -101,7 +101,7 @@ To get help on various options
 
 - The file in the host file system `~/.tyk-sandbox` can be populated with environment variables which are passed into any container created. 
 	- If `SBX_LICENSE` is set then the dashboard will be bootstraped. 
-	- If `SBX_USER` and `SBX_PASSWORD` are set then an admin user will be created with those login details. See 'sbctl -h' for details.
+	- If `SBX_USER` and `SBX_PASSWORD` are set then an admin user will be created with those login details. See `sbctl help` for details.
 	- If `SBX_GW_CNAME` is set then `override_hostname` will be set to it in `/opt/tyk-dashboard/tyk_analytics.conf`
 	- If `SBX_DSHB_CNAME` is set then `host_config.hostname` and `http_server_options.certificates.domain_name` will be set. Note that `http_server_options.certificates.domain_name` isn't used because the dashboard runs on http not https, but its there if someone needs to change to https.
 	- If `SBX_PTL_CNAME` is set then the portal cname will be set when creating the organisation. Note that because `generate_secure_paths` is true the dashboard menu item 'OPEN YOUR PORTAL' will attempt to open it over https when it's only available on http. I don't see a way around this while keeping the gateway on https.
