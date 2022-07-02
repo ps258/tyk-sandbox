@@ -14,6 +14,7 @@ SCRIPTDIR=$(
 	echo $PWD
 )
 VERSIONFILE="$SCRIPTDIR/tyk-versions.list"
+PATH="$SCRIPTDIR:$PATH"
 
 # directories shared into all sandboxes to allow for plugins and certs to be installed easily
 SandboxPluginDir=~/tyk/plugins
@@ -54,8 +55,9 @@ function help {
 	echo "               echo password | base64"
 	echo "        -t ticket or comment field"
 	echo "        -v tyk version of sandbox image. Required"
-	echo "$name images"
+	echo "$name images [-r <image versions to remove|ALL]]"
 	echo "        list the docker images for creating sandboxes"
+	echo "        -r image version to remove|ALL. Removes the image version"
 	echo "$name list <index number...>"
 	echo "        details about the named sandbox or all"
 	echo "$name publish api.json <index number...>"
@@ -66,6 +68,25 @@ function help {
 	echo "        Open a bash shell in the sandboxes named"
 	echo "$name [start|stop|restart|rm] <index number...>"
 	echo "        take the action named on the listed sandboxes"
+}
+
+function rmSandboxImages {
+	set -x
+	typeset version
+	typeset removeList
+	if echo $* | grep -q ALL; then
+		for version in $(docker image list tyk-sandbox | awk '!/REPOSITORY/ {print $2}'); do
+			removeList="$removeList tyk-sandbox:$version"
+		done
+	else
+		for version in $*; do
+			removeList="$removeList tyk-sandbox:$version"
+		done
+	fi
+	#removeList=$(echo $removeList)
+	if [[ -n $removeList ]]; then
+		docker image rm $removeList
+	fi
 }
 
 # touch files correspoinding to the versions that need to be installed so that the installer can install them
@@ -509,9 +530,16 @@ case $1 in
 		createSandbox "$@"
 		;;
 	image*)
-		# list the tyk-sandbox docker images
-		# note the almost magical pipe feature of awk used here. It sorts the versions but not the header
-		docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
+		# list or remove the tyk-sandbox docker images
+		if [[ $# -gt 1 ]]; then
+			if [[ $1 -eq '-r' ]]; then
+				shift 2
+				rmSandboxImages $*
+			fi
+		else
+			# note the almost magical pipe feature of awk used here. It sorts the versions but not the header
+			docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
+		fi
 		;;
 	info | list | status)
 		if [[ $# -gt 1 ]]; then
