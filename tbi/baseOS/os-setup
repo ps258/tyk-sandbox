@@ -13,6 +13,8 @@ for repo in $SOURCE_DIR/repos/*.repo; do
 		cp $repo /etc/yum.repos.d/
 	fi
 done
+# Disable fastestmirror because it sometimes selects a fast but incomplete mirror
+sed -i s/enabled=1/enabled=0/ /etc/yum/pluginconf.d/fastestmirror.conf
 
 useradd -c 'Tyk service user' -m -s /sbin/nologin tyk
 
