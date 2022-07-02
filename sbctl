@@ -71,7 +71,6 @@ function help {
 }
 
 function rmSandboxImages {
-	set -x
 	typeset version
 	typeset removeList
 	if echo $* | grep -q ALL; then
