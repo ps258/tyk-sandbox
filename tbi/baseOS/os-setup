@@ -14,7 +14,9 @@ for repo in $SOURCE_DIR/repos/*.repo; do
 	fi
 done
 # Disable fastestmirror because it sometimes selects a fast but incomplete mirror
-sed -i s/enabled=1/enabled=0/ /etc/yum/pluginconf.d/fastestmirror.conf
+if [[ -f /etc/yum/pluginconf.d/fastestmirror.conf ]]; then
+	sed -i s/enabled=1/enabled=0/ /etc/yum/pluginconf.d/fastestmirror.conf
+fi
 
 useradd -c 'Tyk service user' -m -s /sbin/nologin tyk
 
@@ -27,7 +29,9 @@ if grep -q 'release 7' /etc/redhat-release; then
 fi
 if grep -q 'release 8' /etc/redhat-release; then
 	# centos 8
-	yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm deltarpm
+	sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+	sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+	yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm 
 fi
 
 # skipping golang here because it's huge!
@@ -48,9 +52,6 @@ fi
 sed -i 's/bindIp/#bindIp/' /etc/mongod.conf
 sed -i 's/^protected-mode yes/protected-mode no/' /etc/redis.conf
 sed -i 's/^bind 127.0.0.1/#bind 127.0.0.1/' /etc/redis.conf
-
-# creqate mongo database directory
-mkdir -p /data/db
 
 # tidyup to reduce the image size. Saves 200-300 MB
 yum clean all
