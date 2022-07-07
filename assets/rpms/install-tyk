@@ -28,6 +28,12 @@ else
 	echo "[FATAL]No rpms to install"
 fi
 
+# split out the tyk-sync install because it fails on M1 Macs causing the whole thing to fail
+if [[ -n $SBX_SYNC_VERS && "x86_64" == $(uname -i) ]]; then
+	echo yum install -y $SBX_SYNC_VERS
+	yum -y install $SBX_SYNC_VERS
+fi
+
 # get the tyk.conf schema so 'tyk lint' works
 if [[ -n $SBX_SCHEMA_URL ]]; then
 	wget -q $SBX_SCHEMA_URL -O /assets/schema.json
