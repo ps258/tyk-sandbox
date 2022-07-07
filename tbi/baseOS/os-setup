@@ -35,17 +35,17 @@ if grep -q 'release 8' /etc/redhat-release; then
 fi
 
 # skipping golang here because it's huge!
-yum -y install procps-ng iputils net-tools.x86_64 vim-enhanced.x86_64 wget curl python3 jq # golang.x86_64
+yum -y install procps-ng iputils net-tools vim-enhanced wget curl python3 jq # golang
 yum -y install python3-devel python3-setuptools
 pip3 install --upgrade pip
 pip3 install protobuf grpcio
 if grep -q 'release 7' /etc/redhat-release; then
 	# centos 7
-	yum -y install jemalloc.x86_64 logrotate.x86_64 make.x86_64 openssl.x86_64 mongodb-org.x86_64 redis
+	yum -y install jemalloc logrotate make openssl mongodb-org redis
 fi
 if grep -q 'release 8' /etc/redhat-release; then
 	# centos 8
-	yum -y install logrotate.x86_64 make.x86_64 openssl.x86_64 mongodb-org.x86_64 redis
+	yum -y install logrotate make openssl mongodb-org redis
 fi
 
 # open redis and mongo up to the world! Beware!!!

@@ -19,7 +19,8 @@ then
 fi
 
 # install tyk
-tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS"
+#tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS"
+tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS"
 if [[ -n $tyk_rpmlist ]]; then
 	echo "yum install -y $tyk_rpmlist"
 	yum install -y $tyk_rpmlist
