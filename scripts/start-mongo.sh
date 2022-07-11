@@ -21,7 +21,7 @@ if [[ -f $lock ]]
 then
   rm $lock
 fi
-$command --config $conf
+$command --config $conf --bind_ip_all
 err=$?
 sleep 1
 
