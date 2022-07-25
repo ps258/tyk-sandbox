@@ -35,7 +35,7 @@ if grep -q 'release 8' /etc/redhat-release; then
 fi
 
 # skipping golang here because it's huge!
-yum -y install procps-ng iputils net-tools vim-enhanced wget curl python3 jq # golang
+yum -y install procps-ng iputils net-tools vim-enhanced wget curl python3 jq diffutils # golang
 yum -y install python3-devel python3-setuptools
 pip3 install --upgrade pip
 pip3 install protobuf grpcio
