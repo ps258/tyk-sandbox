@@ -54,6 +54,7 @@
   "ssl_force_common_name_check": false,
   "enable_analytics": true,
   "analytics_config": {
+    "type": "rpc",
     "enable_detailed_recording": true
   },
   "health_check": {
