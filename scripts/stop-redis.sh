@@ -15,7 +15,7 @@ maxWait=11
 function isRunning {
   # check if there's a process listening on the expected port
 	# also populates $PID
-  PID=$(ss -lnptu4H  "( sport = :$PORT )" | awk '/pid=/ {print $NF}' | cut -d, -f 2 | cut -d= -f 2)
+  PID=$(ss -lnptuH  "( sport = :$PORT )" | awk '/pid=/ {print $NF}' | cut -d, -f 2 | cut -d= -f 2 | sort -u)
   if [[ ! -z $PID ]]
   then
     return $TRUE
