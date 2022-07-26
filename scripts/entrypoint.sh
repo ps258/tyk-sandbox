@@ -80,6 +80,11 @@ if [[ -d /opt/tyk-identity-broker/ ]]; then
   /scripts/start-tib.sh
 fi
 
+if [[ -d /opt/tyk-sink ]]; then
+  echo "[INFO]Starting MDCB"
+  start mdcb
+fi
+
 cd /
 echo "[INFO]Sandbox instance has started"
 sleep infinity
