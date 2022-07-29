@@ -39,10 +39,11 @@ function help {
 	name=$(basename $SCRIPTNAME)
 	echo "[USAGE]:"
 	echo "$name build -l | -v tyk-gateway-version-number [-r image version]"
-	echo "        builds a sandbox image for that version if its not already available"
+	echo "        build a sandbox image for that version if its not already available"
 	echo "        -v version to build ('ALL' to build all versions)"
 	echo "        -l list versions that images can be made for (incompatible with -v and -r)"
 	echo "$name create -v tyk-version [-t ticket no] [-i index-number] [-n]"
+	echo "        create a sandbox with the named version of tyk"
 	echo "        -i index number (skip for autoallocation of the next free)"
 	echo "        -l log level. Set to debug, info, warn or error. Defaults to debug"
 	echo "        -n IGNORE ~/.tyk-sandbox even if it exists"
@@ -60,8 +61,11 @@ function help {
 	echo "        -r image version to remove|ALL. Removes the image version"
 	echo "$name list <index number...>"
 	echo "        details about the named sandbox or all"
+	echo "$name mdcb <mdcb rpm path> <index number...>"
+	echo "        install MDCB from the named rpm, configure and start it"
+	echo "        the edge gateway becomes the gateway for the sandbox"
 	echo "$name publish api.json <index number...>"
-	echo "         publish the API in api.json into the sandbox"
+	echo "        publish the API in api.json into the sandbox"
 	echo "$name script scriptfile <index number...>"
 	echo "        copy the script into the container and run it"
 	echo "$name shell <index number...>"
@@ -550,6 +554,22 @@ case $1 in
 		else
 			# Inspect the details of all exiting containers
 			getAllSandboxInfo
+		fi
+		;;
+	mdcb)
+		shift
+		MDCB_RPM="$1"
+		shift
+		if [[ -r "$MDCB_RPM" ]]; then
+			for index in $(listRunningNames $*); do
+				docker container cp "$MDCB_RPM" sandbox-$index:/
+				# note that this must not have a controlling terminal (-t) or mdcb exits when the terminal closes
+				docker container exec sandbox-$index scripts/init-mdcb.sh /$(basename $MDCB_RPM)
+			done
+		else
+			echo "[FATAL]Cannot read $MDCB_RPM"
+			echo "[Usage]mdcb <path to MDCB RPM> <list of sandboxes>"
+			exit 1
 		fi
 		;;
 	shell | bash)
