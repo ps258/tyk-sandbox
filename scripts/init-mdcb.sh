@@ -37,12 +37,15 @@ mkdir -p /var/lib/redis2
 chown redis:redis /var/lib/redis2
 cp /assets/redis-for-remote-gw.conf /etc
 
+# load the SBX_ORG_ID and SBX_ADMIN_API_KEY from where they were saved during initialisation of the sandbox
+. /initial_credentials.txt
+
 # setup slave gateway
 echo "[INFO]Configuring Edge gateway"
 if [[ -f /assets/tyk.conf-rpc ]]; then
 	cp -f /assets/tyk.conf-rpc /opt/tyk-gateway
-	SBX_ORG_ID=$(awk '/Org ID:/ {print $NF}' /initial_credentials.txt)
-	SBX_ADMIN_API_KEY=$(awk '/Initial admin key:/ {print $NF}' /initial_credentials.txt)
+	#SBX_ORG_ID=$(awk '/Org ID:/ {print $NF}' /initial_credentials.txt)
+	#SBX_ADMIN_API_KEY=$(awk '/Initial admin key:/ {print $NF}' /initial_credentials.txt)
 	sed -i "s/SBX_ORG_ID/$SBX_ORG_ID/g" /opt/tyk-gateway/tyk.conf-rpc
 	sed -i "s/SBX_ADMIN_API_KEY/$SBX_ADMIN_API_KEY/g" /opt/tyk-gateway/tyk.conf-rpc
 fi
