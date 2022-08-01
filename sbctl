@@ -552,7 +552,7 @@ case $1 in
 	image*)
 		# list or remove the tyk-sandbox docker images
 		if [[ $# -gt 1 ]]; then
-			if [[ $1 = '-r' ]]; then
+			if [[ $2 = '-r' ]]; then
 				shift 2
 				rmSandboxImages $*
 			fi
