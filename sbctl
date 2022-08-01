@@ -59,8 +59,9 @@ function help {
 	echo "$name images [-r <image versions to remove|ALL]]"
 	echo "        list the docker images for creating sandboxes"
 	echo "        -r image version to remove|ALL. Removes the image version"
-	echo "$name list <index number...>"
+	echo "$name list|info|status [-v] <index number...>"
 	echo "        details about the named sandbox or all"
+	echo "        -v Also echo the org_id and the Admin API key"
 	echo "$name mdcb <mdcb rpm path> <index number...>"
 	echo "        install MDCB from the named rpm, configure and start it"
 	echo "        the edge gateway becomes the gateway for the sandbox"
@@ -206,15 +207,31 @@ function loadVersions {
 # Load the versions of the products that go together
 function loadVersionFile {
 	typeset line
-	typeset versionFile
 	for line in $(awk 'NF && !/#/' $VERSIONFILE); do
 		loadVersions "$line"
 	done
 }
 
 # Report the details of a sandbox container
+function getVerboseSandboxInfo {
+	typeset index
+	typeset containerName
+	typeset containerStatus
+	index=$1
+	containerName=sandbox-$index
+	containerStatus=$(docker container inspect -f '{{ .State.Status }}' $containerName)
+	echo $containerName \($containerStatus\)
+	docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label'
+	if [[ $containerStatus = 'running' ]]; then
+		docker container exec $containerName awk '/SBX_ORG_ID|SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed -e 's/SBX_//g' -e 's/=/ /'
+	fi
+	echo
+}
+
+# Report the details of a sandbox container
 function getSandboxInfo {
 	typeset index
+	typeset containerName
 	index=$1
 	containerName=sandbox-$index
 	echo $containerName \($(docker container inspect -f '{{ .State.Status }}' $containerName)\)
@@ -535,7 +552,7 @@ case $1 in
 	image*)
 		# list or remove the tyk-sandbox docker images
 		if [[ $# -gt 1 ]]; then
-			if [[ $1 -eq '-r' ]]; then
+			if [[ $1 = '-r' ]]; then
 				shift 2
 				rmSandboxImages $*
 			fi
@@ -545,12 +562,19 @@ case $1 in
 		fi
 		;;
 	info | list | status)
+		# Inspect the details of the given container or containers
 		if [[ $# -gt 1 ]]; then
 			shift
-			# Inspect the details of the given container
-			for index in $(listNames $*); do
-				getSandboxInfo $index
-			done
+			if [[ $1 = '-v' ]]; then
+				shift
+				for index in $(listNames $*); do
+					getVerboseSandboxInfo $index
+				done
+			else
+				for index in $(listNames $*); do
+					getSandboxInfo $index
+				done
+			fi
 		else
 			# Inspect the details of all exiting containers
 			getAllSandboxInfo

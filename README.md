@@ -65,38 +65,41 @@ To remind ourselves of the details of this or other sandboxes later
 To get help on various options
 
 	sbctl build -l | -v tyk-gateway-version-number [-r image version]
-					build a sandbox image for that version if its not already available
-					-v version to build ('ALL' to build all versions)
-					-l list versions that images can be made for (incompatible with -v and -r)
+			build a sandbox image for that version if its not already available
+			-v version to build ('ALL' to build all versions)
+			-l list versions that images can be made for (incompatible with -v and -r)
 	sbctl create -v tyk-version [-t ticket no] [-i index-number] [-n]
-					-i index number (skip for autoallocation of the next free)
-					-l log level. Set to debug, info, warn or error. Defaults to debug
-					-n IGNORE ~/.tyk-sandbox even if it exists
-						You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:
-						These will be used when -n is NOT present
-						SBX_LICENSE=licence string
-						SBX_USER=user email
-						SBX_PASSWORD=base64 encoded password
-						Note: create a base64 encoded password with:
-								 echo password | base64
-					-t ticket or comment field
-					-v tyk version of sandbox image. Required
+			create a sandbox with the named version of tyk
+			-i index number (skip for autoallocation of the next free)
+			-l log level. Set to debug, info, warn or error. Defaults to debug
+			-n IGNORE ~/.tyk-sandbox even if it exists
+			You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:
+			These will be used when -n is NOT present
+			SBX_LICENSE=licence string
+			SBX_USER=user email
+			SBX_PASSWORD=base64 encoded password
+			Note: create a base64 encoded password with:
+				echo password | base64
+			-t ticket or comment field
+			-v tyk version of sandbox image. Required
 	sbctl images [-r <image versions to remove|ALL]]
-					list the docker images for creating sandboxes
-					-r image version to remove|ALL. Removes the image version
-	sbctl list <index number...>
-					show details about the named sandbox or all
-	sbctl publish api.json <index number...>
-					publish the API in api.json into the sandbox
+			list the docker images for creating sandboxes
+			-r image version to remove|ALL. Removes the image version
+	sbctl list|info|status [-v] <index number...>
+			details about the named sandbox or all
+			-v Also echo the org_id and the Admin API key
 	sbctl mdcb <mdcb rpm path> <index number...>
-					install MDCB from the named rpm, configure and start it
-					the edge gateway becomes the gateway for the sandbox
+			install MDCB from the named rpm, configure and start it
+			the edge gateway becomes the gateway for the sandbox
+	sbctl publish api.json <index number...>
+			publish the API in api.json into the sandbox
 	sbctl script scriptfile <index number...>
-					copy the script into the container and run it
+			copy the script into the container and run it
 	sbctl shell <index number...>
-					Open a bash shell in the sandboxes named
+			Open a bash shell in the sandboxes named
 	sbctl [start|stop|restart|rm] <index number...>
-					take the action named on the listed sandboxes
+			take the action named on the listed sandboxes
+
 
 
 ### Other details
