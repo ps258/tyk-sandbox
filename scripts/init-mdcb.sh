@@ -3,6 +3,8 @@
 # script to enable and start MDCB and an edge gateway
 
 PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
+# load the SBX_ORG_ID and SBX_ADMIN_API_KEY from where they were saved during initialisation of the sandbox
+. /initial_credentials.txt
 
 if [[ -d /opt/tyk-sink ]]; then
 	echo "[FATAL]tyk-sink already installed"
@@ -31,14 +33,16 @@ if [[ -f /opt/tyk-sink/tyk_sink.conf ]]; then
   fi
 fi
 
-# setup another redis
+# setup edge redis
 echo "[INFO]Configuring edge redis on port 6380"
-mkdir -p /var/lib/redis2
-chown redis:redis /var/lib/redis2
+mkdir -p /var/lib/edgeRedis
+chown redis:redis /var/lib/edgeRedis
 cp /assets/redis-for-remote-gw.conf /etc
-
-# load the SBX_ORG_ID and SBX_ADMIN_API_KEY from where they were saved during initialisation of the sandbox
-. /initial_credentials.txt
+# create a script to dump the edge redis
+cp -fp /scripts/dump-redis /scripts/dump-edge-redis
+sed -i "s/PORT=6379/PORT=6380/g" /scripts/dump-edge-redis
+# rename dump-redis to force use of either control or edge so the choice is conscious
+mv /scripts/dump-redis /scripts/dump-control-redis
 
 # setup slave gateway
 echo "[INFO]Configuring Edge gateway"

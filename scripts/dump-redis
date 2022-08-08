@@ -6,36 +6,38 @@
 
 PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
+PORT=6379
 REDIS_KEY_PATTERN="${1:-*}"
 OLDIFS=$IFS
 IFS="
 "
-for key in $(redis-cli --scan --pattern "$REDIS_KEY_PATTERN" | sort); do
-  type=$(redis-cli type $key)
+
+for key in $(redis-cli -p $PORT --scan --pattern "$REDIS_KEY_PATTERN" | sort); do
+  type=$(redis-cli -p $PORT type $key)
   echo -n "$key ($type) => "
   case $type in
   list)
-    redis-cli lrange $key 0 -1 | sed 's/^/  /'
+    redis-cli -p $PORT lrange $key 0 -1 | sed 's/^/  /'
     ;;
   hash)
-    redis-cli hgetall $key | sed 's/^/  /'
+    redis-cli -p $PORT hgetall $key | sed 's/^/  /'
     ;;
   set)
-    redis-cli smembers $key 
+    redis-cli -p $PORT smembers $key 
     ;;
   zset)
-    redis-cli zrange $key 0 -1 withscores | sed 's/^/  /'
+    redis-cli -p $PORT zrange $key 0 -1 withscores | sed 's/^/  /'
     ;;
   string)
-    if redis-cli get $key | egrep -q '^{'; then
-      redis-cli get $key | jq .
+    if redis-cli -p $PORT get $key | egrep -q '^{'; then
+      redis-cli -p $PORT get $key | jq .
     else
-      redis-cli get $key
+      redis-cli -p $PORT get $key
     fi
     ;;
   *)
     echo "[WARN]Unknown type $type"
-    redis-cli get $key
+    redis-cli -p $PORT get $key
     ;;
   esac
 done
