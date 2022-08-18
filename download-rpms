@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/ksh
 
 # Not used but left as an example.
 # Only looks at release versions in package cloud so is inferior to adding the repos into yum's config
