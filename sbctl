@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/ksh -u
 
 SCRIPTNAME=$0
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
@@ -490,6 +490,7 @@ function createSandbox {
 function listNames {
 	typeset name
 	typeset list
+	list=""
 	if [[ $1 == "ALL" ]]; then
 		docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
 	else
@@ -507,6 +508,7 @@ function listNames {
 function listRunningNames {
 	typeset name
 	typeset list
+	list=""
 	if [[ $1 == "ALL" ]]; then
 		docker container list | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
 	else
