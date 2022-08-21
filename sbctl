@@ -360,6 +360,7 @@ function createSandbox {
 	typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort; typeset label
 	typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap; typeset arg
 	typeset OPTARG; typeset redisPort; typeset mongoPort
+	imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""
 	while getopts :ni:v:t:l: arg; do
 		case $arg in
 		i)
@@ -404,15 +405,12 @@ function createSandbox {
 		echo "[WARN]tyk-sandbox:$imageVersion does not exist. Did you intend to 'build' an image not 'create' a container?"
 		exit 1
 	fi
-
 	if [[ -z $logLevel ]]; then
 		logLevel="debug"
 	fi
-
 	if [[ -z $ticket ]]; then
 		ticket="N/A"
 	fi
-
 	if [[ -z $index ]]; then
 		index=$(nextFreeContainer)
 	fi
@@ -544,12 +542,22 @@ case $1 in
 	build)
 		shift
 		# Create a docker image with the given parameters
-		buildSandboxImage "$@"
+		if [[ $# -gt 1 ]]; then
+			buildSandboxImage "$@"
+		else
+			echo "[FATAL]Must specify a version to build" 1>&2
+			help
+		fi
 		;;
 	create)
 		shift
 		# Create a docker sandbox with the given parameters
-		createSandbox "$@"
+		if [[ $# -gt 1 ]]; then
+			createSandbox "$@"
+		else
+			echo "[FATAL]Must specify a tyk-sandbox version"
+			help
+		fi
 		;;
 	image*)
 		# list or remove the tyk-sandbox docker images
