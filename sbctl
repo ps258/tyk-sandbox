@@ -163,9 +163,13 @@ function echoBuildArgs {
 	SBX_PUMP_VERS="--build-arg SBX_PUMP_VERS=tyk-pump-$pumpVers"
 	if [[ -n $TIBvers ]]; then
 		SBX_TIB_VERS="--build-arg SBX_TIB_VERS=tyk-identity-broker-$TIBvers"
+	else
+		SBX_TIB_VERS=""
 	fi
 	if [[ -n $syncVers ]]; then
 		SBX_SYNC_VERS="--build-arg SBX_SYNC_VERS=tyk-sync-$syncVers"
+	else
+		SBX_SYNC_VERS=""
 	fi
 	echo $SBX_SCHEMA_URL $SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS
 }
@@ -200,7 +204,8 @@ function loadVersions {
 	GATEWAY[$version]=$gwVers
 	DASHBOARD[$version]=$dshbVers
 	PUMP[$version]=$pumpVers
-	[[ -n $TIBvers ]] && TIB[$version]=$TIBvers
+	#[[ -n $TIBvers ]] && TIB[$version]=$TIBvers
+	TIB[$version]=$TIBvers
 	SYNC[$version]=$syncVers
 }
 
@@ -311,6 +316,7 @@ function buildAllImages {
 
 # invoke docker image build with all the right details
 function buildSandboxImage {
+	set -x
 	typeset arg
 	typeset tykVersion
 	typeset tykVersion
@@ -351,7 +357,12 @@ function buildSandboxImage {
 	imageRev=$(nextFreeImageRev $tykVersion)
 	#touchRPMs $tykVersion
 	#echo docker image build $(echoBuildArgs $tykVersion) --tag tyk-sandbox:$tykVersion-$imageRev .
-	docker image build $(echoBuildArgs $tykVersion) --progress=plain --no-cache --tag tyk-sandbox:$tykVersion-$imageRev .
+	if [[ ${GATEWAY[$tykVersion]+_} ]]; then
+		docker image build $(echoBuildArgs $tykVersion) --progress=plain --no-cache --tag tyk-sandbox:$tykVersion-$imageRev .
+	else
+		echo "[FATAL]Version $tykVersion not configured in $VERSIONFILE"
+		exit 1
+	fi
 }
 
 # invoke docker container create and start with everything set
