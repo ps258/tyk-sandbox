@@ -78,6 +78,7 @@ function help {
 function rmSandboxImages {
 	typeset version
 	typeset removeList
+	removeList=""
 	if echo $* | grep -q ALL; then
 		for version in $(docker image list tyk-sandbox | awk '!/REPOSITORY/ {print $2}'); do
 			removeList="$removeList tyk-sandbox:$version"
@@ -204,7 +205,6 @@ function loadVersions {
 	GATEWAY[$version]=$gwVers
 	DASHBOARD[$version]=$dshbVers
 	PUMP[$version]=$pumpVers
-	#[[ -n $TIBvers ]] && TIB[$version]=$TIBvers
 	TIB[$version]=$TIBvers
 	SYNC[$version]=$syncVers
 }
@@ -345,7 +345,7 @@ function buildSandboxImage {
 		esac
 	done
 	if [[ -z $tykVersion ]]; then
-		echo "[FATAL]Must specify a version to build" 1>&2
+		echo "[FATAL]XMust specify a version to build" 1>&2
 		exit 1
   fi
   # build the base image if it's not present
@@ -355,8 +355,6 @@ function buildSandboxImage {
 		return
 	fi
 	imageRev=$(nextFreeImageRev $tykVersion)
-	#touchRPMs $tykVersion
-	#echo docker image build $(echoBuildArgs $tykVersion) --tag tyk-sandbox:$tykVersion-$imageRev .
 	if [[ ${GATEWAY[$tykVersion]+_} ]]; then
 		docker image build $(echoBuildArgs $tykVersion) --progress=plain --no-cache --tag tyk-sandbox:$tykVersion-$imageRev .
 	else
