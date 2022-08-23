@@ -316,7 +316,6 @@ function buildAllImages {
 
 # invoke docker image build with all the right details
 function buildSandboxImage {
-	set -x
 	typeset arg
 	typeset tykVersion
 	typeset tykVersion
