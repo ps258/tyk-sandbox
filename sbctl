@@ -540,13 +540,6 @@ fi
 loadVersionFile
 
 case $1 in
-	rm | stop | start | restart)
-		action=$1
-		shift
-		for index in $(listNames $*); do
-			docker container $action sandbox-$index
-		done
-		;;
 	build)
 		shift
 		# Create a docker image with the given parameters
@@ -566,6 +559,12 @@ case $1 in
 			echo "[FATAL]Must specify a tyk-sandbox version"
 			help
 		fi
+		;;
+	del*)
+		shift
+		for index in $(listNames $*); do
+			docker container rm sandbox-$index
+		done
 		;;
 	image*)
 		# list or remove the tyk-sandbox docker images
@@ -613,6 +612,13 @@ case $1 in
 			echo "[Usage]mdcb <path to MDCB RPM> <list of sandboxes>"
 			exit 1
 		fi
+		;;
+	rm | stop | start | restart)
+		action=$1
+		shift
+		for index in $(listNames $*); do
+			docker container $action sandbox-$index
+		done
 		;;
 	shell | bash)
 		# Give a shell in the given container
