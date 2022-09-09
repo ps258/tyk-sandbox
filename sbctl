@@ -543,7 +543,7 @@ case $1 in
 	build)
 		shift
 		# Create a docker image with the given parameters
-		if [[ $# -gt 1 ]]; then
+		if [[ $# -gt 0 ]]; then
 			buildSandboxImage "$@"
 		else
 			echo "[FATAL]Must specify a version to build" 1>&2
