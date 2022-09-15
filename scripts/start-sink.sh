@@ -20,7 +20,7 @@ if [[ -n $TYK_LOGLEVEL && $TYK_LOGLEVEL == 'debug' ]]; then
 fi
 
 # startup
-$command -conf $conf $flags &>> $log &
+$command -c $conf $flags &>> $log &
 err=$?
 sleep 1
 
