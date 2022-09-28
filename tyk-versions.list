@@ -9,6 +9,7 @@
 # It's not perfect but represents a real effort to pair up the versions that were current at the time
 
 # Gateway 4.2.x
+4.2.1,4.2.1-1,4.2.1,1.6.0-1,,1.2.2-1
 4.2.0,4.2.0-1,4.2.0,1.6.0-1,,1.2.2-1
 
 # Gateway 4.1.x
