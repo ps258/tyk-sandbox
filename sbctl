@@ -471,7 +471,7 @@ function createSandbox {
 		--env SBX_GW_HOST=$hostFQDN \
 		--env SBX_DSHB_HOST=$hostFQDN \
 		--env SBX_DSHB_PORT=$dashboardPort \
-		--env HISTFILE=.bash_history \
+		--env HISTFILE=/.bash_history \
 		--env HISTFILESIZE=-1 \
 		--env HISTSIZE=-1 \
 		--env HISTCONTROL=ignoreboth \
