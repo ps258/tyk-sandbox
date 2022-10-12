@@ -26,6 +26,7 @@ for key in $(redis-cli -p $PORT --scan --pattern "$REDIS_KEY_PATTERN" | sort); d
     redis-cli -p $PORT smembers $key 
     ;;
   zset)
+		echo
     redis-cli -p $PORT zrange $key 0 -1 withscores | sed 's/^/  /'
     ;;
   string)
