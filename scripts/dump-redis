@@ -17,6 +17,7 @@ for key in $(redis-cli -p $PORT --scan --pattern "$REDIS_KEY_PATTERN" | sort); d
   echo -n "$key ($type) => "
   case $type in
   list)
+		echo
     redis-cli -p $PORT lrange $key 0 -1 | sed 's/^/  /'
     ;;
   hash)
