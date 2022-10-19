@@ -26,11 +26,8 @@
 				"name": "mongo-pump-selective",
 				"meta": {
 					"mongo_url": "mongodb://localhost/tyk_analytics",
-					"collection_cap_enable": true,
-					"collection_cap_max_size_bytes": 1048576,
 					"max_insert_batch_size_bytes": 80000,
-					"max_document_size_bytes": 20112,
-					"use_mixed_collection": false
+					"max_document_size_bytes": 20112
 				}
 			}
 		},
