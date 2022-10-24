@@ -2,8 +2,6 @@
 
 PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
-unalias cp
-
 echo "Image starting: $1"
 
 if [[ ! -f /initialised ]]; then
