@@ -39,40 +39,41 @@ function help {
 	name=$(basename $SCRIPTNAME)
 	echo "[USAGE]:"
 	echo "$name build -l | -v tyk-gateway-version-number [-r image version]"
-	echo "        build a sandbox image for that version if its not already available"
-	echo "        -v version to build ('ALL' to build all versions)"
-	echo "        -l list versions that images can be made for (incompatible with -v and -r)"
+	echo "        Build a sandbox image for that version if its not already available"
+	echo "        -v Version to build ('ALL' to build all versions)"
+	echo "        -l List versions that images can be made for (incompatible with -v and -r)"
 	echo "$name create -v tyk-version [-t ticket no] [-i index-number] [-n]"
 	echo "        create a sandbox with the named version of tyk"
-	echo "        -i index number (skip for autoallocation of the next free)"
-	echo "        -l log level. Set to debug, info, warn or error. Defaults to debug"
+	echo "        -e An environment variable file used topopulate the sandboxes environment"
+	echo "        -i Index number (skip for autoallocation of the next free)"
+	echo "        -l Log level. Set to debug, info, warn or error. Defaults to debug"
 	echo "        -n IGNORE ~/.tyk-sandbox even if it exists"
 	echo "           You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:"
 	echo "           These will be used when -n is NOT present"
 	echo "           SBX_LICENSE=licence string"
 	echo "           SBX_USER=user email"
 	echo "           SBX_PASSWORD=base64 encoded password"
-	echo "           Note: create a base64 encoded password with:"
+	echo "           Note: Create a base64 encoded password with:"
 	echo "               echo password | base64"
-	echo "        -t ticket or comment field"
-	echo "        -v tyk version of sandbox image. Required"
+	echo "        -t Ticket or comment field"
+	echo "        -v Tyk version of sandbox image. Required and must have already been built"
 	echo "$name images [-r <image versions to remove|ALL]]"
-	echo "        list the docker images for creating sandboxes"
-	echo "        -r image version to remove|ALL. Removes the image version"
+	echo "        List the docker images for creating sandboxes"
+	echo "        -r Image version to remove|ALL. Removes the image version"
 	echo "$name list|info|status [-v] <index number...>"
-	echo "        details about the named sandbox or all"
+	echo "        Details about the named sandbox or all"
 	echo "        -v Also echo the org_id and the Admin API key"
 	echo "$name mdcb <mdcb rpm path> <index number...>"
-	echo "        install MDCB from the named rpm, configure and start it"
-	echo "        the edge gateway becomes the gateway for the sandbox"
+	echo "        Install MDCB from the named rpm, configure and start it"
+	echo "        The edge gateway becomes the gateway for the sandbox"
 	echo "$name publish api.json <index number...>"
-	echo "        publish the API in api.json into the sandbox"
+	echo "        Publish the API in api.json into the sandbox"
 	echo "$name script scriptfile <index number...>"
-	echo "        copy the script into the container and run it"
+	echo "        Copy the script into the container and run it"
 	echo "$name shell <index number...>"
 	echo "        Open a bash shell in the sandboxes named"
 	echo "$name [start|stop|restart|rm] <index number...>"
-	echo "        take the action named on the listed sandboxes"
+	echo "        Take the action named on the listed sandboxes"
 }
 
 function rmSandboxImages {
@@ -367,23 +368,32 @@ function createSandbox {
 	typeset index; typeset list; typeset ticket; typeset imageVersion; typeset env_file; typeset containerName
 	typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort; typeset label
 	typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap; typeset arg
-	typeset OPTARG; typeset redisPort; typeset mongoPort
-	imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""
-	while getopts :ni:v:t:l: arg; do
+	typeset OPTARG; typeset redisPort; typeset mongoPort; typeset extraEnv_file
+	imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""; extraEnv_file=""
+	while getopts :ne:i:v:t:l: arg; do
 		case $arg in
+		e)
+			# An environment file to include. Should be in standard shell format
+			extraEnv_file=$OPTARG
+			;;
 		i)
+			# Specify which index to create. Not used much
 			index=$OPTARG
 			;;
 		n)
+			# Ignore ~/.tyk-sandbox. Useful when you want to apply licence and create users yourself
 			noBootstrap=1
 			;;
 		t)
+			# Ticket or tag. This is the description of what the sandox is for
 			ticket="$OPTARG"
 			;;
 		v)
+			# Gateway version to install
 			imageVersion=$OPTARG
 			;;
 		l)
+			# Log level to set in the sandbox.
 			logLevel=$OPTARG
 			if [[ $logLevel != "debug" && $logLevel != "info" && $logLevel != "warn" && $logLevel != "error" ]]; then
 				echo "loglevel must be one of 'debug', 'info', 'warn' or 'error'"
@@ -455,6 +465,9 @@ function createSandbox {
 		env_file="--env-file $(\ls ~/.tyk-sandbox)"
 	else
 		env_file=""
+	fi
+	if [[ -n $extraEnv_file && -f $extraEnv_file ]]; then
+		env_file="$env_file --env-file $(\ls $extraEnv_file)"
 	fi
 	echo "[INFO]Creating container $containerName"
 	# this is needed to make golang plugins work on an M1 Mac 'DOCKER_DEFAULT_PLATFORM=linux/amd64'
