@@ -325,6 +325,7 @@ function buildSandboxImage {
 	typeset arg
 	typeset OPTARG
 	cd "$SCRIPTDIR"
+	tykVersion=""
 	while getopts :lv:r: arg; do
 		case $arg in
 		l)
@@ -345,7 +346,7 @@ function buildSandboxImage {
 		esac
 	done
 	if [[ -z $tykVersion ]]; then
-		echo "[FATAL]XMust specify a version to build" 1>&2
+		echo "[FATAL]No build version specified with -v" 1>&2
 		exit 1
   fi
   # build the base image if it's not present

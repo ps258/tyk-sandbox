@@ -19,20 +19,14 @@ then
 fi
 
 # install tyk
-#tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS"
-tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS"
-if [[ -n $tyk_rpmlist ]]; then
-	echo "yum install -y $tyk_rpmlist"
-	yum install -y $tyk_rpmlist
-else
-	echo "[FATAL]No rpms to install"
-fi
-
 # split out the tyk-sync install because it fails on M1 Macs causing the whole thing to fail
 if [[ -n $SBX_SYNC_VERS && "x86_64" == $(uname -i) ]]; then
-	echo yum install -y $SBX_SYNC_VERS
-	yum -y install $SBX_SYNC_VERS
+	tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS"
+else
+	tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS"
 fi
+echo yum install -y $tyk_rpmlist
+yum -y install $tyk_rpmlist
 
 # get the tyk.conf schema so 'tyk lint' works
 if [[ -n $SBX_SCHEMA_URL ]]; then
