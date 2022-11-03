@@ -7,10 +7,10 @@ PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 function create_defn {
 	# converts API definition format from the one given using 'export' on the dashboard to the one expected when importing via /api/apis
 	typeset APIfile
-	APIfile=$1
+	APIfile="$1"
 	echo '  {'
 	echo '    "api_model": {},'
-	echo '	  "api_definition":' $(<$APIfile) ','
+	echo '	  "api_definition":' $(<"$APIfile") ','
 	echo '	  "hook_references": [],'
 	echo '	  "is_site": false,'
 	echo '	  "sort_by": 0'
@@ -21,15 +21,15 @@ access_key=$(/scripts/admin-auth)
 
 if [[ -n $access_key ]]; then
 	for API in "$@"; do
-		if grep -q api_definition $API; then
+		if grep -q api_definition "$API"; then
 			# deal with the files that are a copy and paste of the API JSON from the dashboard
 			echo curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$API
-			curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$API
+			curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@"$API"
 			echo
 		else
 			# deal with the files that are exported APIs from the dashboard
-			APIfilename=$(mktemp /tmp/$(basename $API).XXXXXX)
-			create_defn $API >$APIfilename
+			APIfilename=$(mktemp /tmp/$(basename "$API").XXXXXX)
+			create_defn "$API" >$APIfilename
 			echo curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$APIfilename
 			curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$APIfilename
 			echo
