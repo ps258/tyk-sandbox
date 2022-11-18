@@ -20,10 +20,10 @@ then
   SBX_CLEAR_PASSWORD=$(echo $SBX_PASSWORD | base64 -d)
   echo "[INFO]Bootstraping default user: $SBX_USER"
 
-  # this bootstrap method is reliable for versions 2.9.x - 3.2.x (won't work on 2.8.x or earlier)
+  # this bootstrap method is reliable for versions >= 2.9.x (won't work on 2.8.x or earlier)
   # curl -k -s -d "email_address=$SBX_USER&first_name=Tyk&last_name=Admin&password=$SBX_CLEAR_PASSWORD&confirm_password=$SBX_CLEAR_PASSWORD" $PROTOCOL://localhost:3000/bootstrap
 
-  # this bootstrap method is reliable for 2.5.x -> 4.1.x
+  # this bootstrap method is reliable for at least versions >= 2.5.x
   ADMIN_SECRET=$(jq -r .admin_secret /opt/tyk-dashboard/tyk_analytics.conf)
 	if [[ -n $SBX_PTL_CNAME ]]; then
 		PORTAL_CNAME="$SBX_PTL_CNAME:$SBX_DSHB_PORT"
