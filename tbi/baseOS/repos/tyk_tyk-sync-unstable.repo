@@ -1,11 +1,11 @@
 [tyk_tyk-sync-unstable]
 name=tyk_tyk-sync-unstable
 baseurl=https://packagecloud.io/tyk/tyk-sync-unstable/el/7/$basearch
-repo_gpgcheck=1
+repo_gpgcheck=0
 gpgcheck=0
 enabled=1
 gpgkey=https://packagecloud.io/tyk/tyk-sync-unstable/gpgkey
-sslverify=1
+sslverify=0
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 metadata_expire=300
 
