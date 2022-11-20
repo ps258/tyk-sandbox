@@ -17,7 +17,7 @@ VERSIONFILE="$SCRIPTDIR/tyk-versions.list"
 PATH="$SCRIPTDIR:$PATH"
 
 # directories shared into all sandboxes to allow for plugins and certs to be installed easily
-SandboxPluginDir=~/tyk/plugins
+SandboxPluginDir=~/.tyk/plugins
 
 typeset -A GATEWAY
 typeset -A DASHBOARD
