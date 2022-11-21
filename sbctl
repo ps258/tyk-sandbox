@@ -554,11 +554,10 @@ if [[ $# -lt 1 ]]; then
 	exit 1
 fi
 
-# load the details of what version of what goes with what
-loadVersionFile
-
 case $1 in
 	build)
+		# load the details of what version of what goes with what
+		loadVersionFile
 		shift
 		# Create a docker image with the given parameters
 		if [[ $# -gt 0 ]]; then
@@ -569,6 +568,8 @@ case $1 in
 		fi
 		;;
 	create)
+		# load the details of what version of what goes with what
+		loadVersionFile
 		shift
 		# Create a docker sandbox with the given parameters
 		if [[ $# -gt 1 ]]; then
@@ -580,7 +581,9 @@ case $1 in
 		;;
 	del*)
 		shift
+		# stop and delete the container
 		for index in $(listNames $*); do
+			docker container stop sandbox-$index
 			docker container rm sandbox-$index
 		done
 		;;
