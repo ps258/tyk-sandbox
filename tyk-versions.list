@@ -8,7 +8,7 @@
 # This file also serves as a reference to identify what versions were released together
 # It's not perfect but represents a real effort to pair up the versions that were current at the time
 # Note that there's no RPM for tyk-sync 1.0.0 in package cloud
-# Versions 2.9.3.2 and earlier should use styk-sync 1.0.0 but 1.1.0 has been substitued.
+# Versions 2.9.3.2 and earlier should use tyk-sync 1.0.0 but 1.1.0 has been substitued.
 
 # Gateway 4.2.x
 4.2.4,4.2.4-1,4.2.4,1.6.0-1,,1.2.2-1
