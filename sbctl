@@ -583,8 +583,8 @@ case $1 in
 		shift
 		# stop and delete the container
 		for index in $(listNames $*); do
-			docker container stop sandbox-$index
-			docker container rm sandbox-$index
+			#docker container stop sandbox-$index
+			docker container rm -f sandbox-$index
 		done
 		;;
 	image*)
