@@ -1,501 +1,501 @@
 {
-    "id": "627ce93db1821e13a7413a61",
-    "name": "countries and weather",
-    "slug": "countries-and-weather",
-    "listen_port": 0,
-    "protocol": "",
-    "enable_proxy_protocol": false,
-    "api_id": "8009bfbff1854c0551460242918b1a72",
-    "org_id": "6287aaf1e3b415006f73125a",
-    "use_keyless": true,
-    "use_oauth2": false,
-    "use_openid": false,
-    "openid_options": {
-        "providers": [],
-        "segregate_by_client": false
+  "CORS": {
+    "allow_credentials": false,
+    "allowed_headers": [
+      "Origin",
+      "Accept",
+      "Content-Type",
+      "X-Requested-With",
+      "Authorization"
+    ],
+    "allowed_methods": [
+      "GET",
+      "POST",
+      "HEAD"
+    ],
+    "allowed_origins": [
+      "*"
+    ],
+    "debug": false,
+    "enable": false,
+    "exposed_headers": [],
+    "max_age": 24,
+    "options_passthrough": false
+  },
+  "active": true,
+  "allowed_ips": [],
+  "api_id": "8009bfbff1854c0551460242918b1a72",
+  "auth": {
+    "auth_header_name": "Authorization",
+    "cookie_name": "",
+    "param_name": "",
+    "signature": {
+      "algorithm": "",
+      "allowed_clock_skew": 0,
+      "error_code": 0,
+      "error_message": "",
+      "header": "",
+      "param_name": "",
+      "secret": "",
+      "use_param": false
     },
-    "oauth_meta": {
-        "allowed_access_types": [],
-        "allowed_authorize_types": [],
-        "auth_login_redirect": ""
-    },
-    "auth": {
-        "use_param": false,
-        "param_name": "",
-        "use_cookie": false,
-        "cookie_name": "",
-        "auth_header_name": "Authorization",
-        "use_certificate": false,
-        "validate_signature": false,
-        "signature": {
-            "algorithm": "",
-            "header": "",
-            "use_param": false,
-            "param_name": "",
-            "secret": "",
-            "allowed_clock_skew": 0,
-            "error_code": 0,
-            "error_message": ""
-        }
-    },
-    "auth_configs": {
-        "authToken": {
-            "use_param": false,
-            "param_name": "",
-            "use_cookie": false,
-            "cookie_name": "",
-            "auth_header_name": "Authorization",
-            "use_certificate": false,
-            "validate_signature": false,
-            "signature": {
-                "algorithm": "",
-                "header": "",
-                "use_param": false,
-                "param_name": "",
-                "secret": "",
-                "allowed_clock_skew": 0,
-                "error_code": 0,
-                "error_message": ""
-            }
-        },
-        "basic": {
-            "use_param": false,
-            "param_name": "",
-            "use_cookie": false,
-            "cookie_name": "",
-            "auth_header_name": "Authorization",
-            "use_certificate": false,
-            "validate_signature": false,
-            "signature": {
-                "algorithm": "",
-                "header": "",
-                "use_param": false,
-                "param_name": "",
-                "secret": "",
-                "allowed_clock_skew": 0,
-                "error_code": 0,
-                "error_message": ""
-            }
-        },
-        "coprocess": {
-            "use_param": false,
-            "param_name": "",
-            "use_cookie": false,
-            "cookie_name": "",
-            "auth_header_name": "Authorization",
-            "use_certificate": false,
-            "validate_signature": false,
-            "signature": {
-                "algorithm": "",
-                "header": "",
-                "use_param": false,
-                "param_name": "",
-                "secret": "",
-                "allowed_clock_skew": 0,
-                "error_code": 0,
-                "error_message": ""
-            }
-        },
-        "hmac": {
-            "use_param": false,
-            "param_name": "",
-            "use_cookie": false,
-            "cookie_name": "",
-            "auth_header_name": "Authorization",
-            "use_certificate": false,
-            "validate_signature": false,
-            "signature": {
-                "algorithm": "",
-                "header": "",
-                "use_param": false,
-                "param_name": "",
-                "secret": "",
-                "allowed_clock_skew": 0,
-                "error_code": 0,
-                "error_message": ""
-            }
-        },
-        "jwt": {
-            "use_param": false,
-            "param_name": "",
-            "use_cookie": false,
-            "cookie_name": "",
-            "auth_header_name": "Authorization",
-            "use_certificate": false,
-            "validate_signature": false,
-            "signature": {
-                "algorithm": "",
-                "header": "",
-                "use_param": false,
-                "param_name": "",
-                "secret": "",
-                "allowed_clock_skew": 0,
-                "error_code": 0,
-                "error_message": ""
-            }
-        },
-        "oauth": {
-            "use_param": false,
-            "param_name": "",
-            "use_cookie": false,
-            "cookie_name": "",
-            "auth_header_name": "Authorization",
-            "use_certificate": false,
-            "validate_signature": false,
-            "signature": {
-                "algorithm": "",
-                "header": "",
-                "use_param": false,
-                "param_name": "",
-                "secret": "",
-                "allowed_clock_skew": 0,
-                "error_code": 0,
-                "error_message": ""
-            }
-        },
-        "oidc": {
-            "use_param": false,
-            "param_name": "",
-            "use_cookie": false,
-            "cookie_name": "",
-            "auth_header_name": "Authorization",
-            "use_certificate": false,
-            "validate_signature": false,
-            "signature": {
-                "algorithm": "",
-                "header": "",
-                "use_param": false,
-                "param_name": "",
-                "secret": "",
-                "allowed_clock_skew": 0,
-                "error_code": 0,
-                "error_message": ""
-            }
-        }
-    },
-    "use_basic_auth": false,
-    "basic_auth": {
-        "disable_caching": false,
-        "cache_ttl": 0,
-        "extract_from_body": false,
-        "body_user_regexp": "",
-        "body_password_regexp": ""
-    },
-    "use_mutual_tls_auth": false,
-    "client_certificates": [],
-    "upstream_certificates": {},
-    "pinned_public_keys": {},
-    "enable_jwt": false,
-    "use_standard_auth": false,
-    "use_go_plugin_auth": false,
-    "enable_coprocess_auth": false,
-    "jwt_signing_method": "",
-    "jwt_source": "",
-    "jwt_identity_base_field": "",
-    "jwt_client_base_field": "",
-    "jwt_policy_field_name": "",
-    "jwt_default_policies": [],
-    "jwt_issued_at_validation_skew": 0,
-    "jwt_expires_at_validation_skew": 0,
-    "jwt_not_before_validation_skew": 0,
-    "jwt_skip_kid": false,
-    "jwt_scope_to_policy_mapping": {},
-    "jwt_scope_claim_name": "",
-    "notifications": {
-        "shared_secret": "",
-        "oauth_on_keychange_url": ""
-    },
-    "enable_signature_checking": false,
-    "hmac_allowed_clock_skew": -1,
-    "hmac_allowed_algorithms": [],
-    "request_signing": {
-        "is_enabled": false,
-        "secret": "",
-        "key_id": "",
+    "use_certificate": false,
+    "use_cookie": false,
+    "use_param": false,
+    "validate_signature": false
+  },
+  "auth_configs": {
+    "authToken": {
+      "auth_header_name": "Authorization",
+      "cookie_name": "",
+      "param_name": "",
+      "signature": {
         "algorithm": "",
-        "header_list": [],
-        "certificate_id": "",
-        "signature_header": ""
+        "allowed_clock_skew": 0,
+        "error_code": 0,
+        "error_message": "",
+        "header": "",
+        "param_name": "",
+        "secret": "",
+        "use_param": false
+      },
+      "use_certificate": false,
+      "use_cookie": false,
+      "use_param": false,
+      "validate_signature": false
     },
-    "base_identity_provided_by": "",
-    "definition": {
-        "location": "header",
-        "key": "x-api-version",
-        "strip_path": false
+    "basic": {
+      "auth_header_name": "Authorization",
+      "cookie_name": "",
+      "param_name": "",
+      "signature": {
+        "algorithm": "",
+        "allowed_clock_skew": 0,
+        "error_code": 0,
+        "error_message": "",
+        "header": "",
+        "param_name": "",
+        "secret": "",
+        "use_param": false
+      },
+      "use_certificate": false,
+      "use_cookie": false,
+      "use_param": false,
+      "validate_signature": false
     },
-    "version_data": {
-        "not_versioned": true,
-        "default_version": "",
-        "versions": {
-            "Default": {
-                "name": "Default",
-                "expires": "",
-                "paths": {
-                    "ignored": [],
-                    "white_list": [],
-                    "black_list": []
-                },
-                "use_extended_paths": true,
-                "extended_paths": {},
-                "global_headers": {},
-                "global_headers_remove": [],
-                "global_response_headers": {},
-                "global_response_headers_remove": [],
-                "ignore_endpoint_case": false,
-                "global_size_limit": 0,
-                "override_target": ""
+    "coprocess": {
+      "auth_header_name": "Authorization",
+      "cookie_name": "",
+      "param_name": "",
+      "signature": {
+        "algorithm": "",
+        "allowed_clock_skew": 0,
+        "error_code": 0,
+        "error_message": "",
+        "header": "",
+        "param_name": "",
+        "secret": "",
+        "use_param": false
+      },
+      "use_certificate": false,
+      "use_cookie": false,
+      "use_param": false,
+      "validate_signature": false
+    },
+    "hmac": {
+      "auth_header_name": "Authorization",
+      "cookie_name": "",
+      "param_name": "",
+      "signature": {
+        "algorithm": "",
+        "allowed_clock_skew": 0,
+        "error_code": 0,
+        "error_message": "",
+        "header": "",
+        "param_name": "",
+        "secret": "",
+        "use_param": false
+      },
+      "use_certificate": false,
+      "use_cookie": false,
+      "use_param": false,
+      "validate_signature": false
+    },
+    "jwt": {
+      "auth_header_name": "Authorization",
+      "cookie_name": "",
+      "param_name": "",
+      "signature": {
+        "algorithm": "",
+        "allowed_clock_skew": 0,
+        "error_code": 0,
+        "error_message": "",
+        "header": "",
+        "param_name": "",
+        "secret": "",
+        "use_param": false
+      },
+      "use_certificate": false,
+      "use_cookie": false,
+      "use_param": false,
+      "validate_signature": false
+    },
+    "oauth": {
+      "auth_header_name": "Authorization",
+      "cookie_name": "",
+      "param_name": "",
+      "signature": {
+        "algorithm": "",
+        "allowed_clock_skew": 0,
+        "error_code": 0,
+        "error_message": "",
+        "header": "",
+        "param_name": "",
+        "secret": "",
+        "use_param": false
+      },
+      "use_certificate": false,
+      "use_cookie": false,
+      "use_param": false,
+      "validate_signature": false
+    },
+    "oidc": {
+      "auth_header_name": "Authorization",
+      "cookie_name": "",
+      "param_name": "",
+      "signature": {
+        "algorithm": "",
+        "allowed_clock_skew": 0,
+        "error_code": 0,
+        "error_message": "",
+        "header": "",
+        "param_name": "",
+        "secret": "",
+        "use_param": false
+      },
+      "use_certificate": false,
+      "use_cookie": false,
+      "use_param": false,
+      "validate_signature": false
+    }
+  },
+  "auth_provider": {
+    "meta": {},
+    "name": "",
+    "storage_engine": ""
+  },
+  "base_identity_provided_by": "",
+  "basic_auth": {
+    "body_password_regexp": "",
+    "body_user_regexp": "",
+    "cache_ttl": 0,
+    "disable_caching": false,
+    "extract_from_body": false
+  },
+  "blacklisted_ips": [],
+  "cache_options": {
+    "cache_all_safe_requests": false,
+    "cache_by_headers": [],
+    "cache_control_ttl_header": "",
+    "cache_response_codes": [],
+    "cache_timeout": 60,
+    "enable_cache": true,
+    "enable_upstream_cache_control": false
+  },
+  "certificates": [],
+  "client_certificates": [],
+  "config_data": {},
+  "custom_middleware": {
+    "auth_check": {
+      "name": "",
+      "path": "",
+      "raw_body_only": false,
+      "require_session": false
+    },
+    "driver": "",
+    "id_extractor": {
+      "extract_from": "",
+      "extract_with": "",
+      "extractor_config": {}
+    },
+    "post": [],
+    "post_key_auth": [],
+    "pre": [],
+    "response": []
+  },
+  "custom_middleware_bundle": "",
+  "definition": {
+    "key": "x-api-version",
+    "location": "header",
+    "strip_path": false
+  },
+  "disable_quota": false,
+  "disable_rate_limit": false,
+  "do_not_track": false,
+  "domain": "",
+  "dont_set_quota_on_create": false,
+  "enable_batch_request_support": false,
+  "enable_context_vars": false,
+  "enable_coprocess_auth": false,
+  "enable_detailed_recording": false,
+  "enable_ip_blacklisting": false,
+  "enable_ip_whitelisting": false,
+  "enable_jwt": false,
+  "enable_proxy_protocol": false,
+  "enable_signature_checking": false,
+  "event_handlers": {
+    "events": {}
+  },
+  "expire_analytics_after": 0,
+  "global_rate_limit": {
+    "per": 0,
+    "rate": 0
+  },
+  "graphql": {
+    "enabled": true,
+    "engine": {
+      "data_sources": [
+        {
+          "config": {
+            "default_type_name": "Country",
+            "headers": {},
+            "method": "POST",
+            "url": "https://countries.trevorblades.com/"
+          },
+          "internal": false,
+          "kind": "GraphQL",
+          "name": "getCountries",
+          "root_fields": [
+            {
+              "fields": [
+                "countries"
+              ],
+              "type": "Query"
             }
+          ]
+        },
+        {
+          "config": {
+            "body": "",
+            "default_type_name": "Weather",
+            "headers": {},
+            "method": "GET",
+            "url": "https://goweather.herokuapp.com/weather/{{.object.capital}}"
+          },
+          "internal": false,
+          "kind": "REST",
+          "name": "getWeather",
+          "root_fields": [
+            {
+              "fields": [
+                "weather"
+              ],
+              "type": "Country"
+            }
+          ]
+        },
+        {
+          "config": {
+            "default_type_name": "Country",
+            "headers": {},
+            "method": "POST",
+            "url": "https://countries.trevorblades.com/"
+          },
+          "internal": false,
+          "kind": "GraphQL",
+          "name": "getCountry",
+          "root_fields": [
+            {
+              "fields": [
+                "country"
+              ],
+              "type": "Query"
+            }
+          ]
         }
+      ],
+      "field_configs": [
+        {
+          "disable_default_mapping": false,
+          "field_name": "countries",
+          "path": [
+            "countries"
+          ],
+          "type_name": "Query"
+        },
+        {
+          "disable_default_mapping": true,
+          "field_name": "weather",
+          "path": [
+            ""
+          ],
+          "type_name": "Country"
+        },
+        {
+          "disable_default_mapping": false,
+          "field_name": "country",
+          "path": [
+            "country"
+          ],
+          "type_name": "Query"
+        }
+      ]
     },
-    "uptime_tests": {
-        "check_list": [],
-        "config": {
-            "expire_utime_after": 0,
-            "service_discovery": {
-                "use_discovery_service": false,
-                "query_endpoint": "",
-                "use_nested_query": false,
-                "parent_data_path": "",
-                "data_path": "",
-                "port_data_path": "",
-                "target_path": "",
-                "use_target_list": false,
-                "cache_timeout": 60,
-                "endpoint_returns_list": false
-            },
-            "recheck_wait": 0
-        }
+    "execution_mode": "executionEngine",
+    "last_schema_update": "2022-05-20T14:52:06.818Z",
+    "playground": {
+      "enabled": false,
+      "path": ""
     },
     "proxy": {
-        "preserve_host_header": false,
-        "listen_path": "/countries-and-weather/",
-        "target_url": "",
-        "disable_strip_slash": true,
-        "strip_listen_path": true,
-        "enable_load_balancing": false,
-        "target_list": [],
-        "check_host_against_uptime_tests": false,
-        "service_discovery": {
-            "use_discovery_service": false,
-            "query_endpoint": "",
-            "use_nested_query": false,
-            "parent_data_path": "",
-            "data_path": "",
-            "port_data_path": "",
-            "target_path": "",
-            "use_target_list": false,
-            "cache_timeout": 0,
-            "endpoint_returns_list": false
-        },
-        "transport": {
-            "ssl_insecure_skip_verify": false,
-            "ssl_ciphers": [],
-            "ssl_min_version": 0,
-            "ssl_max_version": 0,
-            "ssl_force_common_name_check": false,
-            "proxy_url": ""
-        }
+      "auth_headers": {}
     },
-    "disable_rate_limit": false,
-    "disable_quota": false,
-    "custom_middleware": {
-        "pre": [],
-        "post": [],
-        "post_key_auth": [],
-        "auth_check": {
-            "name": "",
-            "path": "",
-            "require_session": false,
-            "raw_body_only": false
-        },
-        "response": [],
-        "driver": "",
-        "id_extractor": {
-            "extract_from": "",
-            "extract_with": "",
-            "extractor_config": {}
-        }
+    "schema": "type Country {\n  code: ID!\n  name: String!\n  native: String!\n  phone: String!\n  continent: Continent!\n  capital: String\n  weather: Weather\n  currency: String\n  languages: [Language!]!\n  emoji: String!\n  emojiU: String!\n  states: [State!]!\n}\n\ntype Weather {\n  temperature: String\n  wind: String\n  description: String\n}\n\ntype Continent {\n  code: ID!\n  name: String!\n  countries: [Country!]!\n}\n\ntype Language {\n  code: ID!\n  name: String\n  native: String\n  rtl: Boolean!\n}\n\ntype State {\n  code: String\n  name: String!\n  country: Country!\n}\n\ninput StringQueryOperatorInput {\n  eq: String\n  ne: String\n  in: [String]\n  nin: [String]\n  regex: String\n  glob: String\n}\n\ninput CountryFilterInput {\n  code: StringQueryOperatorInput\n  currency: StringQueryOperatorInput\n  continent: StringQueryOperatorInput\n}\n\ninput ContinentFilterInput {\n  code: StringQueryOperatorInput\n}\n\ninput LanguageFilterInput {\n  code: StringQueryOperatorInput\n}\n\ntype Query {\n  _entities(representations: [_Any!]!): [_Entity]!\n  _service: _Service!\n  countries(filter: CountryFilterInput): [Country!]!\n  country(code: ID!): Country\n}\n\nunion _Entity = Country | Continent | Language\n\nscalar _Any\n\ntype _Service {\n  sdl: String\n}",
+    "subgraph": {
+      "sdl": ""
     },
-    "custom_middleware_bundle": "",
-    "cache_options": {
-        "cache_timeout": 60,
-        "enable_cache": true,
-        "cache_all_safe_requests": false,
-        "cache_response_codes": [],
-        "enable_upstream_cache_control": false,
-        "cache_control_ttl_header": "",
-        "cache_by_headers": []
+    "supergraph": {
+      "disable_query_batching": false,
+      "global_headers": {},
+      "merged_sdl": "",
+      "subgraphs": []
     },
-    "session_lifetime": 0,
-    "active": true,
-    "internal": false,
-    "auth_provider": {
-        "name": "",
-        "storage_engine": "",
-        "meta": {}
+    "type_field_configurations": [],
+    "version": "2"
+  },
+  "hmac_allowed_algorithms": [],
+  "hmac_allowed_clock_skew": -1,
+  "id": "627ce93db1821e13a7413a61",
+  "internal": false,
+  "jwt_client_base_field": "",
+  "jwt_default_policies": [],
+  "jwt_expires_at_validation_skew": 0,
+  "jwt_identity_base_field": "",
+  "jwt_issued_at_validation_skew": 0,
+  "jwt_not_before_validation_skew": 0,
+  "jwt_policy_field_name": "",
+  "jwt_scope_claim_name": "",
+  "jwt_scope_to_policy_mapping": {},
+  "jwt_signing_method": "",
+  "jwt_skip_kid": false,
+  "jwt_source": "",
+  "listen_port": 0,
+  "name": "countries and weather",
+  "notifications": {
+    "oauth_on_keychange_url": "",
+    "shared_secret": ""
+  },
+  "oauth_meta": {
+    "allowed_access_types": [],
+    "allowed_authorize_types": [],
+    "auth_login_redirect": ""
+  },
+  "openid_options": {
+    "providers": [],
+    "segregate_by_client": false
+  },
+  "org_id": "6287aaf1e3b415006f73125a",
+  "pinned_public_keys": {},
+  "protocol": "",
+  "proxy": {
+    "check_host_against_uptime_tests": false,
+    "disable_strip_slash": true,
+    "enable_load_balancing": false,
+    "listen_path": "/countries-and-weather/",
+    "preserve_host_header": false,
+    "service_discovery": {
+      "cache_timeout": 0,
+      "data_path": "",
+      "endpoint_returns_list": false,
+      "parent_data_path": "",
+      "port_data_path": "",
+      "query_endpoint": "",
+      "target_path": "",
+      "use_discovery_service": false,
+      "use_nested_query": false,
+      "use_target_list": false
     },
-    "session_provider": {
-        "name": "",
-        "storage_engine": "",
-        "meta": {}
-    },
-    "event_handlers": {
-        "events": {}
-    },
-    "enable_batch_request_support": false,
-    "enable_ip_whitelisting": false,
-    "allowed_ips": [],
-    "enable_ip_blacklisting": false,
-    "blacklisted_ips": [],
-    "dont_set_quota_on_create": false,
-    "expire_analytics_after": 0,
-    "response_processors": [],
-    "CORS": {
-        "enable": false,
-        "allowed_origins": [
-            "*"
-        ],
-        "allowed_methods": [
-            "GET",
-            "POST",
-            "HEAD"
-        ],
-        "allowed_headers": [
-            "Origin",
-            "Accept",
-            "Content-Type",
-            "X-Requested-With",
-            "Authorization"
-        ],
-        "exposed_headers": [],
-        "allow_credentials": false,
-        "max_age": 24,
-        "options_passthrough": false,
-        "debug": false
-    },
-    "domain": "",
-    "certificates": [],
-    "do_not_track": false,
-    "tags": [],
-    "enable_context_vars": false,
-    "config_data": {},
-    "tag_headers": [],
-    "global_rate_limit": {
-        "rate": 0,
-        "per": 0
-    },
-    "strip_auth_data": false,
-    "enable_detailed_recording": false,
-    "graphql": {
-        "enabled": true,
-        "execution_mode": "executionEngine",
-        "version": "2",
-        "schema": "type Country {\n  code: ID!\n  name: String!\n  native: String!\n  phone: String!\n  continent: Continent!\n  capital: String\n  weather: Weather\n  currency: String\n  languages: [Language!]!\n  emoji: String!\n  emojiU: String!\n  states: [State!]!\n}\n\ntype Weather {\n  temperature: String\n  wind: String\n  description: String\n}\n\ntype Continent {\n  code: ID!\n  name: String!\n  countries: [Country!]!\n}\n\ntype Language {\n  code: ID!\n  name: String\n  native: String\n  rtl: Boolean!\n}\n\ntype State {\n  code: String\n  name: String!\n  country: Country!\n}\n\ninput StringQueryOperatorInput {\n  eq: String\n  ne: String\n  in: [String]\n  nin: [String]\n  regex: String\n  glob: String\n}\n\ninput CountryFilterInput {\n  code: StringQueryOperatorInput\n  currency: StringQueryOperatorInput\n  continent: StringQueryOperatorInput\n}\n\ninput ContinentFilterInput {\n  code: StringQueryOperatorInput\n}\n\ninput LanguageFilterInput {\n  code: StringQueryOperatorInput\n}\n\ntype Query {\n  _entities(representations: [_Any!]!): [_Entity]!\n  _service: _Service!\n  countries(filter: CountryFilterInput): [Country!]!\n  country(code: ID!): Country\n}\n\nunion _Entity = Country | Continent | Language\n\nscalar _Any\n\ntype _Service {\n  sdl: String\n}",
-        "last_schema_update": "2022-05-20T14:52:06.818Z",
-        "type_field_configurations": [],
-        "playground": {
-            "enabled": false,
-            "path": ""
-        },
-        "engine": {
-            "field_configs": [
-                {
-                    "type_name": "Query",
-                    "field_name": "countries",
-                    "disable_default_mapping": false,
-                    "path": [
-                        "countries"
-                    ]
-                },
-                {
-                    "type_name": "Country",
-                    "field_name": "weather",
-                    "disable_default_mapping": true,
-                    "path": [
-                        ""
-                    ]
-                },
-                {
-                    "type_name": "Query",
-                    "field_name": "country",
-                    "disable_default_mapping": false,
-                    "path": [
-                        "country"
-                    ]
-                }
-            ],
-            "data_sources": [
-                {
-                    "kind": "GraphQL",
-                    "name": "getCountries",
-                    "internal": false,
-                    "root_fields": [
-                        {
-                            "type": "Query",
-                            "fields": [
-                                "countries"
-                            ]
-                        }
-                    ],
-                    "config": {
-                        "url": "https://countries.trevorblades.com/",
-                        "method": "POST",
-                        "headers": {},
-                        "default_type_name": "Country"
-                    }
-                },
-                {
-                    "kind": "REST",
-                    "name": "getWeather",
-                    "internal": false,
-                    "root_fields": [
-                        {
-                            "type": "Country",
-                            "fields": [
-                                "weather"
-                            ]
-                        }
-                    ],
-                    "config": {
-                        "url": "https://goweather.herokuapp.com/weather/{{.object.capital}}",
-                        "method": "GET",
-                        "body": "",
-                        "headers": {},
-                        "default_type_name": "Weather"
-                    }
-                },
-                {
-                    "kind": "GraphQL",
-                    "name": "getCountry",
-                    "internal": false,
-                    "root_fields": [
-                        {
-                            "type": "Query",
-                            "fields": [
-                                "country"
-                            ]
-                        }
-                    ],
-                    "config": {
-                        "url": "https://countries.trevorblades.com/",
-                        "method": "POST",
-                        "headers": {},
-                        "default_type_name": "Country"
-                    }
-                }
-            ]
-        },
-        "proxy": {
-            "auth_headers": {}
-        },
-        "subgraph": {
-            "sdl": ""
-        },
-        "supergraph": {
-            "subgraphs": [],
-            "merged_sdl": "",
-            "global_headers": {},
-            "disable_query_batching": false
-        }
+    "strip_listen_path": true,
+    "target_list": [],
+    "target_url": "",
+    "transport": {
+      "proxy_url": "",
+      "ssl_ciphers": [],
+      "ssl_force_common_name_check": false,
+      "ssl_insecure_skip_verify": false,
+      "ssl_max_version": 0,
+      "ssl_min_version": 0
     }
+  },
+  "request_signing": {
+    "algorithm": "",
+    "certificate_id": "",
+    "header_list": [],
+    "is_enabled": false,
+    "key_id": "",
+    "secret": "",
+    "signature_header": ""
+  },
+  "response_processors": [],
+  "session_lifetime": 0,
+  "session_provider": {
+    "meta": {},
+    "name": "",
+    "storage_engine": ""
+  },
+  "slug": "countries-and-weather",
+  "strip_auth_data": false,
+  "tag_headers": [],
+  "tags": [],
+  "upstream_certificates": {},
+  "uptime_tests": {
+    "check_list": [],
+    "config": {
+      "expire_utime_after": 0,
+      "recheck_wait": 0,
+      "service_discovery": {
+        "cache_timeout": 60,
+        "data_path": "",
+        "endpoint_returns_list": false,
+        "parent_data_path": "",
+        "port_data_path": "",
+        "query_endpoint": "",
+        "target_path": "",
+        "use_discovery_service": false,
+        "use_nested_query": false,
+        "use_target_list": false
+      }
+    }
+  },
+  "use_basic_auth": false,
+  "use_go_plugin_auth": false,
+  "use_keyless": true,
+  "use_mutual_tls_auth": false,
+  "use_oauth2": false,
+  "use_openid": false,
+  "use_standard_auth": false,
+  "version_data": {
+    "default_version": "",
+    "not_versioned": true,
+    "versions": {
+      "Default": {
+        "expires": "",
+        "extended_paths": {},
+        "global_headers": {},
+        "global_headers_remove": [],
+        "global_response_headers": {},
+        "global_response_headers_remove": [],
+        "global_size_limit": 0,
+        "ignore_endpoint_case": false,
+        "name": "Default",
+        "override_target": "",
+        "paths": {
+          "black_list": [],
+          "ignored": [],
+          "white_list": []
+        },
+        "use_extended_paths": true
+      }
+    }
+  }
 }
