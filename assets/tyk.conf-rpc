@@ -79,7 +79,6 @@
   "max_idle_connections_per_host": 50,
   "middleware_path": "/opt/tyk-gateway/middleware",
   "node_secret": "shared_node_secret",
-  "optimisations_use_async_session_write": true,
   "pid_file_location": "/opt/tyk-gateway/tyk-gateway.pid",
   "policies": {
     "allow_explicit_policy_id": true,
