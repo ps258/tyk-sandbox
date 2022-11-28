@@ -83,6 +83,9 @@ if [[ -d /opt/tyk-sink ]]; then
   start mdcb
 fi
 
+echo "[INFO]Capping analytics collections"
+/scripts/cap-mongo-z_collections.sh
+
 cd /
 echo "[INFO]Sandbox instance has started"
 sleep infinity
