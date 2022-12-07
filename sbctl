@@ -24,6 +24,7 @@ typeset -A DASHBOARD
 typeset -A TIB
 typeset -A PUMP
 typeset -A SYNC
+typeset -A MDCB
 
 #find the local IP address (use the interface of the default route)
 if [[ $OS == "Linux" ]]; then
@@ -199,15 +200,17 @@ function loadVersions {
 	typeset pumpVers
 	typeset TIBvers
 	typeset syncVers
+	typeset mdcbVers
 	typeset version
 	line=$1
 	IFS=,
-	echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers
+	echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers mdcbVers
 	GATEWAY[$version]=$gwVers
 	DASHBOARD[$version]=$dshbVers
 	PUMP[$version]=$pumpVers
 	TIB[$version]=$TIBvers
 	SYNC[$version]=$syncVers
+	MDCB[$version]=$mdcbVers
 }
 
 # Load the versions of the products that go together
