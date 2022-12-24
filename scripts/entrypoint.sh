@@ -37,7 +37,7 @@ if [[ ! -f /initialised ]]; then
 	fi
 
 	# create a local cert if one isn't already present
-	if [[ ! -e /opt/tyk-certificates/dashboard-certificate.pem ]]; then
+	if [[ ! -e /opt/tyk-certificates/gateway-certificate.pem ]]; then
 		echo "[INFO]Creating certificate for the dashboard and gateway"
 		SAN="DNS:localhost"
 		if [[ -n $SBX_GW_CNAME ]]; then
@@ -52,22 +52,20 @@ if [[ ! -f /initialised ]]; then
 		if [[ -n $SBX_PTL_CNAME ]]; then
 			SAN="DNS:$SBX_PTL_CNAME, $SAN"
 		fi
-		openssl genrsa -des3 -passout pass:ABC-123 -out /opt/tyk-certificates/dashboard-key.pem 2048
-		openssl req -new -key /opt/tyk-certificates/dashboard-key.pem -passin pass:ABC-123 -subj "$SUBJECT" -out /opt/tyk-certificates/certificate.csr
-		cp /opt/tyk-certificates/dashboard-key.pem /opt/tyk-certificates/dashboard-key.pem.orig
-		openssl rsa -in /opt/tyk-certificates/dashboard-key.pem.orig -out /opt/tyk-certificates/dashboard-key.pem -passin pass:ABC-123
-		rm -f /opt/tyk-certificates/dashboard-key.pem.orig
-		cat > v3.ext <<- EOF
+		openssl genrsa -des3 -passout pass:ABC-123 -out /opt/tyk-certificates/gateway-key.pem 2048
+		openssl req -new -key /opt/tyk-certificates/gateway-key.pem -passin pass:ABC-123 -subj "$SUBJECT" -out /opt/tyk-certificates/certificate.csr
+		cp /opt/tyk-certificates/gateway-key.pem /opt/tyk-certificates/gateway-key.pem.orig
+		openssl rsa -in /opt/tyk-certificates/gateway-key.pem.orig -out /opt/tyk-certificates/gateway-key.pem -passin pass:ABC-123
+		rm -f /opt/tyk-certificates/gateway-key.pem.orig
+		cat > /opt/tyk-certificates/extfile.ext <<- EOF
 		subjectKeyIdentifier   = hash
 		authorityKeyIdentifier = keyid:always,issuer:always
 		basicConstraints       = CA:TRUE
 		keyUsage               = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement, keyCertSign
-		subjectAltName         = DNS:kgw.stubbs-family.org, DNS:*.stubbs-family.org, DNS:localhost
+		subjectAltName         = $SAN
 		issuerAltName          = issuer:copy
 		EOF
-		openssl x509 -req -in /opt/tyk-certificates/certificate.csr -signkey /opt/tyk-certificates/dashboard-key.pem -out /opt/tyk-certificates/dashboard-certificate.pem -days 3650 -sha256 -extfile v3.ext
-		ln -s /opt/tyk-certificates/dashboard-certificate.pem /opt/tyk-certificates/gateway-certificate.pem
-		ln -s /opt/tyk-certificates/dashboard-key.pem /opt/tyk-certificates/gateway-key.pem
+		openssl x509 -req -in /opt/tyk-certificates/certificate.csr -signkey /opt/tyk-certificates/gateway-key.pem -out /opt/tyk-certificates/gateway-certificate.pem -days 3650 -sha256 -extfile /opt/tyk-certificates/extfile.ext
 	fi
 fi
 
