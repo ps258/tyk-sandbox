@@ -181,14 +181,27 @@ function echoBuildArgs {
 function listVersions {
 	typeset gwVers
 	typeset version
-	for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
-		gwVers=${GATEWAY[$version]}
-		echo "Version:   $version"
-		echo "    Gateway:   $gwVers"
-		[[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
-		[[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
-		[[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
-	done
+	if [[ $# > 0 ]]; then
+		for version in $*; do
+			gwVers=${GATEWAY[$version]}
+			echo "Version:   $version"
+			echo "    Gateway:   $gwVers"
+			[[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
+			[[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
+			[[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
+			[[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
+		done
+	else
+		for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
+			gwVers=${GATEWAY[$version]}
+			echo "Version:   $version"
+			echo "    Gateway:   $gwVers"
+			[[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
+			[[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
+			[[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
+			[[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
+		done
+	fi
 }
 
 # isolated to keep IFS from leaking
@@ -327,12 +340,18 @@ function buildSandboxImage {
 	typeset imageRev
 	typeset arg
 	typeset OPTARG
+	typeset version
 	cd "$SCRIPTDIR"
 	tykVersion=""
+	version=""
 	while getopts :lv:r: arg; do
 		case $arg in
 		l)
-			listVersions
+			if [[ $# > $OPTIND ]]; then
+				version=\${$OPTIND}
+			fi
+			shift
+			listVersions $*
 			exit 0
 			;;
 		v)
@@ -670,16 +689,22 @@ case $1 in
 	publish )
 		# first parameter will be the file, rest will be the sandboxes
 		shift
-		APIFILE="$1"
-		shift
-		if [[ -f "$APIFILE" ]]; then
-			for index in $(listRunningNames $*); do
-				docker container cp "$APIFILE" sandbox-$index:/$(basename $APIFILE)
-				docker container exec -t sandbox-$index bash -c "/scripts/publish-apis '/$(basename $APIFILE)'"
-			done
+		if [[ $# -gt 0 ]]; then
+			APIFILE="$1"
+			shift
+			if [[ -f "$APIFILE" ]]; then
+				for index in $(listRunningNames $*); do
+					docker container cp "$APIFILE" sandbox-$index:/$(basename $APIFILE)
+					docker container exec -t sandbox-$index bash -c "/scripts/publish-apis '/$(basename $APIFILE)'"
+				done
+			else
+				echo "[FATAL]API file '$APIFILE' does not exist or is unreadable"
+				echo "[Usage]publish API.json <list of sandboxes>"
+				exit 1
+			fi
 		else
-			echo "[FATAL]API file '$APIFILE' does not exist or is unreadable"
-			echo "[Usage]publish API.json <list of sandboxes>"
+			echo "[FATAL]Must specify sandbox and API json file"
+			help
 			exit 1
 		fi
 		;;
