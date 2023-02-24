@@ -50,6 +50,9 @@ fi
 
 # open mongo up to the world! Beware!!!
 sed -i 's/bindIp/#bindIp/' /etc/mongod.conf
+if ! grep -q fork /etc/mongod.conf; then
+	sed -i 's/processManagement:/processManagement:\n  fork: true/' /etc/mongod.conf
+fi
 
 # find the redis config file
 if [[ -f /etc/redis.conf ]]; then
