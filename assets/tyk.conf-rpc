@@ -70,6 +70,7 @@
     "min_version": 771,
     "prefer_server_ciphers": true,
     "server_name": "",
+    "skip_client_ca_announcement": false,
     "ssl_insecure_skip_verify": true,
     "use_ssl": true
   },
