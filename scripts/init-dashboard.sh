@@ -65,9 +65,9 @@ then
     http://localhost:3000/api/users/$USERID/actions/reset
 
 	# remove the ResetPassword property (because that's the way most installs will have it)
-	echo "[INFO]Calling http://localhost:3000/admin/users/$USERID/actions/disallow_reset_passwords to disable ResetPassword"
-	curl -X PUT --silent --header "admin-auth: $ADMIN_SECRET" \
-    http://localhost:3000/admin/users/$USERID/actions/disallow_reset_passwords
+	#echo "[INFO]Calling http://localhost:3000/admin/users/$USERID/actions/disallow_reset_passwords to disable ResetPassword"
+	#curl -X PUT --silent --header "admin-auth: $ADMIN_SECRET" \
+  #  http://localhost:3000/admin/users/$USERID/actions/disallow_reset_passwords
 
   # Save the details for later use
   echo SBX_USER=$SBX_USER >> /initial_credentials.txt
