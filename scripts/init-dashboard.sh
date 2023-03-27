@@ -30,6 +30,7 @@ then
 	else
 		PORTAL_CNAME=""
 	fi
+	echo "[INFO]Creating an organisation"
   ORG_DATA=$(curl --silent \
     --header "admin-auth: $ADMIN_SECRET" \
     --header "Content-Type:application/json" \
@@ -38,6 +39,7 @@ then
 
   ORG_ID=$(echo $ORG_DATA | jq -r .Meta)
   echo SBX_ORG_ID=$ORG_ID >> /initial_credentials.txt
+	echo "[INFO]Creating admin user '$SBX_USER'"
   USER_JSON=$(curl --silent \
     --header "admin-auth: $ADMIN_SECRET" \
     --header "Content-Type:application/json" \
@@ -55,11 +57,17 @@ then
 
   USERID=$(curl --silent --header "authorization: $ACCESS_TOKEN" http://localhost:3000/api/users | jq -r .users[0].id)
 
+	# reset the password to $SBX_CLEAR_PASSWORD
   curl --silent \
     --header "authorization: $ACCESS_TOKEN" \
     --header "Content-Type:application/json" \
     --data '{"new_password":"'$SBX_CLEAR_PASSWORD'"}' \
     http://localhost:3000/api/users/$USERID/actions/reset
+
+	# remove the ResetPassword property (because that's the way most installs will have it)
+	echo "[INFO]Calling http://localhost:3000/admin/users/$USERID/actions/disallow_reset_passwords to disable ResetPassword"
+	curl -X PUT --silent --header "admin-auth: $ADMIN_SECRET" \
+    http://localhost:3000/admin/users/$USERID/actions/disallow_reset_passwords
 
   # Save the details for later use
   echo SBX_USER=$SBX_USER >> /initial_credentials.txt
