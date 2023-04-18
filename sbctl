@@ -246,7 +246,7 @@ function getVerboseSandboxInfo {
 	echo $containerName \($containerStatus\)
 	docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label'
 	if [[ $containerStatus = 'running' ]]; then
-		docker container exec $containerName awk '/SBX_ORG_ID|SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed -e 's/SBX_//g' -e 's/=/ /'
+		docker container exec $containerName awk '/SBX_ORG_ID|SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed  -e 's/SBX_ORG_ID=/sandbox.OrgId: /' -e 's/SBX_ADMIN_API_KEY=/sandbox.AdminKey: /'
 	fi
 	echo
 }
