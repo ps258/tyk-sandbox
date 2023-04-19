@@ -538,7 +538,7 @@ function listNames {
 	typeset name
 	typeset list
 	list=""
-	if [[ $1 == "ALL" ]]; then
+	if [[ $# -eq 0 || $1 == "ALL" ]]; then
 		docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
 	else
 		for name in $*; do
@@ -622,7 +622,7 @@ case $1 in
 			docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
 		fi
 		;;
-	info | list | status)
+	list | status)
 		# Inspect the details of the given container or containers
 		if [[ $# -gt 1 ]]; then
 			shift
@@ -640,6 +640,14 @@ case $1 in
 			# Inspect the details of all exiting containers
 			getAllSandboxInfo
 		fi
+		;;
+	info)
+		# Give details (same as "list -v")
+		shift
+		for index in $(listNames $*); do
+			getVerboseSandboxInfo $index
+		done
+		#fi
 		;;
 	mdcb)
 		shift
