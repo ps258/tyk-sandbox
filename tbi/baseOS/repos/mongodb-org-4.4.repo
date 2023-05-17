@@ -4,3 +4,5 @@ baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.4/$basearc
 gpgcheck=0
 enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-4.4.asc
+metadata_expire=86400
+mirrorlist_expire=86400
