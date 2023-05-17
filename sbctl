@@ -39,7 +39,7 @@ function help {
 	typeset name
 	name=$(basename $SCRIPTNAME)
 	echo "[USAGE]:"
-	echo "$name build -l <version number>| -v tyk-gateway-version-number [-r image version]"
+	echo "$name build -l <version number>| -v tyk-gateway-version-number"
 	echo "        Build a sandbox image for that version if its not already available"
 	echo "        -v Version to build ('ALL' to build all versions)"
 	echo "        -l List versions that images can be made for (incompatible with -v and -r)"
@@ -444,8 +444,10 @@ function createSandbox {
 		imageVersion=$imageVersion-$(latestImageRev $imageVersion)
 	fi
 	if ! docker image inspect tyk-sandbox:$imageVersion >/dev/null 2>&1; then
-		echo "[WARN]tyk-sandbox:$imageVersion does not exist. Did you intend to 'build' an image not 'create' a container?"
-		exit 1
+		echo "[WARN]tyk-sandbox:$(echo $imageVersion | sed -e 's/-$//') does not exist. Building it now"
+		buildSandboxImage -v $(echo $imageVersion | sed -e 's/-$//')
+		echo 
+		imageVersion=${imageVersion}1
 	fi
 	if [[ -z $logLevel ]]; then
 		logLevel="debug"
