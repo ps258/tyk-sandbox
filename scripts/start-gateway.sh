@@ -29,14 +29,14 @@ if [[ $# > 0 ]]; then
 		echo "[FATAL]Config file not found '$conf'"
 		exit 1
 	fi
-	log=/var/log/tyk-gateway-rpc.log
+	PORT=$(awk '/"listen_port"/ {print $NF}' $conf | cut -d: -f2 | sed -e 's/,//')
+	log=/var/log/tyk-gateway-rpc-$PORT.log
 else
 	conf=/opt/tyk-gateway/tyk.conf
+	PORT=$(awk '/"listen_port"/ {print $NF}' $conf | cut -d: -f2 | sed -e 's/,//')
 	log=/var/log/tyk-gateway.log
 fi
 ci $conf
-
-PORT=$(awk '/"listen_port"/ {print $NF}' $conf | cut -d: -f2 | sed -e 's/,//')
 
 # refuse to start if its already running
 if isRunning
