@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# script to install the tyk components during the image build
+
 PATH=/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin
 
 cd $(dirname $0)
@@ -16,6 +18,14 @@ done
 if [[ -n $dep_rpmlist ]]
 then
 	yum --disablerepo=* localinstall -y $dep_rpmlist
+fi
+
+# As of version 5.1 packages are not being build for EL7. But old versions are only available in the EL7 repo
+# Since no single repo will do anymore and since EL8 packages are only made for 3.0.7-1 and later we'll use
+# the EL7 repo for tyk <= version 4 and the EL8 repo for tyk >= 5
+TYK_MAJOR_VERSION=$(echo $SBX_GATEWAY_VERS | cut -d- -f3 | cut -d. -f1)
+if [[ $TYK_MAJOR_VERSION -gt 4 ]]; then
+	sed -i 's/\/7\//\/8\//' /etc/yum.repos.d/tyk_tyk-*.repo
 fi
 
 # install tyk

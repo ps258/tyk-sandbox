@@ -13,9 +13,9 @@ ARG SBX_TIB_VERS=""
 ARG SBX_SYNC_VERS=""
 ARG SBX_SCHEMA_URL=""
 
-RUN chmod +x /assets/rpms/install-tyk && /assets/rpms/install-tyk 
-
 COPY scripts /scripts
 RUN chmod +x /scripts/*
+
+RUN /scripts/install-tyk 
 
 ENTRYPOINT ["/scripts/entrypoint.sh"]
