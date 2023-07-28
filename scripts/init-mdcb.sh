@@ -58,13 +58,13 @@ fi
 echo "[INFO]Enabling hybrid mode in all Orgs"
 /scripts/enable-hybrid.sh
 
-# switch current gateway to port 8081 and allow edge gateway to be on port 8080 so that it's the default gateway
+# switch current gateway to port 444 and allow edge gateway to be on port 443 so that its exposed outside the container
+# switch the dashboard to connect to the management gateway on port 444
 stop dashboard gateway
-sed -i "s/8080/8081/g" /opt/tyk-dashboard/tyk_analytics.conf /opt/tyk-gateway/tyk.conf
+sed -i "s/443/444/g" /opt/tyk-dashboard/tyk_analytics.conf /opt/tyk-gateway/tyk.conf
 
-# switch the current dashboard to connect to the management gateway on port 8081
 
-# dashboard needs to restart to get the updated org and the new management gateway
+# dashboard and gateway have to restart to get the updated org and the new management gateway
 echo "[INFO]Restarting dashboard and gateway to apply organisation and gateway port changes"
 start dashboard gateway
 

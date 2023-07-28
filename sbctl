@@ -46,7 +46,7 @@ function help {
 	echo "           Give version number for details of the named version"
 	echo "$name create -v tyk-version [-t ticket no] [-i index-number] [-n]"
 	echo "        create a sandbox with the named version of tyk"
-	echo "        -e An environment variable file used topopulate the sandboxes environment"
+	echo "        -e An environment variable file used to populate the sandboxes environment"
 	echo "        -i Index number (skip for autoallocation of the next free)"
 	echo "        -l Log level. Set to debug, info, warn or error. Defaults to debug"
 	echo "        -n IGNORE ~/.tyk-sandbox even if it exists"
@@ -57,6 +57,7 @@ function help {
 	echo "           SBX_PASSWORD=base64 encoded password"
 	echo "           Note: Create a base64 encoded password with:"
 	echo "               echo password | base64"
+	echo "           Note: See also -e above"
 	echo "        -t Ticket or comment field"
 	echo "        -v Tyk version of sandbox image. Required and must have already been built"
 	echo "$name images [-r <image versions to remove|ALL]]"
@@ -502,7 +503,7 @@ function createSandbox {
 	docker container create --name $containerName \
 		--hostname $label \
 		--publish $dashboardPort:3000 \
-		--publish $gatewayPort:8080 \
+		--publish $gatewayPort:443 \
 		--publish $redisPort:6379 \
 		--publish $mongoPort:27017 \
 		$TIBPort \

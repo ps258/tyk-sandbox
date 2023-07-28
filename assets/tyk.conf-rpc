@@ -76,7 +76,7 @@
     "use_ssl": true
   },
   "listen_address": "",
-  "listen_port": 8080,
+  "listen_port": 443,
   "max_idle_connections_per_host": 50,
   "middleware_path": "/opt/tyk-gateway/middleware",
   "node_secret": "shared_node_secret",
