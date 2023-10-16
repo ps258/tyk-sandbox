@@ -41,7 +41,7 @@ function help {
 	echo "[USAGE]:"
 	echo "$name build -l <version number>| -v tyk-gateway-version-number"
 	echo "        Build a sandbox image for that version if its not already available"
-	echo "        -v Version to build ('ALL' to build all versions)"
+	echo "        -v Version to build ('all' to build all versions)"
 	echo "        -l List versions that images can be made for (incompatible with -v and -r)"
 	echo "           Give version number for details of the named version"
 	echo "$name create -v tyk-version [-t ticket no] [-i index-number] [-n]"
@@ -60,9 +60,9 @@ function help {
 	echo "           Note: See also -e above"
 	echo "        -t Ticket or comment field"
 	echo "        -v Tyk version of sandbox image. Required and must have already been built"
-	echo "$name images [-r <image versions to remove|ALL]]"
+	echo "$name images [-r <image versions to remove|all]]"
 	echo "        List the docker images for creating sandboxes"
-	echo "        -r Image version to remove|ALL. Removes the image version"
+	echo "        -r Image version to remove|all. Removes the image version"
 	echo "$name list|info|status [-v] <index number...>"
 	echo "        Details about the named sandbox or all"
 	echo "        -v Also echo the org_id and the Admin API key"
@@ -83,7 +83,7 @@ function rmSandboxImages {
 	typeset version
 	typeset removeList
 	removeList=""
-	if echo $* | grep -q ALL; then
+	if echo $* | grep -qw all; then
 		for version in $(docker image list tyk-sandbox | awk '!/REPOSITORY/ {print $2}'); do
 			removeList="$removeList tyk-sandbox:$version"
 		done
@@ -375,7 +375,7 @@ function buildSandboxImage {
   fi
   # build the base image if it's not present
   buildTykBaseImage
-	if [[ $tykVersion == "ALL" ]]; then
+	if [[ $tykVersion == "all" ]]; then
 		buildAllImages
 		return
 	fi
@@ -544,7 +544,7 @@ function listNames {
 	typeset name
 	typeset list
 	list=""
-	if [[ $# -eq 0 || $1 == "ALL" ]]; then
+	if [[ $# -eq 0 || $1 == "all" ]]; then
 		docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
 	else
 		for name in $*; do
@@ -562,7 +562,7 @@ function listRunningNames {
 	typeset name
 	typeset list
 	list=""
-	if [[ $1 == "ALL" ]]; then
+	if [[ $1 == "all" ]]; then
 		docker container list | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
 	else
 		for name in $*; do
