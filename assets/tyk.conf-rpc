@@ -94,7 +94,7 @@
     "bind_to_slugs": false,
     "connection_string": "localhost:9090",
     "enable_rpc_cache": true,
-    "group_id": "",
+    "group_id": "edge",
     "rpc_key": "SBX_ORG_ID",
     "ssl_insecure_skip_verify": true,
     "use_rpc": true,
