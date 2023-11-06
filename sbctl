@@ -185,13 +185,18 @@ function listVersions {
 	typeset version
 	if [[ $# > 0 ]]; then
 		for version in $*; do
-			gwVers=${GATEWAY[$version]}
-			echo "Version:   $version"
-			echo "    Gateway:   $gwVers"
-			[[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
-			[[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
-			[[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
-			[[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
+      if echo ${!GATEWAY[@]} | grep -qEw $version; then
+			  gwVers=${GATEWAY[$version]}
+			  echo "Version:   $version"
+			  echo "    Gateway:   $gwVers"
+			  [[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
+			  [[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
+			  [[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
+			  [[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
+      else
+        echo "[FATAL]Gateway '$version' is not configured $VERSIONFILE"
+        exit 1
+      fi
 		done
 	else
 		for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
