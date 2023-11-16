@@ -176,7 +176,7 @@ function echoBuildArgs {
 	else
 		SBX_SYNC_VERS=""
 	fi
-	echo $SBX_SCHEMA_URL $SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS
+	echo $SBX_SCHEMA_URL $SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS --build-arg TBI_IMAGE=$TBI_IMAGE
 }
 
 # list the version relationships we know about
@@ -319,12 +319,27 @@ function nextFreeContainer {
 	done
 }
 
+function setTbiVersions {
+  case $1 in
+    2*)
+      TBI_IMAGE=tbi7:latest
+      BASE_UBI=centos:7
+      ;;
+    *)
+      TBI_IMAGE=tbi8:latest
+      BASE_UBI=centos:8
+      ;;
+  esac
+}
+
+
 # build the TBI to save build time with lots of images
 function buildTykBaseImage {
-	existing=$(docker image list tbi:latest | awk '/tbi/')
+  setTbiVersions $1
+	existing=$(docker image list $TBI_IMAGE | awk '/tbi/')
   if [[ -z $existing ]]; then
     cd tbi
-	  docker image build --no-cache --progress=plain --tag tbi:latest .
+	  docker image build --build-arg BASE_UBI=$BASE_UBI --no-cache --progress=plain --tag $TBI_IMAGE .
     cd -
   fi
 }
@@ -334,6 +349,7 @@ function buildAllImages {
 	typeset version
 	for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
 		echo "[INFO]Building $version"
+    buildTykBaseImage $version
 		buildSandboxImage -v $version
 	done
 }
@@ -378,12 +394,12 @@ function buildSandboxImage {
 		echo "[FATAL]No build version specified with -v" 1>&2
 		exit 1
   fi
-  # build the base image if it's not present
-  buildTykBaseImage
 	if [[ $tykVersion == "all" ]]; then
 		buildAllImages
 		return
 	fi
+  # build the base image if it's not present
+  buildTykBaseImage $tykVersion
 	imageRev=$(nextFreeImageRev $tykVersion)
 	if [[ ${GATEWAY[$tykVersion]+_} ]]; then
 		docker image build $(echoBuildArgs $tykVersion) --progress=plain --no-cache --tag tyk-sandbox:$tykVersion-$imageRev .

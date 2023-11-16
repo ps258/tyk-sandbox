@@ -1,4 +1,5 @@
-FROM centos:8
+ARG BASE_UBI=centos:8
+FROM --platform=linux/amd64 $BASE_UBI
 
 COPY baseOS /baseOS
 
