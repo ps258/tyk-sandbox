@@ -10,8 +10,8 @@ GatewayBasePort=5001
 RedisBasePort=6001
 MongoBasePort=7001
 SCRIPTDIR=$(
-	cd "$(dirname $SCRIPTNAME)"
-	echo $PWD
+  cd "$(dirname $SCRIPTNAME)"
+  echo $PWD
 )
 VERSIONFILE="$SCRIPTDIR/tyk-versions.list"
 PATH="$SCRIPTDIR:$PATH"
@@ -28,295 +28,294 @@ typeset -A MDCB
 
 #find the local IP address (use the interface of the default route)
 if [[ $OS == "Linux" ]]; then
-	default_dev=$(ip route list | sed 's/none //' | awk '/default/ {print $5}')
-	IP_addr=$(ip addr show dev $default_dev | awk '$1 == "inet" {print $2}' | head -1 | cut -d/ -f1)
+  default_dev=$(ip route list | sed 's/none //' | awk '/default/ {print $5}')
+  IP_addr=$(ip addr show dev $default_dev | awk '$1 == "inet" {print $2}' | head -1 | cut -d/ -f1)
 elif [[ $OS == "Darwin" ]]; then
-	default_dev=$(netstat -rnf inet | awk '/^default/{print $NF}')
-	IP_addr=$(ipconfig getifaddr $default_dev)
+  default_dev=$(netstat -rnf inet | awk '/^default/{print $NF}')
+  IP_addr=$(ipconfig getifaddr $default_dev)
 fi
 
 function help {
-	typeset name
-	name=$(basename $SCRIPTNAME)
-	echo "[USAGE]:"
-	echo "$name build -l <version number>| -v tyk-gateway-version-number"
-	echo "        Build a sandbox image for that version if its not already available"
-	echo "        -v Version to build ('all' to build all versions)"
-	echo "        -l List versions that images can be made for (incompatible with -v and -r)"
-	echo "           Give version number for details of the named version"
-	echo "$name create -v tyk-version [-t ticket no] [-i index-number] [-n]"
-	echo "        create a sandbox with the named version of tyk"
-	echo "        -e An environment variable file used to populate the sandboxes environment"
-	echo "        -i Index number (skip for autoallocation of the next free)"
-	echo "        -l Log level. Set to debug, info, warn or error. Defaults to debug"
-	echo "        -n IGNORE ~/.tyk-sandbox even if it exists"
-	echo "           You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:"
-	echo "           These will be used when -n is NOT present"
-	echo "           SBX_LICENSE=licence string"
-	echo "           SBX_USER=user email"
-	echo "           SBX_PASSWORD=base64 encoded password"
-	echo "           Note: Create a base64 encoded password with:"
-	echo "               echo password | base64"
-	echo "           Note: See also -e above"
-	echo "        -t Ticket or comment field"
-	echo "        -v Tyk version of sandbox image. Required and must have already been built"
-	echo "$name images [-r <image versions to remove|all]]"
-	echo "        List the docker images for creating sandboxes"
-	echo "        -r Image version to remove|all. Removes the image version"
-	echo "$name list|info|status [-v] <index number...>"
-	echo "        Details about the named sandbox or all"
-	echo "        -v Also echo the org_id and the Admin API key"
-	echo "$name mdcb <mdcb rpm path> <index number...>"
-	echo "        Install MDCB from the named rpm, configure and start it"
-	echo "        The edge gateway becomes the gateway for the sandbox"
-	echo "$name publish api.json <index number...>"
-	echo "        Publish the API in api.json into the sandbox"
-	echo "$name script scriptfile <index number...>"
-	echo "        Copy the script into the container and run it"
-	echo "$name shell <index number...>"
-	echo "        Open a bash shell in the sandboxes named"
-	echo "$name [start|stop|restart|rm] <index number...>"
-	echo "        Take the action named on the listed sandboxes"
+  typeset name
+  name=$(basename $SCRIPTNAME)
+  echo "[USAGE]:"
+  echo "$name build -l <version number>| -v tyk-gateway-version-number"
+  echo "        Build a sandbox image for that version if its not already available"
+  echo "        -v Version to build ('all' to build all versions)"
+  echo "        -l List versions that images can be made for (incompatible with -v and -r)"
+  echo "           Give version number for details of the named version"
+  echo "$name create -v tyk-version [-t ticket no] [-i index-number] [-n]"
+  echo "        create a sandbox with the named version of tyk"
+  echo "        -e An environment variable file used to populate the sandboxes environment"
+  echo "        -i Index number (skip for autoallocation of the next free)"
+  echo "        -l Log level. Set to debug, info, warn or error. Defaults to debug"
+  echo "        -n IGNORE ~/.tyk-sandbox even if it exists"
+  echo "           You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:"
+  echo "           These will be used when -n is NOT present"
+  echo "           SBX_LICENSE=licence string"
+  echo "           SBX_USER=user email"
+  echo "           SBX_PASSWORD=base64 encoded password"
+  echo "           Note: Create a base64 encoded password with:"
+  echo "               echo password | base64"
+  echo "           Note: See also -e above"
+  echo "        -t Ticket or comment field"
+  echo "        -v Tyk version of sandbox image. Required and must have already been built"
+  echo "$name images [-r <image versions to remove|all]]"
+  echo "        List the docker images for creating sandboxes"
+  echo "        -r Image version to remove|all. Removes the image version"
+  echo "$name list|info <index number...>"
+  echo "        Details about the named sandbox or all"
+  echo "$name mdcb <mdcb rpm path> <index number...>"
+  echo "        Install MDCB from the named rpm, configure and start it"
+  echo "        The edge gateway becomes the gateway for the sandbox"
+  echo "$name publish api.json <index number...>"
+  echo "        Publish the API in api.json into the sandbox"
+  echo "$name script scriptfile <index number...>"
+  echo "        Copy the script into the container and run it"
+  echo "$name shell <index number...>"
+  echo "        Open a bash shell in the sandboxes named"
+  echo "$name [start|stop|restart|rm] <index number...>"
+  echo "        Take the action named on the listed sandboxes"
 }
 
 function rmSandboxImages {
-	typeset version
-	typeset removeList
-	removeList=""
-	if echo $* | grep -qw all; then
-		for version in $(docker image list tyk-sandbox | awk '!/REPOSITORY/ {print $2}'); do
-			removeList="$removeList tyk-sandbox:$version"
-		done
-	else
-		for version in $*; do
-			removeList="$removeList tyk-sandbox:$version"
-		done
-	fi
-	#removeList=$(echo $removeList)
-	if [[ -n $removeList ]]; then
-		docker image rm $removeList
-	fi
+  typeset version
+  typeset removeList
+  removeList=""
+  if echo $* | grep -qw all; then
+    for version in $(docker image list tyk-sandbox | awk '!/REPOSITORY/ {print $2}'); do
+      removeList="$removeList tyk-sandbox:$version"
+    done
+  else
+    for version in $*; do
+      removeList="$removeList tyk-sandbox:$version"
+    done
+  fi
+  #removeList=$(echo $removeList)
+  if [[ -n $removeList ]]; then
+    docker image rm $removeList
+  fi
 }
 
 # touch files correspoinding to the versions that need to be installed so that the installer can install them
 # deprecated in favour of echoBuildArgs and using --build-arg docker options which allows parallel builds
 function touchRPMs {
-	typeset version
-	typeset gwVers
-	typeset dshbVers
-	typeset pumpVers
-	typeset TIBvers
-	typeset syncVers
-	typeset oldFile
-	typeset assetDir="$SCRIPTDIR/assets"
-	typeset rpmDir="$assetDir"/rpms/tyk
-	version=$1
-	if [[ ${GATEWAY[$version]+_} ]]; then
-		gwVers=${GATEWAY[$version]}
-		dshbVers=${DASHBOARD[$version]}
-		TIBvers=${TIB[$version]}
-		pumpVers=${PUMP[$version]}
-		syncVers=${SYNC[$version]}
-	else
-		echo "[FATAL]Gateway version '$version' isn't configured in $VERSIONFILE"
-		exit 1
-	fi
-	# get the schema file
-	if [[ -f "$assetDir/schema.json" ]]; then
-		\rm -f "$assetDir/schema.json"
-	fi
-	wget -q https://raw.githubusercontent.com/TykTechnologies/tyk/v$version/cli/linter/schema.json -O "$assetDir/schema.json"
-	# remove the existing install files so we can create new ones
-	for oldFile in "$rpmDir"/tyk-gateway-* "$rpmDir"/tyk-dashboard-* "$rpmDir"/tyk-pump-* "$rpmDir"/tyk-identity-broker-* "$rpmDir"/tyk-sync-*; do
-		if [[ -f "$oldFile" ]]; then
-			rm -f "$oldFile"
-		fi
-	done
-	touch "$rpmDir/tyk-gateway-$gwVers"
-	touch "$rpmDir/tyk-dashboard-$dshbVers"
-	touch "$rpmDir/tyk-pump-$pumpVers"
-	if [[ -n $TIBvers ]]; then
-		touch "$rpmDir/tyk-identity-broker-$TIBvers"
-	fi
-	if [[ -n $syncVers ]]; then
-		touch "$rpmDir/tyk-sync-$syncVers"
-	fi
+  typeset version
+  typeset gwVers
+  typeset dshbVers
+  typeset pumpVers
+  typeset TIBvers
+  typeset syncVers
+  typeset oldFile
+  typeset assetDir="$SCRIPTDIR/assets"
+  typeset rpmDir="$assetDir"/rpms/tyk
+  version=$1
+  if [[ ${GATEWAY[$version]+_} ]]; then
+    gwVers=${GATEWAY[$version]}
+    dshbVers=${DASHBOARD[$version]}
+    TIBvers=${TIB[$version]}
+    pumpVers=${PUMP[$version]}
+    syncVers=${SYNC[$version]}
+  else
+    echo "[FATAL]Gateway version '$version' isn't configured in $VERSIONFILE"
+    exit 1
+  fi
+  # get the schema file
+  if [[ -f "$assetDir/schema.json" ]]; then
+    \rm -f "$assetDir/schema.json"
+  fi
+  wget -q https://raw.githubusercontent.com/TykTechnologies/tyk/v$version/cli/linter/schema.json -O "$assetDir/schema.json"
+  # remove the existing install files so we can create new ones
+  for oldFile in "$rpmDir"/tyk-gateway-* "$rpmDir"/tyk-dashboard-* "$rpmDir"/tyk-pump-* "$rpmDir"/tyk-identity-broker-* "$rpmDir"/tyk-sync-*; do
+    if [[ -f "$oldFile" ]]; then
+      rm -f "$oldFile"
+    fi
+  done
+  touch "$rpmDir/tyk-gateway-$gwVers"
+  touch "$rpmDir/tyk-dashboard-$dshbVers"
+  touch "$rpmDir/tyk-pump-$pumpVers"
+  if [[ -n $TIBvers ]]; then
+    touch "$rpmDir/tyk-identity-broker-$TIBvers"
+  fi
+  if [[ -n $syncVers ]]; then
+    touch "$rpmDir/tyk-sync-$syncVers"
+  fi
 }
 
 # Echo the build versions for each component in a format ready for docker build to swallow
 function echoBuildArgs {
-	typeset version; typeset gwVers; typeset dshbVers; typeset pumpVers; typeset TIBvers
-	typeset syncVers; typeset assetDir="$SCRIPTDIR/assets"
-	typeset SBX_SCHEMA_URL; typeset SBX_GATEWAY_VERS; typeset SBX_DASHBOARD_VERS;
-	typeset SBX_PUMP_VERS; typeset SBX_TIB_VERS; typeset SBX_SYNC_VERS
-	version=$1
-	if [[ ${GATEWAY[$version]+_} ]]; then
-		gwVers=${GATEWAY[$version]}
-		dshbVers=${DASHBOARD[$version]}
-		TIBvers=${TIB[$version]}
-		pumpVers=${PUMP[$version]}
-		syncVers=${SYNC[$version]}
-	else
-		echo "[FATAL]Gateway version '$version' isn't configured in $VERSIONFILE"
-		exit 1
-	fi
-	# store the URL for the schema
-	SBX_SCHEMA_URL="--build-arg SBX_SCHEMA_URL=https://raw.githubusercontent.com/TykTechnologies/tyk/v$version/cli/linter/schema.json"
-	# set the env vars for the build
-	SBX_GATEWAY_VERS="--build-arg SBX_GATEWAY_VERS=tyk-gateway-$gwVers"
-	SBX_DASHBOARD_VERS="--build-arg SBX_DASHBOARD_VERS=tyk-dashboard-$dshbVers"
-	SBX_PUMP_VERS="--build-arg SBX_PUMP_VERS=tyk-pump-$pumpVers"
-	if [[ -n $TIBvers ]]; then
-		SBX_TIB_VERS="--build-arg SBX_TIB_VERS=tyk-identity-broker-$TIBvers"
-	else
-		SBX_TIB_VERS=""
-	fi
-	if [[ -n $syncVers ]]; then
-		SBX_SYNC_VERS="--build-arg SBX_SYNC_VERS=tyk-sync-$syncVers"
-	else
-		SBX_SYNC_VERS=""
-	fi
-	echo $SBX_SCHEMA_URL $SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS --build-arg TBI_IMAGE=$TBI_IMAGE
+  typeset version; typeset gwVers; typeset dshbVers; typeset pumpVers; typeset TIBvers
+  typeset syncVers; typeset assetDir="$SCRIPTDIR/assets"
+  typeset SBX_SCHEMA_URL; typeset SBX_GATEWAY_VERS; typeset SBX_DASHBOARD_VERS;
+  typeset SBX_PUMP_VERS; typeset SBX_TIB_VERS; typeset SBX_SYNC_VERS
+  version=$1
+  if [[ ${GATEWAY[$version]+_} ]]; then
+    gwVers=${GATEWAY[$version]}
+    dshbVers=${DASHBOARD[$version]}
+    TIBvers=${TIB[$version]}
+    pumpVers=${PUMP[$version]}
+    syncVers=${SYNC[$version]}
+  else
+    echo "[FATAL]Gateway version '$version' isn't configured in $VERSIONFILE"
+    exit 1
+  fi
+  # store the URL for the schema
+  SBX_SCHEMA_URL="--build-arg SBX_SCHEMA_URL=https://raw.githubusercontent.com/TykTechnologies/tyk/v$version/cli/linter/schema.json"
+  # set the env vars for the build
+  SBX_GATEWAY_VERS="--build-arg SBX_GATEWAY_VERS=tyk-gateway-$gwVers"
+  SBX_DASHBOARD_VERS="--build-arg SBX_DASHBOARD_VERS=tyk-dashboard-$dshbVers"
+  SBX_PUMP_VERS="--build-arg SBX_PUMP_VERS=tyk-pump-$pumpVers"
+  if [[ -n $TIBvers ]]; then
+    SBX_TIB_VERS="--build-arg SBX_TIB_VERS=tyk-identity-broker-$TIBvers"
+  else
+    SBX_TIB_VERS=""
+  fi
+  if [[ -n $syncVers ]]; then
+    SBX_SYNC_VERS="--build-arg SBX_SYNC_VERS=tyk-sync-$syncVers"
+  else
+    SBX_SYNC_VERS=""
+  fi
+  echo $SBX_SCHEMA_URL $SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS --build-arg TBI_IMAGE=$TBI_IMAGE
 }
 
 # list the version relationships we know about
 function listVersions {
-	typeset gwVers
-	typeset version
-	if [[ $# > 0 ]]; then
-		for version in $*; do
+  typeset gwVers
+  typeset version
+  if [[ $# > 0 ]]; then
+    for version in $*; do
       if echo ${!GATEWAY[@]} | grep -qEw $version; then
-			  gwVers=${GATEWAY[$version]}
-			  echo "Version:   $version"
-			  echo "    Gateway:   $gwVers"
-			  [[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
-			  [[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
-			  [[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
-			  [[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
+        gwVers=${GATEWAY[$version]}
+        echo "Version:   $version"
+        echo "    Gateway:   $gwVers"
+        [[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
+        [[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
+        [[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
+        [[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
       else
         echo "[FATAL]Gateway '$version' is not configured $VERSIONFILE"
         exit 1
       fi
-		done
-	else
-		for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
-			gwVers=${GATEWAY[$version]}
-			echo "Version:   $version"
-			echo "    Gateway:   $gwVers"
-			[[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
-			[[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
-			[[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
-			[[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
-		done
-	fi
+    done
+  else
+    for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
+      gwVers=${GATEWAY[$version]}
+      echo "Version:   $version"
+      echo "    Gateway:   $gwVers"
+      [[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
+      [[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
+      [[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
+      [[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
+    done
+  fi
 }
 
 # isolated to keep IFS from leaking
 function loadVersions {
-	typeset line
-	typeset IFS
-	typeset gwVers
-	typeset dshbVers
-	typeset pumpVers
-	typeset TIBvers
-	typeset syncVers
-	typeset mdcbVers
-	typeset version
-	line=$1
-	IFS=,
-	echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers mdcbVers
-	GATEWAY[$version]=$gwVers
-	DASHBOARD[$version]=$dshbVers
-	PUMP[$version]=$pumpVers
-	TIB[$version]=$TIBvers
-	SYNC[$version]=$syncVers
-	MDCB[$version]=$mdcbVers
+  typeset line
+  typeset IFS
+  typeset gwVers
+  typeset dshbVers
+  typeset pumpVers
+  typeset TIBvers
+  typeset syncVers
+  typeset mdcbVers
+  typeset version
+  line=$1
+  IFS=,
+  echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers mdcbVers
+  GATEWAY[$version]=$gwVers
+  DASHBOARD[$version]=$dshbVers
+  PUMP[$version]=$pumpVers
+  TIB[$version]=$TIBvers
+  SYNC[$version]=$syncVers
+  MDCB[$version]=$mdcbVers
 }
 
 # Load the versions of the products that go together
 function loadVersionFile {
-	typeset line
-	for line in $(awk 'NF && !/#/' $VERSIONFILE); do
-		loadVersions "$line"
-	done
+  typeset line
+  for line in $(awk 'NF && !/#/' $VERSIONFILE); do
+    loadVersions "$line"
+  done
 }
 
 # Report the details of a sandbox container
 function getVerboseSandboxInfo {
-	typeset index
-	typeset containerName
-	typeset containerStatus
-	index=$1
-	containerName=sandbox-$index
-	containerStatus=$(docker container inspect -f '{{ .State.Status }}' $containerName)
-	echo $containerName \($containerStatus\)
-	docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label'
-	if [[ $containerStatus = 'running' ]]; then
-		docker container exec $containerName awk '/SBX_ORG_ID|SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed  -e 's/SBX_ORG_ID=/sandbox.OrgId: /' -e 's/SBX_ADMIN_API_KEY=/sandbox.AdminKey: /'
-	fi
-	echo
+  typeset index
+  typeset containerName
+  typeset containerStatus
+  index=$1
+  containerName=sandbox-$index
+  containerStatus=$(docker container inspect -f '{{ .State.Status }}' $containerName)
+  echo $containerName \($containerStatus\)
+  docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label'
+  if [[ $containerStatus = 'running' ]]; then
+    docker container exec $containerName awk '/SBX_ORG_ID|SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed  -e 's/SBX_ORG_ID=/sandbox.OrgId: /' -e 's/SBX_ADMIN_API_KEY=/sandbox.AdminKey: /'
+  fi
+  echo
 }
 
 # Report the details of a sandbox container
 function getSandboxInfo {
-	typeset index
-	typeset containerName
-	index=$1
-	containerName=sandbox-$index
-	echo $containerName \($(docker container inspect -f '{{ .State.Status }}' $containerName)\)
-	docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label'
-	echo
+  typeset index
+  typeset containerName
+  index=$1
+  containerName=sandbox-$index
+  echo $containerName \($(docker container inspect -f '{{ .State.Status }}' $containerName)\)
+  docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label'
+  echo
 }
 
 # Loop through all the sandboxes
 function getAllSandboxInfo {
-	typeset existing
-	typeset index
-	existing=$(docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n)
-	for index in $existing; do
-		getSandboxInfo $index
-	done
+  typeset existing
+  typeset index
+  existing=$(docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n)
+  for index in $existing; do
+    getSandboxInfo $index
+  done
 }
 
 # find the highest image rev
 function latestImageRev {
-	typeset version
-	typeset existing
-	version=$1
-	existing=$(docker image list tyk-sandbox | awk '$2 ~ /'$version-'/ {print $2}' | sort -V | tail -1)
-	if [[ ! -z $existing ]]; then
-		echo $existing | cut -d- -f2
-	fi
+  typeset version
+  typeset existing
+  version=$1
+  existing=$(docker image list tyk-sandbox | awk '$2 ~ /'$version-'/ {print $2}' | sort -V | tail -1)
+  if [[ ! -z $existing ]]; then
+    echo $existing | cut -d- -f2
+  fi
 }
 
 # find the the highest image revision and add one
 function nextFreeImageRev {
-	typeset version
-	typeset existing
-	typeset biggest
-	version=$1
-	existing=$(latestImageRev $version)
-	if [[ -z $existing ]]; then
-		echo 1
-	else
-		biggest=$(echo $existing | cut -d- -f2)
-		let biggest=biggest+1
-		echo $biggest
-	fi
+  typeset version
+  typeset existing
+  typeset biggest
+  version=$1
+  existing=$(latestImageRev $version)
+  if [[ -z $existing ]]; then
+    echo 1
+  else
+    biggest=$(echo $existing | cut -d- -f2)
+    let biggest=biggest+1
+    echo $biggest
+  fi
 }
 
 # find the next container index that's unused
 function nextFreeContainer {
-	typeset existing
-	typeset i
-	existing=$(docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}')
-	for i in $(seq 1 1000); do
-		test="sandbox-$i"
-		if ! echo $existing | grep -qw $test; then
-			echo $i
-			break
-		fi
-	done
+  typeset existing
+  typeset i
+  existing=$(docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}')
+  for i in $(seq 1 1000); do
+    test="sandbox-$i"
+    if ! echo $existing | grep -qw $test; then
+      echo $i
+      break
+    fi
+  done
 }
 
 function setTbiVersions {
@@ -336,419 +335,412 @@ function setTbiVersions {
 # build the TBI to save build time with lots of images
 function buildTykBaseImage {
   setTbiVersions $1
-	existing=$(docker image list $TBI_IMAGE | awk '/tbi/')
+  existing=$(docker image list $TBI_IMAGE | awk '/tbi/')
   if [[ -z $existing ]]; then
     cd tbi
-	  docker image build --build-arg BASE_UBI=$BASE_UBI --no-cache --progress=plain --tag $TBI_IMAGE .
+    docker image build --build-arg BASE_UBI=$BASE_UBI --no-cache --progress=plain --tag $TBI_IMAGE .
     cd -
   fi
 }
 
 # build all images
 function buildAllImages {
-	typeset version
-	for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
-		echo "[INFO]Building $version"
+  typeset version
+  for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
+    echo "[INFO]Building $version"
     buildTykBaseImage $version
-		buildSandboxImage -v $version
-	done
+    buildSandboxImage -v $version
+  done
 }
 
 # invoke docker image build with all the right details
 function buildSandboxImage {
-	typeset arg
-	typeset tykVersion
-	typeset tykVersion
-	typeset rpm
-	typeset imageRev
-	typeset arg
-	typeset OPTARG
-	typeset version
-	cd "$SCRIPTDIR"
-	tykVersion=""
-	version=""
-	while getopts :lv:r: arg; do
-		case $arg in
-		l)
-			if [[ $# > $OPTIND ]]; then
-				version=\${$OPTIND}
-			fi
-			shift
-			listVersions $*
-			exit 0
-			;;
-		v)
-			tykVersion=$OPTARG
-			;;
-		:)
-			echo "Option -$OPTARG requires an arguement."
-			exit 1
-			;;
-		\?)
-			echo "Invalid option: -$OPTARG"
-			exit 1
-			;;
-		esac
-	done
-	if [[ -z $tykVersion ]]; then
-		echo "[FATAL]No build version specified with -v" 1>&2
-		exit 1
+  typeset arg
+  typeset tykVersion
+  typeset tykVersion
+  typeset rpm
+  typeset imageRev
+  typeset arg
+  typeset OPTARG
+  typeset version
+  cd "$SCRIPTDIR"
+  tykVersion=""
+  version=""
+  while getopts :lv:r: arg; do
+    case $arg in
+      l)
+        if [[ $# > $OPTIND ]]; then
+          version=\${$OPTIND}
+        fi
+        shift
+        listVersions $*
+        exit 0
+        ;;
+      v)
+        tykVersion=$OPTARG
+        ;;
+      :)
+        echo "Option -$OPTARG requires an arguement."
+        exit 1
+        ;;
+      \?)
+        echo "Invalid option: -$OPTARG"
+        exit 1
+        ;;
+    esac
+  done
+  if [[ -z $tykVersion ]]; then
+    echo "[FATAL]No build version specified with -v" 1>&2
+    exit 1
   fi
-	if [[ $tykVersion == "all" ]]; then
-		buildAllImages
-		return
-	fi
+  if [[ $tykVersion == "all" ]]; then
+    buildAllImages
+    return
+  fi
   # build the base image if it's not present
   buildTykBaseImage $tykVersion
-	imageRev=$(nextFreeImageRev $tykVersion)
-	if [[ ${GATEWAY[$tykVersion]+_} ]]; then
-		docker image build $(echoBuildArgs $tykVersion) --progress=plain --no-cache --tag tyk-sandbox:$tykVersion-$imageRev .
-	else
-		echo "[FATAL]Version $tykVersion not configured in $VERSIONFILE"
-		exit 1
-	fi
+  imageRev=$(nextFreeImageRev $tykVersion)
+  if [[ ${GATEWAY[$tykVersion]+_} ]]; then
+    docker image build $(echoBuildArgs $tykVersion) --progress=plain --no-cache --tag tyk-sandbox:$tykVersion-$imageRev .
+  else
+    echo "[FATAL]Version $tykVersion not configured in $VERSIONFILE"
+    exit 1
+  fi
 }
 
 # invoke docker container create and start with everything set
 function createSandbox {
-	typeset index; typeset list; typeset ticket; typeset imageVersion; typeset env_file; typeset containerName
-	typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort; typeset label
-	typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap; typeset arg
-	typeset OPTARG; typeset redisPort; typeset mongoPort; typeset extraEnv_file
-	imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""; extraEnv_file=""
-	while getopts :ne:i:v:t:l: arg; do
-		case $arg in
-		e)
-			# An environment file to include. Should be in standard shell format
-			extraEnv_file=$OPTARG
-			;;
-		i)
-			# Specify which index to create. Not used much
-			index=$OPTARG
-			;;
-		n)
-			# Ignore ~/.tyk-sandbox. Useful when you want to apply licence and create users yourself
-			noBootstrap=1
-			;;
-		t)
-			# Ticket or tag. This is the description of what the sandox is for
-			ticket="$OPTARG"
-			;;
-		v)
-			# Gateway version to install
-			imageVersion=$OPTARG
-			;;
-		l)
-			# Log level to set in the sandbox.
-			logLevel=$OPTARG
-			if [[ $logLevel != "debug" && $logLevel != "info" && $logLevel != "warn" && $logLevel != "error" ]]; then
-				echo "loglevel must be one of 'debug', 'info', 'warn' or 'error'"
-				exit 1
-			fi
-			;;
-		:)
-			echo "Option -$OPTARG requires an arguement."
-			exit 1
-			;;
-		\?)
-			echo "Invalid option: -$OPTARG"
-			exit 1
-			;;
-		esac
-	done
+  typeset index; typeset list; typeset ticket; typeset imageVersion; typeset env_file; typeset containerName
+  typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort; typeset label
+  typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap; typeset arg
+  typeset OPTARG; typeset redisPort; typeset mongoPort; typeset extraEnv_file
+  imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""; extraEnv_file=""
+  while getopts :ne:i:v:t:l: arg; do
+    case $arg in
+      e)
+        # An environment file to include. Should be in standard shell format
+        extraEnv_file=$OPTARG
+        ;;
+      i)
+        # Specify which index to create. Not used much
+        index=$OPTARG
+        ;;
+      n)
+        # Ignore ~/.tyk-sandbox. Useful when you want to apply licence and create users yourself
+        noBootstrap=1
+        ;;
+      t)
+        # Ticket or tag. This is the description of what the sandox is for
+        ticket="$OPTARG"
+        ;;
+      v)
+        # Gateway version to install
+        imageVersion=$OPTARG
+        ;;
+      l)
+        # Log level to set in the sandbox.
+        logLevel=$OPTARG
+        if [[ $logLevel != "debug" && $logLevel != "info" && $logLevel != "warn" && $logLevel != "error" ]]; then
+          echo "loglevel must be one of 'debug', 'info', 'warn' or 'error'"
+          exit 1
+        fi
+        ;;
+      :)
+        echo "Option -$OPTARG requires an arguement."
+        exit 1
+        ;;
+      \?)
+        echo "Invalid option: -$OPTARG"
+        exit 1
+        ;;
+    esac
+  done
 
-	if [[ -z $imageVersion ]]; then
-		echo "[FATAL]Must specify a tyk-sandbox version"
-		sbctl images
-		exit 1
-	fi
-	if ! echo $imageVersion | grep -q -- -; then
-		imageVersion=$imageVersion-$(latestImageRev $imageVersion)
-	fi
-	if ! docker image inspect tyk-sandbox:$imageVersion >/dev/null 2>&1; then
-		echo "[WARN]tyk-sandbox:$(echo $imageVersion | sed -e 's/-$//') does not exist. Building it now"
-		buildSandboxImage -v $(echo $imageVersion | sed -e 's/-$//')
-		echo 
-		imageVersion=${imageVersion}1
-	fi
-	if [[ -z $logLevel ]]; then
-		logLevel="debug"
-	fi
-	if [[ -z $ticket ]]; then
-		ticket="N/A"
-	fi
-	if [[ -z $index ]]; then
-		index=$(nextFreeContainer)
-	fi
+  if [[ -z $imageVersion ]]; then
+    echo "[FATAL]Must specify a tyk-sandbox version"
+    sbctl images
+    exit 1
+  fi
+  if ! echo $imageVersion | grep -q -- -; then
+    imageVersion=$imageVersion-$(latestImageRev $imageVersion)
+  fi
+  if ! docker image inspect tyk-sandbox:$imageVersion >/dev/null 2>&1; then
+    echo "[WARN]tyk-sandbox:$(echo $imageVersion | sed -e 's/-$//') does not exist. Building it now"
+    buildSandboxImage -v $(echo $imageVersion | sed -e 's/-$//')
+    echo 
+    imageVersion=${imageVersion}1
+  fi
+  if [[ -z $logLevel ]]; then
+    logLevel="debug"
+  fi
+  if [[ -z $ticket ]]; then
+    ticket="N/A"
+  fi
+  if [[ -z $index ]]; then
+    index=$(nextFreeContainer)
+  fi
 
-	offset=$(($index - 1))
-	hostFQDN=$IP_addr
-	dashboardPort=$(($DashboardBasePort + $offset))
-	gatewayPort=$(($GatewayBasePort + $offset))
-	redisPort=$(($RedisBasePort + $offset))
-	mongoPort=$(($MongoBasePort + $offset))
-	containerName=sandbox-$index
-	label=$containerName
-	dashboardURL=http://$hostFQDN:$dashboardPort/
-	gatewayURL=https://$hostFQDN:$gatewayPort/
-	# only configure TIB if gateway version is in the 2 series
-	if echo $imageVersion | egrep -q '^2'; then
-		TIBPort="--publish $(($TIBBasePort + $offset)):3010"
-		tibURL="--label sandbox.tiburl=http://$hostFQDN:$(($TIBBasePort + $offset))/"
-	fi
-	# Create a directory just for this version to hold plugins
-	if [[ ! -d "$SandboxPluginDir" ]]; then
-		if ! mkdir -p "$SandboxPluginDir"; then
-			echo "[FATAL]Unable to create '$SandboxPluginDir'"
-			exit 1
-		fi
-	fi
-	if [[ $imageVersion != "latest" && ! -d $SandboxPluginDir/$imageVersion ]]; then
-		echo "[WARN]Creating $SandboxPluginDir/$imageVersion: It will be empty"
-		mkdir -p $SandboxPluginDir/$imageVersion
-	fi
-	# load username, password and licence if they stored in ~/.tyk-sandbox
-	# varaible names are SBX_LICENSE, SBX_USER, SBX_PASSWORD
-	if [[ -z $noBootstrap && -r ~/.tyk-sandbox ]]; then
-		env_file="--env-file $(\ls ~/.tyk-sandbox)"
-	else
-		env_file=""
-	fi
-	if [[ -n $extraEnv_file && -f $extraEnv_file ]]; then
-		env_file="$env_file --env-file $(\ls $extraEnv_file)"
-	fi
-	echo "[INFO]Creating container $containerName"
-	# Notes on the envrionment variables passed into the container (the non-obvious ones)
-	# SBX_HOST_IP_ADDR is the script's best guess of the IP address of the host running the script
-	# this is needed to make golang plugins work on an M1 Mac 'DOCKER_DEFAULT_PLATFORM=linux/amd64'
-	docker container create --name $containerName \
-		--hostname $label \
-		--publish $dashboardPort:3000 \
-		--publish $gatewayPort:443 \
-		--publish $redisPort:6379 \
-		--publish $mongoPort:27017 \
-		$TIBPort \
-		--env DOCKER_DEFAULT_PLATFORM=linux/amd64 \
-		--env TYK_LOGLEVEL=$logLevel \
-		--env SBX_GW_PORT=$gatewayPort \
-		--env SBX_GW_HOST=$hostFQDN \
-		--env SBX_DSHB_HOST=$hostFQDN \
-		--env SBX_DSHB_PORT=$dashboardPort \
-		--env SBX_HOST_IP_ADDR=$IP_addr \
-		--env HISTFILE=/.bash_history \
-		--env HISTFILESIZE=-1 \
-		--env HISTSIZE=-1 \
-		--env HISTCONTROL=ignoreboth \
-		--env PS1='[\u@'sandbox-$index' \W]\$ ' \
-		--env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/scripts:/opt/tyk-sync \
-		$env_file \
-		--label sandbox.label=$label \
-		--label sandbox.version=$imageVersion \
-		--label sandbox.dashurl=$dashboardURL \
-		--label sandbox.ticket="$ticket" \
-		--label sandbox.gateurl=$gatewayURL \
-		--label sandbox.redis="redis-cli -h $hostFQDN -p $redisPort" \
-		--label sandbox.mongo="mongo --quiet --host $hostFQDN --port $mongoPort" \
-		$tibURL \
-		--label sandbox.index=$index \
-		--volume $SandboxPluginDir/$imageVersion:/opt/tyk-plugins \
-		tyk-sandbox:$imageVersion
-	if [[ $? -eq 0 ]]; then
-		echo "[INFO]Starting container $containerName"
-		docker container start $containerName
-		getSandboxInfo $index
-	fi
+  offset=$(($index - 1))
+  hostFQDN=$IP_addr
+  dashboardPort=$(($DashboardBasePort + $offset))
+  gatewayPort=$(($GatewayBasePort + $offset))
+  redisPort=$(($RedisBasePort + $offset))
+  mongoPort=$(($MongoBasePort + $offset))
+  containerName=sandbox-$index
+  label=$containerName
+  dashboardURL=http://$hostFQDN:$dashboardPort/
+  gatewayURL=https://$hostFQDN:$gatewayPort/
+  # only configure TIB if gateway version is in the 2 series
+  if echo $imageVersion | egrep -q '^2'; then
+    TIBPort="--publish $(($TIBBasePort + $offset)):3010"
+    tibURL="--label sandbox.tiburl=http://$hostFQDN:$(($TIBBasePort + $offset))/"
+  fi
+  # Create a directory just for this version to hold plugins
+  if [[ ! -d "$SandboxPluginDir" ]]; then
+    if ! mkdir -p "$SandboxPluginDir"; then
+      echo "[FATAL]Unable to create '$SandboxPluginDir'"
+      exit 1
+    fi
+  fi
+  if [[ $imageVersion != "latest" && ! -d $SandboxPluginDir/$imageVersion ]]; then
+    echo "[WARN]Creating $SandboxPluginDir/$imageVersion: It will be empty"
+    mkdir -p $SandboxPluginDir/$imageVersion
+  fi
+  # load username, password and licence if they stored in ~/.tyk-sandbox
+  # varaible names are SBX_LICENSE, SBX_USER, SBX_PASSWORD
+  if [[ -z $noBootstrap && -r ~/.tyk-sandbox ]]; then
+    env_file="--env-file $(\ls ~/.tyk-sandbox)"
+  else
+    env_file=""
+  fi
+  if [[ -n $extraEnv_file && -f $extraEnv_file ]]; then
+    env_file="$env_file --env-file $(\ls $extraEnv_file)"
+  fi
+  echo "[INFO]Creating container $containerName"
+  # Notes on the envrionment variables passed into the container (the non-obvious ones)
+  # SBX_HOST_IP_ADDR is the script's best guess of the IP address of the host running the script
+  # this is needed to make golang plugins work on an M1 Mac 'DOCKER_DEFAULT_PLATFORM=linux/amd64'
+  docker container create --name $containerName \
+    --hostname $label \
+    --publish $dashboardPort:3000 \
+    --publish $gatewayPort:443 \
+    --publish $redisPort:6379 \
+    --publish $mongoPort:27017 \
+    $TIBPort \
+    --env DOCKER_DEFAULT_PLATFORM=linux/amd64 \
+    --env TYK_LOGLEVEL=$logLevel \
+    --env SBX_GW_PORT=$gatewayPort \
+    --env SBX_GW_HOST=$hostFQDN \
+    --env SBX_DSHB_HOST=$hostFQDN \
+    --env SBX_DSHB_PORT=$dashboardPort \
+    --env SBX_HOST_IP_ADDR=$IP_addr \
+    --env HISTFILE=/.bash_history \
+    --env HISTFILESIZE=-1 \
+    --env HISTSIZE=-1 \
+    --env HISTCONTROL=ignoreboth \
+    --env PS1='[\u@'sandbox-$index' \W]\$ ' \
+    --env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/scripts:/opt/tyk-sync \
+    $env_file \
+    --label sandbox.label=$label \
+    --label sandbox.version=$imageVersion \
+    --label sandbox.dashurl=$dashboardURL \
+    --label sandbox.ticket="$ticket" \
+    --label sandbox.gateurl=$gatewayURL \
+    --label sandbox.redis="redis-cli -h $hostFQDN -p $redisPort" \
+    --label sandbox.mongo="mongo --quiet --host $hostFQDN --port $mongoPort" \
+    $tibURL \
+    --label sandbox.index=$index \
+    --volume $SandboxPluginDir/$imageVersion:/opt/tyk-plugins \
+    tyk-sandbox:$imageVersion
+  if [[ $? -eq 0 ]]; then
+    echo "[INFO]Starting container $containerName"
+    docker container start $containerName
+    getSandboxInfo $index
+  fi
 }
 
 # list the sandboxes in a standard format, which is just the numbers.
 function listNames {
-	typeset name
-	typeset list
-	list=""
-	if [[ $# -eq 0 || $1 == "all" ]]; then
-		docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
-	else
-		for name in $*; do
-			if echo $name | grep -iq sandbox-; then
-				name=$(echo $name | cut -d\- -f2)
-			fi
-			list="$list $name"
-		done
-		echo $list
-	fi
+  typeset name
+  typeset list
+  list=""
+  if [[ $# -eq 0 || $1 == "all" ]]; then
+    docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
+  else
+    for name in $*; do
+      if echo $name | grep -iq sandbox-; then
+        name=$(echo $name | cut -d\- -f2)
+      fi
+      list="$list $name"
+    done
+    echo $list
+  fi
 }
 
 # list the currently running sandboxes in a standard format, which is just the numbers.
 function listRunningNames {
-	typeset name
-	typeset list
-	list=""
-	if [[ $1 == "all" ]]; then
-		docker container list | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
-	else
-		for name in $*; do
-			if echo $name | grep -iq sandbox-; then
-				name=$(echo $name | cut -d\- -f2)
-			fi
-			list="$list $name"
-		done
-		echo $list
-	fi
+  typeset name
+  typeset list
+  list=""
+  if [[ $1 == "all" ]]; then
+    docker container list | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
+  else
+    for name in $*; do
+      if echo $name | grep -iq sandbox-; then
+        name=$(echo $name | cut -d\- -f2)
+      fi
+      list="$list $name"
+    done
+    echo $list
+  fi
 }
 
 ##########################
 # BEGINNING OF MAIN SCRIPT
 ##########################
 if [[ $# -lt 1 ]]; then
-	help
-	exit 1
+  help
+  exit 1
 fi
 
 case $1 in
-	build)
-		# load the details of what version of what goes with what
-		loadVersionFile
-		shift
-		# Create a docker image with the given parameters
-		if [[ $# -gt 0 ]]; then
-			buildSandboxImage "$@"
-		else
-			echo "[FATAL]Must specify a version to build" 1>&2
-			help
-		fi
-		;;
-	create)
-		# load the details of what version of what goes with what
-		loadVersionFile
-		shift
-		# Create a docker sandbox with the given parameters
-		if [[ $# -gt 1 ]]; then
-			createSandbox "$@"
-		else
-			echo "[FATAL]Must specify a tyk-sandbox version"
-			help
-		fi
-		;;
-	del*)
-		shift
-		# stop and delete the container
-		for index in $(listNames $*); do
-			#docker container stop sandbox-$index
-			docker container rm -f sandbox-$index
-		done
-		;;
-	image*)
-		# list or remove the tyk-sandbox docker images
-		if [[ $# -gt 1 ]]; then
-			if [[ $2 = '-r' ]]; then
-				shift 2
-				rmSandboxImages $*
-			fi
-		else
-			# note the almost magical pipe feature of awk used here. It sorts the versions but not the header
-			docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
-		fi
-		;;
-	list | status)
-		# Inspect the details of the given container or containers
-		if [[ $# -gt 1 ]]; then
-			shift
-			if [[ $1 = '-v' ]]; then
-				shift
-				for index in $(listNames $*); do
-					getVerboseSandboxInfo $index
-				done
-			else
-				for index in $(listNames $*); do
-					getSandboxInfo $index
-				done
-			fi
-		else
-			# Inspect the details of all exiting containers
-			getAllSandboxInfo
-		fi
-		;;
-	info)
-		# Give details (same as "list -v")
-		shift
-		for index in $(listNames $*); do
-			getVerboseSandboxInfo $index
-		done
-		#fi
-		;;
-	mdcb)
-		shift
-		MDCB_RPM="$1"
-		shift
-		if [[ -r "$MDCB_RPM" ]]; then
-			for index in $(listRunningNames $*); do
-				docker container cp "$MDCB_RPM" sandbox-$index:/
-				# note that this must not have a controlling terminal (-t) or mdcb exits when the terminal closes
-				docker container exec sandbox-$index scripts/init-mdcb.sh /$(basename $MDCB_RPM)
-			done
-		else
-			echo "[FATAL]Cannot read $MDCB_RPM"
-			echo "[Usage]mdcb <path to MDCB RPM> <list of sandboxes>"
-			exit 1
-		fi
-		;;
-	rm | stop | start | restart)
-		action=$1
-		shift
-		for index in $(listNames $*); do
-			docker container $action sandbox-$index
-		done
-		;;
-	shell | bash)
-		# Give a shell in the given container
-		shift
-		for index in $(listRunningNames $*); do
-			docker container exec -it sandbox-$index bash
-		done
-		;;
-	script)
-		# copy a script into the container and execute it
-		shift
-		SCRIPTFILE="$1"
-		shift
-		if [[ -r "$SCRIPTFILE" ]]; then
-			for index in $(listRunningNames $*); do
-				docker container cp $SCRIPTFILE sandbox-$index:/$(basename $SCRIPTFILE)
-				docker container exec -t sandbox-$index /$(basename $SCRIPTFILE)
-			done
-		else
-			echo "[FATAL]Scipt '$SCRIPTFILE' does not exist or is unreadable"
-			echo "[Usage]scipt scriptname <list of sandboxes>"
-			exit 1
-		fi
-		;;
-	publish )
-		# first parameter will be the file, rest will be the sandboxes
-		shift
-		if [[ $# -gt 0 ]]; then
-			APIFILE="$1"
-			shift
-			if [[ -f "$APIFILE" ]]; then
-				for index in $(listRunningNames $*); do
-					docker container cp "$APIFILE" sandbox-$index:/$(basename $APIFILE)
-					docker container exec -t sandbox-$index bash -c "/scripts/publish-apis '/$(basename $APIFILE)'"
-				done
-			else
-				echo "[FATAL]API file '$APIFILE' does not exist or is unreadable"
-				echo "[Usage]publish API.json <list of sandboxes>"
-				exit 1
-			fi
-		else
-			echo "[FATAL]Must specify sandbox and API json file"
-			help
-			exit 1
-		fi
-		;;
-	help)
-		help
-		;;
-	*)
-		echo "[FATAL]Unknown option \"$1\"" 1>&2
-		help
-		;;
+  build)
+    # load the details of what version of what goes with what
+    loadVersionFile
+    shift
+    # Create a docker image with the given parameters
+    if [[ $# -gt 0 ]]; then
+      buildSandboxImage "$@"
+    else
+      echo "[FATAL]Must specify a version to build" 1>&2
+      help
+    fi
+    ;;
+
+  create)
+    # load the details of what version of what goes with what
+    loadVersionFile
+    shift
+    # Create a docker sandbox with the given parameters
+    if [[ $# -gt 1 ]]; then
+      createSandbox "$@"
+    else
+      echo "[FATAL]Must specify a tyk-sandbox version"
+      help
+    fi
+    ;;
+
+  del*)
+    shift
+    # stop and delete the container
+    for index in $(listNames $*); do
+      #docker container stop sandbox-$index
+      docker container rm -f sandbox-$index
+    done
+    ;;
+
+  image*)
+    # list or remove the tyk-sandbox docker images
+    if [[ $# -gt 1 ]]; then
+      if [[ $2 = '-r' ]]; then
+        shift 2
+        rmSandboxImages $*
+      fi
+    else
+      # note the almost magical pipe feature of awk used here. It sorts the versions but not the header
+      docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
+    fi
+    ;;
+
+  list|info)
+    # Give details (same as "list -v")
+    shift
+    for index in $(listNames $*); do
+      getVerboseSandboxInfo $index
+    done
+    #fi
+    ;;
+
+  mdcb)
+    shift
+    MDCB_RPM="$1"
+    shift
+    if [[ -r "$MDCB_RPM" ]]; then
+      for index in $(listRunningNames $*); do
+        docker container cp "$MDCB_RPM" sandbox-$index:/
+        # note that this must not have a controlling terminal (-t) or mdcb exits when the terminal closes
+        docker container exec sandbox-$index scripts/init-mdcb.sh /$(basename $MDCB_RPM)
+      done
+    else
+      echo "[FATAL]Cannot read $MDCB_RPM"
+      echo "[Usage]mdcb <path to MDCB RPM> <list of sandboxes>"
+      exit 1
+    fi
+    ;;
+
+  rm | stop | start | restart)
+    action=$1
+    shift
+    for index in $(listNames $*); do
+      docker container $action sandbox-$index
+    done
+    ;;
+
+  shell | bash)
+    # Give a shell in the given container
+    shift
+    for index in $(listRunningNames $*); do
+      docker container exec -it sandbox-$index bash
+    done
+    ;;
+
+  script)
+    # copy a script into the container and execute it
+    shift
+    SCRIPTFILE="$1"
+    shift
+    if [[ -r "$SCRIPTFILE" ]]; then
+      for index in $(listRunningNames $*); do
+        docker container cp $SCRIPTFILE sandbox-$index:/$(basename $SCRIPTFILE)
+        docker container exec -t sandbox-$index /$(basename $SCRIPTFILE)
+      done
+    else
+      echo "[FATAL]Scipt '$SCRIPTFILE' does not exist or is unreadable"
+      echo "[Usage]scipt scriptname <list of sandboxes>"
+      exit 1
+    fi
+    ;;
+
+  publish)
+    # first parameter will be the file, rest will be the sandboxes
+    shift
+    if [[ $# -gt 0 ]]; then
+      APIFILE="$1"
+      shift
+      if [[ -f "$APIFILE" ]]; then
+        for index in $(listRunningNames $*); do
+          docker container cp "$APIFILE" sandbox-$index:/$(basename $APIFILE)
+          docker container exec -t sandbox-$index bash -c "/scripts/publish-apis '/$(basename $APIFILE)'"
+        done
+      else
+        echo "[FATAL]API file '$APIFILE' does not exist or is unreadable"
+        echo "[Usage]publish API.json <list of sandboxes>"
+        exit 1
+      fi
+    else
+      echo "[FATAL]Must specify sandbox and API json file"
+      help
+      exit 1
+    fi
+    ;;
+
+  help)
+    help
+    ;;
+
+  *)
+    echo "[FATAL]Unknown option \"$1\"" 1>&2
+    help
+    ;;
+
 esac
