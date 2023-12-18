@@ -60,6 +60,8 @@ function help {
   echo "           Note: See also -e above"
   echo "        -t Ticket or comment field"
   echo "        -v Tyk version of sandbox image. Required and must have already been built"
+  echo "$name get <index number> [key|dashboard|desc|gateway|org|mongo|redis|version]"
+  echo "        print requested info in a way that's useful in other scripts"
   echo "$name images [-r <image versions to remove|all]]"
   echo "        List the docker images for creating sandboxes"
   echo "        -r Image version to remove|all. Removes the image version"
@@ -595,9 +597,6 @@ function listRunningNames {
   fi
 }
 
-##########################
-# BEGINNING OF MAIN SCRIPT
-##########################
 if [[ $# -lt 1 ]]; then
   help
   exit 1
@@ -632,11 +631,54 @@ case $1 in
 
   del*)
     shift
-    # stop and delete the container
+    # force delete the container
     for index in $(listNames $*); do
-      #docker container stop sandbox-$index
       docker container rm -f sandbox-$index
     done
+    ;;
+
+  get)
+    typeset containerName
+    shift
+    # print requested info in a way that's useful in other scripts
+    index=$(listNames $1)
+    containerName=sandbox-$index
+    shift
+    if [[ $# > 1 ]]; then
+      case $1 in
+        [Aa]*|[Kk]*)
+          docker container exec $containerName awk '/SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed  -e 's/SBX_ADMIN_API_KEY=//'
+          ;;
+        [Dd]ash*)
+          docker container inspect -f '{{ index .Config.Labels "sandbox.dashurl" }}' $containerName
+          ;;
+        [Dd]esc*|[Tt]ick*)
+          docker container inspect -f '{{ index .Config.Labels "sandbox.ticket" }}' $containerName
+          ;;
+        [Gg]*)
+          docker container inspect -f '{{ index .Config.Labels "sandbox.gateurl" }}' $containerName
+          ;;
+        [Oo]*)
+          docker container exec $containerName awk '/SBX_ORG_ID/' /initial_credentials.txt | sed  -e 's/SBX_ORG_ID=//'
+          ;;
+        [Mm]*)
+          docker container inspect -f '{{ index .Config.Labels "sandbox.mongo" }}' $containerName | awk '{print $3, $4, $5, $6}'
+          ;;
+        [Rr]*)
+          docker container inspect -f '{{ index .Config.Labels "sandbox.redis" }}' $containerName | awk '{print $2, $3, $4, $5}'
+          ;;
+        [Vv]*)
+          docker container inspect -f '{{ index .Config.Labels "sandbox.version" }}' $containerName
+          ;;
+        *)
+          echo "[FATAL]Unknown option '$1'"
+          exit 1
+          ;;
+      esac
+    else
+      help
+      exit 1
+    fi
     ;;
 
   image*)
@@ -653,7 +695,7 @@ case $1 in
     ;;
 
   list|info)
-    # Give details (same as "list -v")
+    # Give details
     shift
     for index in $(listNames $*); do
       getVerboseSandboxInfo $index
