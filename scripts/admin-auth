@@ -5,11 +5,11 @@
 
 PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 for user in $(redis-cli --scan --pattern 'tyk-admin-api-*'); do
-	if [[ $(redis-cli type $user) == 'string' ]]; then
-		if [[ "admin" == $(redis-cli get $user | jq -r .UserData.user_permissions.IsAdmin) ]]; then
-			redis-cli get $user | jq -r .UserData.access_key
-			exit 0
-		fi
-	fi
+  if [[ $(redis-cli type $user) == 'string' ]]; then
+    if [[ "admin" == $(redis-cli get $user | jq -r .UserData.user_permissions.IsAdmin) ]]; then
+      redis-cli get $user | jq -r .UserData.access_key
+      exit 0
+    fi
+  fi
 done
 exit 1
