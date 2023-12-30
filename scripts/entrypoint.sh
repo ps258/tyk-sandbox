@@ -102,9 +102,11 @@ sleep 1
 if [[ ! -f /initialised ]]; then
 	echo "[INFO]Initialising the dashboard"
 	/scripts/init-dashboard.sh > /var/log/init-dashboard.log 2>&1
-	sleep 1
-	restart dashboard
-	sleep 1
+  if [[ -n $SBX_LICENSE ]] || [[ -n $SBX_USER && -n $SBX_PASSWORD ]]; then
+	  sleep 1
+	  restart dashboard
+	  sleep 1
+  fi
 fi
 
 echo "[INFO]Starting Tyk gateway"
