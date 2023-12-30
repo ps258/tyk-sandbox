@@ -60,7 +60,7 @@ function help {
   echo "           Note: See also -e above"
   echo "        -t Ticket or comment field"
   echo "        -v Tyk version of sandbox image. Required and must have already been built"
-  echo "$name get <index number> [key|dashboard|desc|gateway|org|mongo|redis|version]"
+  echo "$name get <index number> [key|dashboard|desc|gateway|org|mongo|redis|version|admin_secret]"
   echo "        print requested info in a way that's useful in other scripts"
   echo "$name images [-r <image versions to remove|all]]"
   echo "        List the docker images for creating sandboxes"
@@ -362,7 +362,7 @@ function buildSandboxImage {
   typeset tykVersion
   typeset rpm
   typeset imageRev
-  typeset arg
+  typeset OPTIND
   typeset OPTARG
   typeset version
   cd "$SCRIPTDIR"
@@ -626,6 +626,7 @@ case $1 in
     else
       echo "[FATAL]Must specify a tyk-sandbox version"
       help
+      exit 1
     fi
     ;;
 
@@ -641,13 +642,24 @@ case $1 in
     typeset containerName
     shift
     # print requested info in a way that's useful in other scripts
-    index=$(listNames $1)
+    if [[ $# -lt 1 ]]; then
+      echo "[FATAL]Must give sandbox name"
+      help
+      exit 1
+    else
+      index=$(listNames $1)
+    fi
     containerName=sandbox-$index
     shift
-    if [[ $# > 1 ]]; then
+    if [[ $# -gt 0 ]]; then
       case $1 in
-        [Aa]*|[Kk]*)
-          docker container exec $containerName awk '/SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed  -e 's/SBX_ADMIN_API_KEY=//'
+        [Aa]cc*|[Kk]*)
+          # access key or key
+          docker container exec $containerName /scripts/admin-auth
+          ;;
+        [Aa]dmin_s*|[Aa]dmins*)
+          # admin_secret or adminsecret
+          docker container exec $containerName jq -r .admin_secret /opt/tyk-dashboard/tyk_analytics.conf
           ;;
         [Dd]ash*)
           docker container inspect -f '{{ index .Config.Labels "sandbox.dashurl" }}' $containerName
@@ -667,6 +679,10 @@ case $1 in
         [Rr]*)
           docker container inspect -f '{{ index .Config.Labels "sandbox.redis" }}' $containerName | awk '{print $2, $3, $4, $5}'
           ;;
+        [Ss]ecret)
+          # secret (gateway secret)
+          docker container exec $containerName jq -r .tyk_api_config.Secret /opt/tyk-dashboard/tyk_analytics.conf
+          ;;
         [Vv]*)
           docker container inspect -f '{{ index .Config.Labels "sandbox.version" }}' $containerName
           ;;
@@ -676,6 +692,7 @@ case $1 in
           ;;
       esac
     else
+      echo "[FATAL]Must give one of key|dashboard|desc|gateway|org|mongo|redis|version"
       help
       exit 1
     fi
