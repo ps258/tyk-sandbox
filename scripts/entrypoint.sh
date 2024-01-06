@@ -112,6 +112,7 @@ if [[ -z $SBX_MODE || $SBX_MODE != 'CE' ]]; then
 elif [[ $SBX_MODE = 'CE' ]]; then
 	# setup CE
 	if [[ ! -f /initialised ]]; then
+		rm -f /opt/tyk-gateway/apps/* /opt/tyk-gateway/policies/*
 		cp -f /assets/tyk-CE.conf /opt/tyk-gateway/tyk.conf
 	fi
 fi
