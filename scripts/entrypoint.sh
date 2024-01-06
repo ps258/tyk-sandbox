@@ -91,22 +91,29 @@ echo "[INFO]Starting plugin server"
 echo "[INFO]Starting Redis"
 /scripts/start-redis.sh
 
-echo "[INFO]Starting mongoDB"
-/scripts/start-mongo.sh
+if [[ -z $SBX_MODE || $SBX_MODE != 'CE' ]]; then
+	echo "[INFO]Starting mongoDB"
+	/scripts/start-mongo.sh
 
-echo "[INFO]Starting Tyk dashboard"
-/scripts/start-dashboard.sh
-sleep 1
+	echo "[INFO]Starting Tyk dashboard"
+	/scripts/start-dashboard.sh
+	sleep 1
 
-# once the dashboard is running, use the admin API to create users and upload a licence
-if [[ ! -f /initialised ]]; then
-	echo "[INFO]Initialising the dashboard"
-	/scripts/init-dashboard.sh > /var/log/init-dashboard.log 2>&1
-  if [[ -n $SBX_LICENSE ]] || [[ -n $SBX_USER && -n $SBX_PASSWORD ]]; then
-	  sleep 1
-	  restart dashboard
-	  sleep 1
-  fi
+	# once the dashboard is running, use the admin API to create users and upload a licence
+	if [[ ! -f /initialised ]]; then
+		echo "[INFO]Initialising the dashboard"
+		/scripts/init-dashboard.sh > /var/log/init-dashboard.log 2>&1
+		if [[ -n $SBX_LICENSE ]] || [[ -n $SBX_USER && -n $SBX_PASSWORD ]]; then
+			sleep 1
+			restart dashboard
+			sleep 1
+		fi
+	fi
+elif [[ $SBX_MODE = 'CE' ]]; then
+	# setup CE
+	if [[ ! -f /initialised ]]; then
+		cp -f /assets/tyk-CE.conf /opt/tyk-gateway/tyk.conf
+	fi
 fi
 
 echo "[INFO]Starting Tyk gateway"

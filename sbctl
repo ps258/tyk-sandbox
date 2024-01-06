@@ -58,6 +58,7 @@ function help {
   echo "           Note: Create a base64 encoded password with:"
   echo "               echo password | base64"
   echo "           Note: See also -e above"
+	echo "        -s Deploy standalone (CE) gateway"
   echo "        -t Ticket or comment field"
   echo "        -v Tyk version of sandbox image. Required and must have already been built"
   echo "$name get <index number> [key|dashboard|desc|gateway|org|mongo|redis|version|admin_secret]"
@@ -415,9 +416,9 @@ function createSandbox {
   typeset index; typeset list; typeset ticket; typeset imageVersion; typeset env_file; typeset containerName
   typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort; typeset label
   typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap; typeset arg
-  typeset OPTARG; typeset redisPort; typeset mongoPort; typeset extraEnv_file
-  imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""; extraEnv_file=""
-  while getopts :ne:i:v:t:l: arg; do
+  typeset OPTARG; typeset redisPort; typeset mongoPort; typeset extraEnv_file; typeset SBX_MODE
+  imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""; extraEnv_file=""; SBX_MODE=PRO
+  while getopts :ne:i:v:st:l: arg; do
     case $arg in
       e)
         # An environment file to include. Should be in standard shell format
@@ -431,12 +432,16 @@ function createSandbox {
         # Ignore ~/.tyk-sandbox. Useful when you want to apply licence and create users yourself
         noBootstrap=1
         ;;
+			s)
+				# Standalone gateway. Don't start the dashboard
+				SBX_MODE=CE
+				;;
       t)
         # Ticket or tag. This is the description of what the sandox is for
         ticket="$OPTARG"
         ;;
       v)
-        # Gateway version to install
+        # Gateway image version to use
         imageVersion=$OPTARG
         ;;
       l)
@@ -536,6 +541,7 @@ function createSandbox {
     --env SBX_DSHB_HOST=$hostFQDN \
     --env SBX_DSHB_PORT=$dashboardPort \
     --env SBX_HOST_IP_ADDR=$IP_addr \
+    --env SBX_MODE=$SBX_MODE \
     --env HISTFILE=/.bash_history \
     --env HISTFILESIZE=-1 \
     --env HISTSIZE=-1 \
