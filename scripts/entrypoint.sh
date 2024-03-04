@@ -89,14 +89,14 @@ echo "[INFO]Starting plugin server"
 /scripts/serve-plugins.sh >> /var/log/plugin-server.log 2>&1 &
 
 echo "[INFO]Starting Redis"
-/scripts/start-redis.sh
+start redis
 
 if [[ -z $SBX_MODE || $SBX_MODE != 'CE' ]]; then
 	echo "[INFO]Starting mongoDB"
-	/scripts/start-mongo.sh
+	start mongo
 
 	echo "[INFO]Starting Tyk dashboard"
-	/scripts/start-dashboard.sh
+	start dashboard
 	sleep 1
 
 	# once the dashboard is running, use the admin API to create users and upload a licence
@@ -109,29 +109,32 @@ if [[ -z $SBX_MODE || $SBX_MODE != 'CE' ]]; then
 			sleep 1
 		fi
 	fi
+
+  echo "[INFO]Starting Tyk pump"
+  start pump
+
+  if [[ -d /opt/tyk-identity-broker/ ]]; then
+    echo "[INFO]Starting Tyk identity broker"
+    start tib
+  fi
+
 elif [[ $SBX_MODE = 'CE' ]]; then
 	# setup CE
 	if [[ ! -f /initialised ]]; then
 		rm -f /opt/tyk-gateway/apps/* /opt/tyk-gateway/policies/*
 		cp -f /assets/tyk-CE.conf /opt/tyk-gateway/tyk.conf
 	fi
-fi
-
-echo "[INFO]Starting Tyk gateway"
-/scripts/start-gateway.sh
-
-echo "[INFO]Starting Tyk pump"
-/scripts/start-pump.sh
-
-if [[ -d /opt/tyk-identity-broker/ ]]; then
-	echo "[INFO]Starting Tyk identity broker"
-	/scripts/start-tib.sh
+  # create an empyt file so "sbctl info" doesn't give errors
+  touch /initial_credentials.txt
 fi
 
 if [[ -d /opt/tyk-sink ]]; then
 	echo "[INFO]Starting MDCB"
 	start mdcb
 fi
+
+echo "[INFO]Starting Tyk gateway"
+start gateway
 
 #echo "[INFO]Capping analytics collections"
 #/scripts/cap-mongo-z_collections.sh

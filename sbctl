@@ -252,7 +252,11 @@ function getVerboseSandboxInfo {
   containerName=sandbox-$index
   containerStatus=$(docker container inspect -f '{{ .State.Status }}' $containerName)
   echo $containerName \($containerStatus\)
-  docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label'
+  if [[ $(docker container inspect -f '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
+    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.dashurl'
+  else
+    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.mode'
+  fi
   if [[ $containerStatus = 'running' ]]; then
     docker container exec $containerName awk '/SBX_ORG_ID|SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed  -e 's/SBX_ORG_ID=/sandbox.OrgId: /' -e 's/SBX_ADMIN_API_KEY=/sandbox.AdminKey: /'
   fi
@@ -266,7 +270,11 @@ function getSandboxInfo {
   index=$1
   containerName=sandbox-$index
   echo $containerName \($(docker container inspect -f '{{ .State.Status }}' $containerName)\)
-  docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label'
+  if [[ $(docker container inspect -f '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
+    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.dashurl'
+  else
+    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.mode'
+  fi
   echo
 }
 
@@ -554,6 +562,7 @@ function createSandbox {
     --label sandbox.dashurl=$dashboardURL \
     --label sandbox.ticket="$ticket" \
     --label sandbox.gateurl=$gatewayURL \
+    --label sandbox.mode=$SBX_MODE \
     --label sandbox.redis="redis-cli -h $hostFQDN -p $redisPort" \
     --label sandbox.mongo="mongo --quiet --host $hostFQDN --port $mongoPort" \
     $tibURL \
