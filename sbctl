@@ -551,8 +551,8 @@ function createSandbox {
     --env SBX_HOST_IP_ADDR=$IP_addr \
     --env SBX_MODE=$SBX_MODE \
     --env HISTFILE=/.bash_history \
-    --env HISTFILESIZE=-1 \
-    --env HISTSIZE=-1 \
+    --env HISTFILESIZE=1000000
+    --env HISTSIZE=100000 \
     --env HISTCONTROL=ignoreboth \
     --env PS1='[\u@'sandbox-$index' \W]\$ ' \
     --env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/scripts:/opt/tyk-sync \
