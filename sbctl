@@ -335,13 +335,16 @@ function setTbiVersions {
       TBI_IMAGE=tbi7:latest
       BASE_UBI=centos:7
       ;;
+    #5*)
+      #TBI_IMAGE=tbi9:latest
+      #BASE_UBI="redhat/ubi9"
+      #;;
     *)
       TBI_IMAGE=tbi8:latest
       BASE_UBI=centos:8
       ;;
   esac
 }
-
 
 # build the TBI to save build time with lots of images
 function buildTykBaseImage {

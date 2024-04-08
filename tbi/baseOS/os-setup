@@ -26,16 +26,24 @@ chown tyk:tyk /opt/tyk-plugins /opt/tyk-certificates
 if grep -q 'release 7' /etc/redhat-release; then
 	# centos 7
 	yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm deltarpm
+  yum -y install procps-ng iputils net-tools vim-enhanced wget curl python3 jq diffutils # golang
 fi
 if grep -q 'release 8' /etc/redhat-release; then
 	# centos 8
 	sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
 	sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 	yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm 
+  yum -y install procps-ng iputils net-tools vim-enhanced wget curl python3 jq diffutils # golang
+fi
+if grep -q 'release 9' /etc/redhat-release; then
+	# centos 9
+  set -x
+  ls -l /baseOS
+  sed -i 's/$releasever/8/' /etc/yum.repos.d/mongodb-org-4.4.repo
+	yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm 
+  yum -y install bash procps-ng iputils net-tools vim-enhanced wget python3 jq diffutils # golang
 fi
 
-# skipping golang here because it's huge!
-yum -y install procps-ng iputils net-tools vim-enhanced wget curl python3 jq diffutils # golang
 yum -y install python3-devel python3-setuptools
 pip3 install --upgrade pip
 pip3 install protobuf grpcio
@@ -47,11 +55,17 @@ if grep -q 'release 8' /etc/redhat-release; then
 	# centos 8
 	yum -y install logrotate make openssl mongodb-org redis
 fi
+if grep -q 'release 9' /etc/redhat-release; then
+	# centos 9
+	yum -y install logrotate make openssl mongodb-org redis
+fi
 
 # open mongo up to the world! Beware!!!
-sed -i 's/bindIp/#bindIp/' /etc/mongod.conf
-if ! grep -q fork /etc/mongod.conf; then
-	sed -i 's/processManagement:/processManagement:\n  fork: true/' /etc/mongod.conf
+if [[ -f /etc/mongod.conf ]]; then
+  sed -i 's/bindIp/#bindIp/' /etc/mongod.conf
+  if ! grep -q fork /etc/mongod.conf; then
+	  sed -i 's/processManagement:/processManagement:\n  fork: true/' /etc/mongod.conf
+  fi
 fi
 
 # find the redis config file
@@ -59,14 +73,17 @@ if [[ -f /etc/redis.conf ]]; then
 	REDIS_CONFIG=/etc/redis.conf
 elif [[ -f /etc/redis/redis.conf ]]; then
 	REDIS_CONFIG=/etc/redis/redis.conf
+  ln -s /etc/redis/redis.conf /etc/redis.conf
 else
 	echo "[FATAL]Cannot find redis config file. Checked /etc/redis.conf and /etc/redis/redis.conf but didn't find them"
 	exit 1
 fi
 
 # open redis up to the world! Beware!!!
-sed -i 's/^protected-mode yes/protected-mode no/' $REDIS_CONFIG
-sed -i 's/^bind 127.0.0.1/#bind 127.0.0.1/' $REDIS_CONFIG
+if [[ ! -z $REDIS_CONFIG ]]; then
+  sed -i 's/^protected-mode yes/protected-mode no/' $REDIS_CONFIG
+  sed -i 's/^bind 127.0.0.1/#bind 127.0.0.1/' $REDIS_CONFIG
+fi
 
 # tidyup to reduce the image size. Saves 200-300 MB
 # removed to speed up next stage
