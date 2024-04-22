@@ -5,6 +5,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
 OS=$(uname -s)
 DashboardBasePort=3001
+CDPATH=
 TIBBasePort=4001
 GatewayBasePort=5001
 RedisBasePort=6001
@@ -336,9 +337,9 @@ function setTbiVersions {
       BASE_UBI=centos:7
       ;;
     #5*)
-      #TBI_IMAGE=tbi9:latest
-      #BASE_UBI="redhat/ubi9"
-      #;;
+    #  TBI_IMAGE=tbi9:latest
+    #  BASE_UBI="redhat/ubi9"
+    #  ;;
     *)
       TBI_IMAGE=tbi8:latest
       BASE_UBI=centos:8
@@ -348,10 +349,10 @@ function setTbiVersions {
 
 # build the TBI to save build time with lots of images
 function buildTykBaseImage {
+  set -x
   setTbiVersions $1
   existing=$(docker image list $TBI_IMAGE | awk '/tbi/')
   if [[ -z $existing ]]; then
-    cd tbi
     docker image build --build-arg BASE_UBI=$BASE_UBI --no-cache --progress=plain --tag $TBI_IMAGE .
     cd -
   fi
@@ -411,10 +412,11 @@ function buildSandboxImage {
     buildAllImages
     return
   fi
-  # build the base image if it's not present
-  buildTykBaseImage $tykVersion
   imageRev=$(nextFreeImageRev $tykVersion)
   if [[ ${GATEWAY[$tykVersion]+_} ]]; then
+    # build the base image if it's not present
+    buildTykBaseImage $tykVersion
+    # build the version
     docker image build $(echoBuildArgs $tykVersion) --progress=plain --no-cache --tag tyk-sandbox:$tykVersion-$imageRev .
   else
     echo "[FATAL]Version $tykVersion not configured in $VERSIONFILE"
