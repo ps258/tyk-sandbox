@@ -349,10 +349,10 @@ function setTbiVersions {
 
 # build the TBI to save build time with lots of images
 function buildTykBaseImage {
-  set -x
   setTbiVersions $1
   existing=$(docker image list $TBI_IMAGE | awk '/tbi/')
   if [[ -z $existing ]]; then
+    cd tbi
     docker image build --build-arg BASE_UBI=$BASE_UBI --no-cache --progress=plain --tag $TBI_IMAGE .
     cd -
   fi
