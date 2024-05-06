@@ -1,0 +1,68 @@
+{
+  "active": true,
+  "auth": {
+    "auth_header_name": "Authorization"
+  },
+  "name": "Combined JWKS",
+  "proxy": {
+    "listen_path": "/combined-jwks/",
+    "strip_listen_path": true,
+    "target_url": "http://httpbin.org/anything/jwks"
+  },
+  "use_keyless": true,
+  "version_data": {
+    "not_versioned": true,
+    "versions": {
+      "Default": {
+        "extended_paths": {
+          "ignored": [
+            {
+              "disabled": false,
+              "ignore_case": false,
+              "method": "",
+              "method_actions": {
+                "GET": {
+                  "action": "no_action",
+                  "code": 200,
+                  "data": "",
+                  "headers": {}
+                }
+              },
+              "path": ""
+            }
+          ],
+          "virtual": [
+            {
+              "disabled": false,
+              "function_source_type": "blob",
+              "function_source_uri": "ZnVuY3Rpb24gandrcyhyZXF1ZXN0LCBzZXNzaW9uLCBjb25maWcpIHsKCiAgSldLU19VUkxTID0gWwogICAgImh0dHA6Ly8xMC4wLjAuMTc6ODA4MCIsCiAgICAiaHR0cDovLzEwLjAuMC4yNDo4MDgwIgogIF07CiAgCiAgLy8gU2V0IHVwIGEgcmVzcG9uc2Ugb2JqZWN0CiAgdmFyIHJlc3BvbnNlID0gewogICAgQm9keTogIiIsCiAgICBIZWFkZXJzOiB7CiAgICAgICJjb250ZW50LXR5cGUiOiAiYXBwbGljYXRpb24vanNvbiIKICAgIH0sCiAgICBDb2RlOiAyMDAKICB9OwoKICAvLyBCYXRjaCByZXF1ZXN0CiAgdmFyIGJhdGNoID0ge307CiAgYmF0Y2guc3VwcHJlc3NfcGFyYWxsZWxfZXhlY3V0aW9uID0gZmFsc2U7CiAgYmF0Y2gucmVxdWVzdHMgPSBbXTsKICBmb3IgKHZhciB1cmwgaW4gSldLU19VUkxTKSB7CiAgICB2YXIgcmVxdWVzdG9iaiA9IHsKICAgICAgICAibWV0aG9kIjogIkdFVCIsCiAgICAgICAgImhlYWRlcnMiOiB7fSwKICAgICAgICAiYm9keSI6ICIiLAogICAgICAgICJyZWxhdGl2ZV91cmwiOiBKV0tTX1VSTFNbdXJsXQogICAgICB9OwogICAgYmF0Y2gucmVxdWVzdHMucHVzaChyZXF1ZXN0b2JqKTsKICB9CiAgdmFyIG5ld0JvZHkgPSBUeWtCYXRjaFJlcXVlc3QoSlNPTi5zdHJpbmdpZnkoYmF0Y2gpKTsKCiAgLy8gV2Uga25vdyB0aGF0IHRoZSByZXF1ZXN0cyByZXR1cm4gSlNPTiBpbiB0aGVpciBib2R5LCBsZXRzIGZsYXR0ZW4gaXQKICB2YXIgQWxsSldLUyA9IEpTT04ucGFyc2UobmV3Qm9keSk7CiAgdmFyIGtleXMgPSB7fTsKICBrZXlzLmtleXMgPSBbXTsKICBmb3IgKHZhciBpIGluIEFsbEpXS1MpIHsKICAgIC8vbG9nKCJpIGlzICIgKyBpICsgIiBib2R5IGlzICIgKyBKU09OLnN0cmluZ2lmeShBbGxKV0tTW2ldLmJvZHkpICk7CiAgICBBbGxKV0tTW2ldLmJvZHkgPSBKU09OLnBhcnNlKEFsbEpXS1NbaV0uYm9keSk7CiAgICBmb3IgKHZhciBqIGluIEFsbEpXS1NbaV0uYm9keS5rZXlzKSB7CiAgICAgICAga2V5ID0gQWxsSldLU1tpXS5ib2R5LmtleXNbal07CiAgICAgICAgLy9sb2coIiBrZXkgaXMgIiArIEpTT04uc3RyaW5naWZ5KGtleSkgKTsKICAgICAgICBrZXlzLmtleXMucHVzaChrZXkpOwogICAgfQogIH0KCiAgLy8gV2UgbmVlZCB0byBzZW5kIGEgc3RyaW5nIG9iamVjdCBiYWNrIHRvIFR5ayB0byBlbWJlZCBpbiB0aGUgcmVzcG9uc2UKICByZXNwb25zZS5Cb2R5ID0gSlNPTi5zdHJpbmdpZnkoa2V5cyk7CiAgcmV0dXJuIFR5a0pzUmVzcG9uc2UocmVzcG9uc2UsIHNlc3Npb24ubWV0YV9kYXRhKTsKfQ==",
+              "method": "GET",
+              "path": "",
+              "proxy_on_error": false,
+              "response_function_name": "jwks",
+              "use_session": false
+            }
+          ],
+          "white_list": [
+            {
+              "disabled": false,
+              "ignore_case": false,
+              "method": "",
+              "method_actions": {
+                "GET": {
+                  "action": "no_action",
+                  "code": 200,
+                  "data": "",
+                  "headers": {}
+                }
+              },
+              "path": ""
+            }
+          ]
+        },
+        "name": "Default",
+        "use_extended_paths": true
+      }
+    }
+  }
+}
