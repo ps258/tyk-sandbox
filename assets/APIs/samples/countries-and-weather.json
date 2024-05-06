@@ -365,7 +365,6 @@
   },
   "hmac_allowed_algorithms": [],
   "hmac_allowed_clock_skew": -1,
-  "id": "627ce93db1821e13a7413a61",
   "internal": false,
   "jwt_client_base_field": "",
   "jwt_default_policies": [],
@@ -394,7 +393,6 @@
     "providers": [],
     "segregate_by_client": false
   },
-  "org_id": "6287aaf1e3b415006f73125a",
   "pinned_public_keys": {},
   "protocol": "",
   "proxy": {
