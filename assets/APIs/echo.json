@@ -1,7 +1,7 @@
 {
   "active": true,
   "auth": {
-    "auth_header_name": "authorization"
+    "auth_header_name": "Authorization"
   },
   "name": "echo",
   "proxy": {
