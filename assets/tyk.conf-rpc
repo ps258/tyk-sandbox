@@ -123,7 +123,7 @@
       "failure_trigger_sample_size": 3,
       "time_wait": 10
     },
-    "disable": false
+    "disable": true
   },
   "use_db_app_configs": false,
   "use_redis_log": true
