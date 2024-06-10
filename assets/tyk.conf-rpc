@@ -72,6 +72,7 @@
     "prefer_server_ciphers": true,
     "server_name": "",
     "skip_client_ca_announcement": false,
+    "skip_url_cleaning": false,
     "ssl_insecure_skip_verify": true,
     "use_ssl": true
   },
