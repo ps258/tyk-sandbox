@@ -1,0 +1,11 @@
+[tyk_tyk-portal]
+name=tyk_tyk-portal
+baseurl=https://packagecloud.io/tyk/portal/el/7/$basearch
+repo_gpgcheck=0
+gpgcheck=0
+enabled=1
+gpgkey=https://packagecloud.io/tyk/portal/gpgkey
+sslverify=0
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=86400
+mirrorlist_expire=86400

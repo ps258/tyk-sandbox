@@ -31,9 +31,9 @@ fi
 # install tyk
 # split out the tyk-sync install because it fails on M1 Macs causing the whole thing to fail
 if [[ -n $SBX_SYNC_VERS && "x86_64" == $(uname -i) ]]; then
-	tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS"
+	tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS $SBX_EDP_VERS"
 else
-	tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS"
+	tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_EDP_VERS"
 fi
 echo yum install --disablerepo=*-unstable -y $tyk_rpmlist
 yum --disablerepo=*-unstable -y install $tyk_rpmlist

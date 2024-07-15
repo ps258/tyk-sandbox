@@ -17,6 +17,12 @@ if [[ ! -f /initialised ]]; then
 	cp -f /assets/tyk.conf /opt/tyk-gateway/
 	cp -f /assets/pump.conf /opt/tyk-pump/
 
+  if [[ -d /opt/portal ]]; then
+    cp -f /assets/portal.conf /opt/portal/portal.conf
+	  sed -i "s/SBX_LICENSE/$SBX_LICENSE/g" /opt/portal/portal.conf
+  fi
+
+
 	if [[ -n $SBX_GW_CNAME ]]; then
 		SBX_GW_HOST=$SBX_GW_CNAME
 	fi
@@ -135,6 +141,11 @@ fi
 
 echo "[INFO]Starting Tyk gateway"
 start gateway
+
+if [[ -d /opt/portal ]]; then
+  echo "[INFO]Starting the EDP"
+  start portal
+fi
 
 #echo "[INFO]Capping analytics collections"
 #/scripts/cap-mongo-z_collections.sh

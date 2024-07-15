@@ -10,6 +10,7 @@ TIBBasePort=4001
 GatewayBasePort=5001
 RedisBasePort=6001
 MongoBasePort=7001
+EdpBasePort=3101
 SCRIPTDIR=$(
   cd "$(dirname $SCRIPTNAME)"
   echo $PWD
@@ -120,6 +121,7 @@ function touchRPMs {
     TIBvers=${TIB[$version]}
     pumpVers=${PUMP[$version]}
     syncVers=${SYNC[$version]}
+    edpVers="1.10.0-1"
   else
     echo "[FATAL]Gateway version '$version' isn't configured in $VERSIONFILE"
     exit 1
@@ -151,7 +153,7 @@ function echoBuildArgs {
   typeset version; typeset gwVers; typeset dshbVers; typeset pumpVers; typeset TIBvers
   typeset syncVers; typeset assetDir="$SCRIPTDIR/assets"
   typeset SBX_SCHEMA_URL; typeset SBX_GATEWAY_VERS; typeset SBX_DASHBOARD_VERS;
-  typeset SBX_PUMP_VERS; typeset SBX_TIB_VERS; typeset SBX_SYNC_VERS
+  typeset SBX_PUMP_VERS; typeset SBX_TIB_VERS; typeset SBX_SYNC_VERS; typeset SBX_EDP_VERS
   version=$1
   if [[ ${GATEWAY[$version]+_} ]]; then
     gwVers=${GATEWAY[$version]}
@@ -159,6 +161,7 @@ function echoBuildArgs {
     TIBvers=${TIB[$version]}
     pumpVers=${PUMP[$version]}
     syncVers=${SYNC[$version]}
+    edpVers="1.10.0-1"
   else
     echo "[FATAL]Gateway version '$version' isn't configured in $VERSIONFILE"
     exit 1
@@ -169,6 +172,11 @@ function echoBuildArgs {
   SBX_GATEWAY_VERS="--build-arg SBX_GATEWAY_VERS=tyk-gateway-$gwVers"
   SBX_DASHBOARD_VERS="--build-arg SBX_DASHBOARD_VERS=tyk-dashboard-$dshbVers"
   SBX_PUMP_VERS="--build-arg SBX_PUMP_VERS=tyk-pump-$pumpVers"
+  if [[ $(echo $version | cut -d. -f1) -gt 4 ]]; then
+    SBX_EDP_VERS="--build-arg SBX_EDP_VERS=portal-$edpVers"
+  else
+    SBX_EDP_VERS=""
+  fi
   if [[ -n $TIBvers ]]; then
     SBX_TIB_VERS="--build-arg SBX_TIB_VERS=tyk-identity-broker-$TIBvers"
   else
@@ -179,7 +187,7 @@ function echoBuildArgs {
   else
     SBX_SYNC_VERS=""
   fi
-  echo $SBX_SCHEMA_URL $SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS --build-arg TBI_IMAGE=$TBI_IMAGE
+  echo $SBX_SCHEMA_URL $SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS $SBX_EDP_VERS --build-arg TBI_IMAGE=$TBI_IMAGE
 }
 
 # list the version relationships we know about
@@ -429,7 +437,8 @@ function createSandbox {
   typeset index; typeset list; typeset ticket; typeset imageVersion; typeset env_file; typeset containerName
   typeset arg; typeset offset; typeset hostFQDN; typeset dashboardPort; typeset gatewayPort; typeset label
   typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap; typeset arg
-  typeset OPTARG; typeset redisPort; typeset mongoPort; typeset extraEnv_file; typeset SBX_MODE
+  typeset OPTARG; typeset redisPort; typeset mongoPort; typeset extraEnv_file; typeset SBX_MODE; typeset EdpURL
+  typeset edpPort;
   imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""; extraEnv_file=""; SBX_MODE=PRO
   while getopts :ne:i:v:st:l: arg; do
     case $arg in
@@ -506,10 +515,12 @@ function createSandbox {
   gatewayPort=$(($GatewayBasePort + $offset))
   redisPort=$(($RedisBasePort + $offset))
   mongoPort=$(($MongoBasePort + $offset))
+  edpPort=$(($EdpBasePort + $offset))
   containerName=sandbox-$index
   label=$containerName
   dashboardURL=http://$hostFQDN:$dashboardPort/
   gatewayURL=https://$hostFQDN:$gatewayPort/
+  EdpURL=http://$hostFQDN:$edpPort/
   # only configure TIB if gateway version is in the 2 series
   if echo $imageVersion | egrep -q '^2'; then
     TIBPort="--publish $(($TIBBasePort + $offset)):3010"
@@ -546,6 +557,7 @@ function createSandbox {
     --publish $gatewayPort:443 \
     --publish $redisPort:6379 \
     --publish $mongoPort:27017 \
+    --publish $edpPort:3001 \
     $TIBPort \
     --env DOCKER_DEFAULT_PLATFORM=linux/amd64 \
     --env TYK_LOGLEVEL=$logLevel \
@@ -567,6 +579,7 @@ function createSandbox {
     --label sandbox.dashurl=$dashboardURL \
     --label sandbox.ticket="$ticket" \
     --label sandbox.gateurl=$gatewayURL \
+    --label sandbox.edpurl=$EdpURL \
     --label sandbox.mode=$SBX_MODE \
     --label sandbox.redis="redis-cli -h $hostFQDN -p $redisPort" \
     --label sandbox.mongo="mongo --quiet --host $hostFQDN --port $mongoPort" \
