@@ -58,6 +58,7 @@ function dumpRedis {
         redis-cli -h $HOST -p $PORT hgetall $key | sed 's/^/  /'
         ;;
       set)
+        echo
         redis-cli -h $HOST -p $PORT smembers $key
         ;;
       zset)
