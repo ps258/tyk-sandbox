@@ -2,6 +2,9 @@
 
 PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
+PORTAL_LOG_LEVEL=$TYK_LOGLEVEL
+export PORTAL_LOG_LEVEL
+
 command=/opt/portal/dev-portal
 conf=/opt/portal/portal.conf
 log=/var/log/tyk-portal.log
