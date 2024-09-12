@@ -16,12 +16,13 @@ if [[ $# -lt 1 ]]; then
 	exit 1
 fi
 
-if [[ ! -f $1 ]]; then
-	echo "Usage: $0 <tyk-sink-rpm-path>"
-	exit 1
+if ! yum --disablerepo='*' --enablerepo=tyk_tyk-mdcb-stable -y install $1; then
+  echo "[WARN]Install of $1 failed from tyk_tyk-mdcb-stable, trying tyk_tyk-mdcb-unstable"
+  if ! yum --disablerepo='*' --enablerepo=tyk_tyk-mdcb-unstable -y install $1; then
+    echo "[WARN]Install of $1 failed from tyk_tyk-mdcb-unstable too, giving up"
+    exit 1
+  fi
 fi
-
-rpm --install $1
 
 # setup MDCB config 
 cp -f /assets/tyk_sink.conf /opt/tyk-sink/

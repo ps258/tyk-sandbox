@@ -70,8 +70,9 @@ function help {
   echo "        -r Image version to remove|all. Removes the image version"
   echo "$name list|info <index number...>"
   echo "        Details about the named sandbox or all"
-  echo "$name mdcb <mdcb rpm path> <index number...>"
-  echo "        Install MDCB from the named rpm, configure and start it"
+  echo "$name mdcb <MDCB version> <index number...>"
+  echo "        Install MDCB from the release tyk_tyk-mdcb-stable, configure and start it"
+  echo "        Note that only release versions can be installed because of the mess on package cloud"
   echo "        The edge gateway becomes the gateway for the sandbox"
   echo "$name publish api.json <index number...>"
   echo "        Publish the API in api.json into the sandbox"
@@ -757,15 +758,14 @@ case $1 in
     shift
     MDCB_RPM="$1"
     shift
-    if [[ -r "$MDCB_RPM" ]]; then
+    if [[ -n "$MDCB_RPM" ]]; then
       for index in $(listRunningNames $*); do
-        docker container cp "$MDCB_RPM" sandbox-$index:/
         # note that this must not have a controlling terminal (-t) or mdcb exits when the terminal closes
-        docker container exec sandbox-$index scripts/init-mdcb.sh /$(basename $MDCB_RPM)
+        docker container exec sandbox-$index scripts/init-mdcb.sh $MDCB_RPM
       done
     else
-      echo "[FATAL]Cannot read $MDCB_RPM"
-      echo "[Usage]mdcb <path to MDCB RPM> <list of sandboxes>"
+      echo "[FATAL]Must supply MDCB version like 'tyk-sink-2.7.0-1.'"
+      echo "[Usage]mdcb <MDCB version> <list of sandboxes>"
       exit 1
     fi
     ;;
