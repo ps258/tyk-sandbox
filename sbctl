@@ -811,7 +811,7 @@ case $1 in
       shift
       if [[ -f "$APIFILE" ]]; then
         for index in $(listRunningNames $*); do
-          TARGET_APIFILE=$(mktemp api-XXXX.json)
+          TARGET_APIFILE=$(mktemp -u api-XXXX.json)
           docker container cp "$APIFILE" sandbox-$index:/$TARGET_APIFILE
           docker container exec -t sandbox-$index bash -c "/scripts/publish-apis '/$TARGET_APIFILE'"
         done
