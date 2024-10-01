@@ -30,12 +30,15 @@ while getopts :a:p:h: arg; do
       ;;
   esac
 done
-if [[ -z $HOST || -z $PORT ]]; then
-  echo "[FATAL]Usage $0 -p <port> -h <hostname or IP> -a password"
-  exit 1
+if [[ -z $HOST ]]; then
+  HOST=localhost
 else
-  # remove the first 4 commandline arguments to leave the remaining patterns to search for
-  shift 4
+  shift 2
+fi
+if [[ -z $PORT ]]; then
+  PORT=6379
+else
+  shift 2
 fi
 if [[ ! -z $REDISCLI_AUTH ]]; then
   # remove the next 2 commandline arguments to leave the remaining patterns to search for
