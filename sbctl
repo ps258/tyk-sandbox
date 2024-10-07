@@ -342,18 +342,19 @@ function nextFreeContainer {
 function setTbiVersions {
   case $1 in
     2*)
+      BASE_UBI=centos:7
       TBI_IMAGE=saintpeter/tbi7:latest
       TBI_SECOND_TAG=saintpeter/tbi7:$(date +%Y%m%d)
-      BASE_UBI=centos:7
       ;;
     #5*)
-    #  TBI_IMAGE=tbi9:latest
-    #  BASE_UBI="redhat/ubi9"
+    #  BASE_UBI=almalinux:9
+    #  TBI_IMAGE=saintpeter/tbi7:latest
+    #  TBI_SECOND_TAG=saintpeter/tbi7:$(date +%Y%m%d)
     #  ;;
     *)
+      BASE_UBI=centos:8
       TBI_IMAGE=saintpeter/tbi8:latest
       TBI_SECOND_TAG=saintpeter/tbi8:$(date +%Y%m%d)
-      BASE_UBI=centos:8
       ;;
   esac
 }
