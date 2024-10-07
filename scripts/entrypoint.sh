@@ -124,6 +124,16 @@ if [[ -z $SBX_MODE || $SBX_MODE != 'CE' ]]; then
     start tib
   fi
 
+  if [[ -d /opt/portal ]]; then
+    echo "[INFO]Starting the EDP"
+    start portal
+  fi
+
+  if [[ -d /opt/tyk-sink ]]; then
+    echo "[INFO]Starting MDCB"
+    start mdcb
+  fi
+
 elif [[ $SBX_MODE = 'CE' ]]; then
 	# setup CE
 	if [[ ! -f /initialised ]]; then
@@ -134,18 +144,8 @@ elif [[ $SBX_MODE = 'CE' ]]; then
   touch /initial_credentials.txt
 fi
 
-if [[ -d /opt/tyk-sink ]]; then
-	echo "[INFO]Starting MDCB"
-	start mdcb
-fi
-
 echo "[INFO]Starting Tyk gateway"
 start gateway
-
-if [[ -d /opt/portal ]]; then
-  echo "[INFO]Starting the EDP"
-  start portal
-fi
 
 #echo "[INFO]Capping analytics collections"
 #/scripts/cap-mongo-z_collections.sh
