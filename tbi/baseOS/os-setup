@@ -62,7 +62,7 @@ if grep -q 'release 9' /etc/redhat-release; then
   # ksbctl sepecific setup
   cd /
   git clone https://github.com/ps258/tyk-scripts.git
-  cd /tyk-scripts
+  cd /tyk-scripts/python
   pip3 install -r requirements.txt
   mkdir /root/bin
   # end ksbctl sepecific setup
