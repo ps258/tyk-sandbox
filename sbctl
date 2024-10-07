@@ -263,7 +263,7 @@ function getVerboseSandboxInfo {
   containerStatus=$(docker container inspect -f '{{ .State.Status }}' $containerName)
   echo $containerName \($containerStatus\)
   if [[ $(docker container inspect -f '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
-    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.dashurl'
+    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.dashurl|sandbox.edpurl'
   else
     docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.mode'
   fi
@@ -342,8 +342,8 @@ function nextFreeContainer {
 function setTbiVersions {
   case $1 in
     2*)
-      TBI_IMAGE=saintpeter/tbi7:$(date +%Y%m%d)
-      TBI_SECOND_TAG=saintpeter/tbi7:latest
+      TBI_IMAGE=saintpeter/tbi7:latest
+      TBI_SECOND_TAG=saintpeter/tbi7:$(date +%Y%m%d)
       BASE_UBI=centos:7
       ;;
     #5*)
@@ -351,8 +351,8 @@ function setTbiVersions {
     #  BASE_UBI="redhat/ubi9"
     #  ;;
     *)
-      TBI_IMAGE=saintpeter/tbi8:$(date +%Y%m%d)
-      TBI_SECOND_TAG=saintpeter/tbi8:latest
+      TBI_IMAGE=saintpeter/tbi8:latest
+      TBI_SECOND_TAG=saintpeter/tbi8:$(date +%Y%m%d)
       BASE_UBI=centos:8
       ;;
   esac
