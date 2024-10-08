@@ -4,6 +4,9 @@
 # handy to poke around but will alto take an arguement which is the pattern to search for
 # use "api-key*" for example
 
+DEFAULT_HOST=control-redis
+DEFAULT_PORT=6379
+
 PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 PORT=''
@@ -30,13 +33,14 @@ while getopts :a:p:h: arg; do
       ;;
   esac
 done
+
 if [[ -z $HOST ]]; then
-  HOST=localhost
+  HOST=$DEFAULT_HOST
 else
   shift 2
 fi
 if [[ -z $PORT ]]; then
-  PORT=6379
+  PORT=$DEFAULT_PORT
 else
   shift 2
 fi
