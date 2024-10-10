@@ -27,6 +27,7 @@ typeset -A TIB
 typeset -A PUMP
 typeset -A SYNC
 typeset -A MDCB
+typeset -A EDP
 
 #find the local IP address (use the interface of the default route)
 if [[ $OS == "Linux" ]]; then
@@ -122,7 +123,7 @@ function touchRPMs {
     TIBvers=${TIB[$version]}
     pumpVers=${PUMP[$version]}
     syncVers=${SYNC[$version]}
-    edpVers="1.10.0-1"
+    edpVers=${EDP[$version]}
   else
     echo "[FATAL]Gateway version '$version' isn't configured in $VERSIONFILE"
     exit 1
@@ -162,7 +163,7 @@ function echoBuildArgs {
     TIBvers=${TIB[$version]}
     pumpVers=${PUMP[$version]}
     syncVers=${SYNC[$version]}
-    edpVers="1.10.0-1"
+    edpVers=${EDP[$version]}
   else
     echo "[FATAL]Gateway version '$version' isn't configured in $VERSIONFILE"
     exit 1
@@ -173,7 +174,7 @@ function echoBuildArgs {
   SBX_GATEWAY_VERS="--build-arg SBX_GATEWAY_VERS=tyk-gateway-$gwVers"
   SBX_DASHBOARD_VERS="--build-arg SBX_DASHBOARD_VERS=tyk-dashboard-$dshbVers"
   SBX_PUMP_VERS="--build-arg SBX_PUMP_VERS=tyk-pump-$pumpVers"
-  if [[ $(echo $version | cut -d. -f1) -gt 4 ]]; then
+  if [[ -n $edpVers ]]; then
     SBX_EDP_VERS="--build-arg SBX_EDP_VERS=portal-$edpVers"
   else
     SBX_EDP_VERS=""
@@ -205,6 +206,7 @@ function listVersions {
         [[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
         [[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
         [[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
+        [[ -n ${EDP[$version]} ]] && echo "    EDP:       ${EDP[$version]}"
       else
         echo "[FATAL]Gateway '$version' is not configured $VERSIONFILE"
         exit 1
@@ -219,6 +221,7 @@ function listVersions {
       [[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
       [[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
       [[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
+      [[ -n ${EDP[$version]} ]] && echo "    EDP:       ${EDP[$version]}"
     done
   fi
 }
@@ -233,16 +236,18 @@ function loadVersions {
   typeset TIBvers
   typeset syncVers
   typeset mdcbVers
+  typeset EDPvers
   typeset version
   line=$1
   IFS=,
-  echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers mdcbVers
+  echo "$line" | read version gwVers dshbVers pumpVers TIBvers syncVers mdcbVers EDPvers
   GATEWAY[$version]=$gwVers
   DASHBOARD[$version]=$dshbVers
   PUMP[$version]=$pumpVers
   TIB[$version]=$TIBvers
   SYNC[$version]=$syncVers
   MDCB[$version]=$mdcbVers
+  EDP[$version]=$EDPvers
 }
 
 # Load the versions of the products that go together
@@ -444,7 +449,7 @@ function createSandbox {
   typeset dashboardURL; typeset gatewayURL; typeset TIBPort; typeset tibURL; typeset noBootstrap; typeset arg
   typeset OPTARG; typeset redisPort; typeset mongoPort; typeset extraEnv_file; typeset SBX_MODE; typeset EdpURL
   typeset edpPort;
-  imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""; extraEnv_file=""; SBX_MODE=PRO
+  imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""; extraEnv_file=""; SBX_MODE=PRO; EdpURL=""
   while getopts :ne:i:v:st:l: arg; do
     case $arg in
       e)
@@ -525,7 +530,9 @@ function createSandbox {
   label=$containerName
   dashboardURL=http://$hostFQDN:$dashboardPort/
   gatewayURL=https://$hostFQDN:$gatewayPort/
-  EdpURL=http://$hostFQDN:$edpPort/
+  if [[ -n ${EDP[${imageVersion%%-*}]} ]]; then
+    EdpURL="--label sandbox.edpurl=http://$hostFQDN:$edpPort/"
+  fi
   # only configure TIB if gateway version is in the 2 series
   if echo $imageVersion | egrep -q '^2'; then
     TIBPort="--publish $(($TIBBasePort + $offset)):3010"
@@ -584,7 +591,7 @@ function createSandbox {
     --label sandbox.dashurl=$dashboardURL \
     --label sandbox.ticket="$ticket" \
     --label sandbox.gateurl=$gatewayURL \
-    --label sandbox.edpurl=$EdpURL \
+    $EdpURL \
     --label sandbox.mode=$SBX_MODE \
     --label sandbox.redis="redis-cli -h $hostFQDN -p $redisPort" \
     --label sandbox.mongo="mongo --quiet --host $hostFQDN --port $mongoPort" \
