@@ -26,5 +26,5 @@ then
   echo "[FATAL]Check $log for errors" 1>&2
   exit 1
 else
-  echo "[INFO]$command started"
+  echo "[INFO]$command started. Logs are in $log"
 fi

@@ -53,7 +53,7 @@ sleep 1
 # check if its running
 if isRunning
 then
-  echo "[INFO]'$command --conf $conf' started. PID=$PID"
+  echo "[INFO]'$command --conf $conf' started. PID=$PID. Logs are in $log"
   exit 0
 else  
   echo "[FATAL]'$command --conf $conf' didn't start"

@@ -19,7 +19,12 @@ fi
 
 # startup
 cd /opt/portal
-$command -bootstrap -first Tyk -last Admin -user $SBX_USER -pass $(echo $SBX_PASSWORD | base64 -d) --conf $conf &>> $log &
+if [[ ! -f .bootstrapped ]]; then
+  echo -user $SBX_USER -pass $(echo $SBX_PASSWORD | base64 -d) >> .bootstrapped
+  $command -bootstrap -first Tyk -last Admin -user $SBX_USER -pass $(echo $SBX_PASSWORD | base64 -d) --conf $conf &>> $log &
+else
+  $command --conf $conf &>> $log &
+fi
 err=$?
 sleep 1
 
@@ -30,5 +35,5 @@ then
   echo "[FATAL]Check $log for errors" 1>&2
   exit 1
 else
-  echo "[INFO]$command started"
+  echo "[INFO]$command started. Logs are in $log"
 fi

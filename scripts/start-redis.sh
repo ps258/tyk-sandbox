@@ -50,7 +50,7 @@ $command "$conf" --daemonize yes
 # check if its running
 if isRunning
 then
-	echo "[INFO]'$command "$conf" --daemonize yes' started. PID=$PID"
+	echo "[INFO]'$command "$conf" --daemonize yes' started. PID=$PID. Logs are in $log"
 	exit 0
 else  
 	echo "[FATAL]'$command "$conf" --daemonize yes' didn't start"
