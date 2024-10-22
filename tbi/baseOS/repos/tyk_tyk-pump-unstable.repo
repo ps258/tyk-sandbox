@@ -1,6 +1,6 @@
 [tyk_tyk-pump-unstable]
 name=tyk_tyk-pump-unstable
-baseurl=https://packagecloud.io/tyk/tyk-pump-unstable/el/7/$basearch
+baseurl=https://packagecloud.io/tyk/tyk-pump-unstable/el/$releasever/$basearch
 repo_gpgcheck=0
 gpgcheck=0
 enabled=1

@@ -1,6 +1,6 @@
 [tyk_tyk-portal]
 name=tyk_tyk-portal
-baseurl=https://packagecloud.io/tyk/portal/el/7/$basearch
+baseurl=https://packagecloud.io/tyk/portal/el/$releasever/$basearch
 repo_gpgcheck=0
 gpgcheck=0
 enabled=1

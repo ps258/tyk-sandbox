@@ -1,6 +1,6 @@
 [tyk_tyk-sync-unstable]
 name=tyk_tyk-sync-unstable
-baseurl=https://packagecloud.io/tyk/tyk-sync-unstable/el/7/$basearch
+baseurl=https://packagecloud.io/tyk/tyk-sync-unstable/el/$releasever/$basearch
 repo_gpgcheck=0
 gpgcheck=0
 enabled=1

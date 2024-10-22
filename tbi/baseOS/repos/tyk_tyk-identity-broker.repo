@@ -1,6 +1,6 @@
 [tyk_tyk-identity-broker]
 name=tyk_tyk-identity-broker
-baseurl=https://packagecloud.io/tyk/tyk-identity-broker/el/7/$basearch
+baseurl=https://packagecloud.io/tyk/tyk-identity-broker/el/$releasever/$basearch
 repo_gpgcheck=0
 gpgcheck=0
 enabled=1

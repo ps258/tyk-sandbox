@@ -1,6 +1,6 @@
 [tyk_tyk-identity-broker-unstable]
 name=tyk_tyk-identity-broker-unstable
-baseurl=https://packagecloud.io/tyk/tyk-identity-broker-unstable/el/7/$basearch
+baseurl=https://packagecloud.io/tyk/tyk-identity-broker-unstable/el/$releasever/$basearch
 repo_gpgcheck=0
 gpgcheck=0
 enabled=1
