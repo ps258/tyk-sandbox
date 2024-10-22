@@ -7,22 +7,25 @@ SOURCE_DIR=$(dirname $(readlink -f $0))
 cp $SOURCE_DIR/vimrc /root/.vimrc
 cp $SOURCE_DIR/curlrc /root/.curlrc
 
+# Disable fastestmirror because it sometimes selects a fast but incomplete mirror
+if [[ -f /etc/yum/pluginconf.d/fastestmirror.conf ]]; then
+	sed -i s/enabled=1/enabled=0/ /etc/yum/pluginconf.d/fastestmirror.conf
+fi
+
 # copy repos into place
 for repo in $SOURCE_DIR/repos/*.repo; do
 	if [[ -f $repo ]]; then
 		cp $repo /etc/yum.repos.d/
 	fi
 done
-# Disable fastestmirror because it sometimes selects a fast but incomplete mirror
-if [[ -f /etc/yum/pluginconf.d/fastestmirror.conf ]]; then
-	sed -i s/enabled=1/enabled=0/ /etc/yum/pluginconf.d/fastestmirror.conf
-fi
 
 useradd -c 'Tyk service user' -m -s /sbin/nologin tyk
 
 # make directories for the docker volumes
 mkdir -m 750 -p /opt/tyk-plugins /opt/tyk-certificates
 chown tyk:tyk /opt/tyk-plugins /opt/tyk-certificates
+
+# Release specitic steps
 if grep -q 'release 7' /etc/redhat-release; then
 	# centos 7
 	sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
@@ -43,6 +46,9 @@ if grep -q 'release 9' /etc/redhat-release; then
   sed -i 's/$releasever/8/' /etc/yum.repos.d/mongodb-org-4.4.repo
   yum -y install bash procps-ng iputils net-tools vim-enhanced wget python3 jq diffutils # golang
 fi
+
+# update all the OS packages
+yum -y --disablerepo='tyk*' --disablerepo='mongo*' update
 
 yum -y install python3-devel python3-setuptools
 pip3 install --upgrade pip
