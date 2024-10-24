@@ -4,7 +4,7 @@
 # handy to poke around but will alto take an arguement which is the pattern to search for
 # use "api-key*" for example
 
-DEFAULT_HOST=control-redis
+DEFAULT_HOST=localhost
 DEFAULT_PORT=6379
 
 PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
