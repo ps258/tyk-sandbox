@@ -49,7 +49,7 @@ function help {
   echo "           Give version number for details of the named version"
   echo "$name create -v tyk-version [-t ticket no] [-i index-number] [-n]"
   echo "        create a sandbox with the named version of tyk"
-  echo "        -e An environment variable file used to populate the sandboxes environment"
+  echo "        -E An environment variable file used to populate the sandboxes environment"
   echo "        -i Index number (skip for autoallocation of the next free)"
   echo "        -l Log level. Set to debug, info, warn or error. Defaults to debug"
   echo "        -n IGNORE ~/.tyk-sandbox even if it exists"
@@ -450,9 +450,9 @@ function createSandbox {
   typeset OPTARG; typeset redisPort; typeset mongoPort; typeset extraEnv_file; typeset SBX_MODE; typeset EdpURL
   typeset edpPort;
   imageVersion=""; index=""; noBootstrap=""; logLevel=""; ticket=""; TIBPort=""; tibURL=""; extraEnv_file=""; SBX_MODE=PRO; EdpURL=""
-  while getopts :ne:i:v:st:l: arg; do
+  while getopts :nE:i:v:st:l: arg; do
     case $arg in
-      e)
+      E)
         # An environment file to include. Should be in standard shell format
         extraEnv_file=$OPTARG
         ;;
@@ -678,9 +678,14 @@ case $1 in
   del*)
     shift
     # force delete the container
-    for index in $(listNames $*); do
-      docker container rm -f sandbox-$index
-    done
+    if [[ $# -gt 0 ]]; then
+      for index in $(listNames $*); do
+        docker container rm -f sandbox-$index
+      done
+    else
+      echo "[FATAL]Must give container identifier to delete or 'ALL'"
+      exit 1
+    fi
     ;;
 
   get)
