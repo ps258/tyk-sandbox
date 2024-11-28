@@ -6,6 +6,9 @@
 
 PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
+# always run from /opt/tyk-gateway since so many customers do and assume it
+cd /opt/tyk-gateway
+
 command=/opt/tyk-gateway/tyk
 TRUE=0
 FALSE=1
