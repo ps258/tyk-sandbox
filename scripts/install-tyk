@@ -35,8 +35,10 @@ if [[ -n $SBX_SYNC_VERS && "x86_64" == $(uname -i) ]]; then
 else
 	tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_EDP_VERS"
 fi
-echo yum install --disablerepo=*-unstable -y $tyk_rpmlist
-yum --disablerepo=*-unstable -y install $tyk_rpmlist
+for rpm in $tyk_rpmlist; do
+  echo yum install --disablerepo=*-unstable -y $rpm
+  yum --disablerepo=*-unstable -y install $rpm
+done
 
 # get the tyk.conf schema so 'tyk lint' works
 if [[ -n $SBX_SCHEMA_URL ]]; then
