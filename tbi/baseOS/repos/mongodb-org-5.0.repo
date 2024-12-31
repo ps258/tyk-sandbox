@@ -1,0 +1,8 @@
+[mongodb-org-5.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/5.0/$basearch/
+gpgcheck=0
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-5.0.asc
+metadata_expire=86400
+mirrorlist_expire=86400
