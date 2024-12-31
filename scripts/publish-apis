@@ -21,7 +21,12 @@ access_key=$(/scripts/admin-auth)
 
 if [[ -n $access_key ]]; then
 	for API in "$@"; do
-		if grep -q api_definition "$API"; then
+    if grep -q x-tyk-api-gateway "$API"; then
+      # OAS
+			echo curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis/oas -d@$API
+      curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis/oas -d@$API
+      echo
+		elif grep -q api_definition "$API"; then
 			# deal with the files that are a copy and paste of the API JSON from the dashboard
 			echo curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@$API
 			curl -X POST -H "Content-Type: application/json" -H "Authorization: $access_key" http://localhost:3000/api/apis -d@"$API"
