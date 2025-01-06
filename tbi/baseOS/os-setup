@@ -51,7 +51,7 @@ if grep -q 'release 9' /etc/redhat-release; then
   # remove the mongo 4.4 repo
   rm /etc/yum.repos.d/mongodb-org-4.4.repo
   sed -i 's/$releasever/8/' /etc/yum.repos.d/mongodb-org-5.0.repo
-  yum -y install bash procps-ng iputils net-tools vim-enhanced wget python3 jq diffutils # golang
+  yum -y install bash procps-ng iputils iproute net-tools vim-enhanced wget python3 jq diffutils # golang
 fi
 
 # update all the OS packages
