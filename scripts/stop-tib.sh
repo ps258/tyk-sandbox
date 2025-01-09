@@ -2,6 +2,7 @@
 
 PATH=/scripts:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
+command=/opt/tyk-identity-broker/tyk-identity-broker
 process=tyk-identity-broker
 count=0
 maxWait=11
