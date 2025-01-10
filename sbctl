@@ -736,7 +736,7 @@ case $1 in
           ;;
         [Ss]ecret)
           # secret (gateway secret)
-          docker container exec $containerName jq -r .tyk_api_config.Secret /opt/tyk-dashboard/tyk_analytics.conf
+          docker container exec $containerName jq -r .secret /opt/tyk-gateway/tyk.conf
           ;;
         [Vv]*)
           docker container inspect -f '{{ index .Config.Labels "sandbox.version" }}' $containerName
