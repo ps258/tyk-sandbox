@@ -30,15 +30,28 @@ fi
 
 # install tyk
 # split out the tyk-sync install because it fails on M1 Macs causing the whole thing to fail
+# Don't install the gateway in this step. Do that by itself so that we can try to install the ee version
 if [[ -n $SBX_SYNC_VERS && "x86_64" == $(uname -i) ]]; then
-	tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS $SBX_EDP_VERS"
+	tyk_rpmlist="$SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_SYNC_VERS $SBX_EDP_VERS"
 else
-	tyk_rpmlist="$SBX_GATEWAY_VERS $SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_EDP_VERS"
+	tyk_rpmlist="$SBX_DASHBOARD_VERS $SBX_PUMP_VERS $SBX_TIB_VERS $SBX_EDP_VERS"
 fi
 for rpm in $tyk_rpmlist; do
   echo yum install --disablerepo=*-unstable -y $rpm
   yum --disablerepo=*-unstable -y install $rpm
 done
+# attempt to install the ee gateway so it's there if we need it
+rpm=$(echo $SBX_GATEWAY_VERS | sed 's/gateway/gateway-ee/')
+echo yum install --disablerepo=*-unstable -y $rpm
+yum --disablerepo=*-unstable -y install $rpm
+# if the ee version didn't install, just install the standard one
+if [[ ! -d /opt/tyk-gateway ]]; then
+	echo yum install --disablerepo=*-unstable -y $SBX_GATEWAY_VERS
+  yum --disablerepo=*-unstable -y install $SBX_GATEWAY_VERS
+fi
+
+# attempt to install the ee version of the gateway
+$echo yum install --disablerepo=*-unstable -y $rpm
 
 # get the tyk.conf schema so 'tyk lint' works
 if [[ -n $SBX_SCHEMA_URL ]]; then
