@@ -6,6 +6,13 @@ command=/opt/tyk-identity-broker/tyk-identity-broker
 conf=/opt/tyk-identity-broker/tib.conf
 log=/var/log/tyk-identity-broker.log
 
+DIRNAME="$(dirname $command)"
+
+cd "$DIRNAME"
+if [[ ! -e "$DIRNAME/profiles.json" ]]; then
+	touch "$DIRNAME/profiles.json"
+fi
+
 if [[ ! -e $command ]]
 then
   echo "TIB not installed in $command"
