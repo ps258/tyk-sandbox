@@ -45,7 +45,7 @@ if [[ ! -f /initialised ]]; then
 	# create a local cert if one isn't already present
 	if [[ ! -e /opt/tyk-certificates/gateway-certificate.pem ]]; then
 		echo "[INFO]Creating certificate for the dashboard and gateway"
-		SAN="DNS:localhost"
+		SAN="DNS:localhost, IP:127.0.0.1"
 		if [[ -n $SBX_GW_CNAME ]]; then
 			SAN="DNS:$SBX_GW_CNAME, $SAN"
 			SUBJECT="/emailAddress=email@company.com/C=GB/ST=Mid Lothian/L=Home Office/O=Garage/OU=Desk/CN=$SBX_GW_CNAME"
