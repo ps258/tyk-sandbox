@@ -1,0 +1,72 @@
+{
+  "components": {
+    "securitySchemes": {
+      "authToken": {
+        "in": "header",
+        "name": "Authorization",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "title": "Steams simple echo",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.3",
+  "paths": {},
+  "security": [
+    {
+      "authToken": []
+    }
+  ],
+  "servers": [
+  ],
+	"x-tyk-api-gateway": {
+		"info": {
+			"name": "Steams simple echo",
+			"state": {
+				"active": true,
+				"internal": false
+			}
+		},
+		"server": {
+			"authentication": {
+				"enabled": false,
+				"securitySchemes": {
+					"authToken": {
+						"enabled": true
+					}
+				}
+			},
+			"listenPath": {
+				"strip": true,
+				"value": "/streams-echo/"
+			}
+		},
+		"upstream": {
+			"url": ""
+		}
+	},
+  "x-tyk-streaming": {
+    "streams": {
+      "simple echo": {
+        "input": {
+          "http_server": {
+            "allowed_verbs": [
+              "POST"
+            ],
+            "path": "/input"
+          }
+        },
+        "output": {
+          "http_server": {
+            "allowed_verbs": [
+              "GET"
+            ],
+            "stream_path": "/output"
+          }
+        }
+      }
+    }
+  }
+}
