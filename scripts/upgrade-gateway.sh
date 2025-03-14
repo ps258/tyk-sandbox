@@ -4,6 +4,7 @@ SERVICE=gateway
 PRODUCT=tyk-$SERVICE
 BINARY=tyk
 BASEDIR=/opt/$PRODUCT
+
 if [[ $# -lt 1 ]]
 then
   echo Must provide $SERVICE version like 5.7.2
@@ -16,6 +17,16 @@ then
   ln -sf $BASEDIR/$PRODUCT-$1 $BASEDIR/$BINARY
   restart $SERVICE
 else
+	# check if this is the only install
+	if [[ -f $BASEDIR/$BINARY ]]
+	then
+		if [[ ! -L $BASEDIR/$BINARY ]]
+		then
+			current_version=$(rpm -qf $BASEDIR/$BINARY --queryformat '%{VERSION}')
+			mv $BASEDIR/$BINARY $BASEDIR/$PRODUCT-$current_version
+		fi
+	fi
+	# install the new version
   yum -y install $PRODUCT-$1
   if [[ -f $BASEDIR/$BINARY ]]
   then
