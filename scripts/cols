@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+ 
+# Reads a file (or std in) and makes it into regular columns based on the width of each field
+ 
+use strict;
+use warnings;
+use Getopt::Long;
+ 
+my ($field, $field_index, %field_length, $field_count, @fields, $line, @lines, $i);
+my $left        = 1;
+my $centre      = 0;
+my $right       = 0;
+my $min_width   = 0;
+my $help        = 0;
+my $splitstring = '\s+';    # Default is to split on one or more space
+my $preSpace    = 0;
+my $postSpace   = 0;
+my $flen        = 0;
+my $outputseparator = '';
+my $ignorecomments = 0;
+my $commentcharacter = '#';
+ 
+GetOptions(
+  'centre' => \$centre,
+  'left'   => \$left,
+  'right'  => \$right,
+  'min=i'  => \$min_width,
+  'help'   => \$help,
+	'ignorecomments' => \$ignorecomments,
+  'isep=s'  => \$splitstring,
+  'osep=s'  => \$outputseparator
+) or exit 1;
+ 
+my $use = "Reads a file (or std in) and makes it into regular columns based on the width of each field.
+Options:
+  cols [--left|--right|--centre] [--min min-col-width] [--isep input separator char] [--osep output separator char] [[ --ignorecomments ]] file
+  --centre  : centre adjust
+  --left    : left adjust (default)
+  --min     : minimum column width
+  --right   : right adjust
+  --ignorecomments: skip lines starting with a $commentcharacter
+  --isep    : separator for columns in the input
+  --osep    : separator for columns in the output";
+ 
+if ($help) {
+  print "$use\n";
+  exit 0;
+}
+ 
+$left = 0 if ($right or $centre);
+ 
+sub max {
+  my $max = shift(@_);
+  my $foo;
+  foreach $foo (@_) {
+    $max = $foo if $max < $foo;
+  }
+  if ($max < $min_width) {
+    $max = $min_width;
+  }
+  return $max;
+}
+ 
+$splitstring =~ s/([\|\.])/\\$1/;
+ 
+# read the input and save the needed widths for each token in a column
+foreach $line (<>) {
+	$line =~ s/^\s+//;    # get rid of leading spaces. The line starts at the first field
+	$line =~ s/\s+$//;    # get rid of trailing spaces. The line ends at the last field
+	push(@lines, $line);
+	if (not $ignorecomments or ($ignorecomments and not $line =~ m/^\s*$commentcharacter/)) {
+		(@fields) = split(/$splitstring/, $line);    # was /$splitstring+/ which joined empty fields together. Default is \s+
+		$field_count = $#fields;
+		# work out the maximum length of each field (plus the length of the output separator)
+		$field_index = 0;
+		foreach $field (@fields) {
+			if (exists($field_length{$field_index})) {
+				$field_length{$field_index} = max($field_length{$field_index}, length($field)+length($outputseparator));
+			}
+			else {
+				$field_length{$field_index} = length($field)+length($outputseparator);
+			}
+			#print($outputseparator . ' ' . length($outputseparator));
+			$field_index++;
+		}
+	}
+}
+ 
+# print the input in enough space to make it all line up
+foreach $line (@lines) {
+	if (not $ignorecomments or ($ignorecomments and not $line =~ m/^\s*$commentcharacter/)) {
+		(@fields) = split(/$splitstring/, $line);    # was /$splitstring+/ which joined empty fields together. Default is \s+
+		$field_index = 0;
+		$field_count = $#fields;
+		foreach $field (@fields) {
+			chomp $field;
+			$field =~ s/^\s+|\s+$//g;
+			if ($left) {
+				if ($field_count == $field_index) {      # we're on the last field, just print it without trailing spaces
+					print $field;
+				}
+				else {
+					printf("%-$field_length{$field_index}s ", $field.$outputseparator);
+				}
+			}
+			elsif ($right) {
+				printf("%$field_length{$field_index}s ", $field.$outputseparator);
+			}
+			else {
+				$flen      = length($field);
+				$preSpace  = int(($field_length{$field_index} - $flen) / 2);
+				$postSpace = ($field_length{$field_index} - $preSpace - $flen);
+				printf("%s", ' ' x $preSpace);
+				if ($field_count != $field_index) {    # we're not on the last field, print the padding
+					printf("%s%s", $field, $outputseparator);
+					printf("%s ", ' ' x $postSpace);
+				} else {
+					printf("%s", $field);
+				}
+			}
+			$field_index++;
+		}
+		print "\n";
+	} else {
+		print "$line\n";
+	}
+}
