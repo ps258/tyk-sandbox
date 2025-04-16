@@ -1,5 +1,5 @@
 ARG TBI_IMAGE=tbi8:latest
-FROM --platform=linux/amd64 $TBI_IMAGE
+FROM $TBI_IMAGE
 
 EXPOSE 3000
 EXPOSE 8080
