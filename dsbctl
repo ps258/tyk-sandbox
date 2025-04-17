@@ -502,7 +502,7 @@ function createSandbox {
 
   if [[ -z $imageVersion ]]; then
     echo "[FATAL]Must specify a tyk-sandbox version"
-    sbctl images
+    $SCRIPTNAME images
     exit 1
   fi
   if ! echo $imageVersion | grep -q -- -; then
