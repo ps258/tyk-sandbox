@@ -567,7 +567,6 @@ function createSandbox {
   echo "[INFO]Creating container $containerName"
   # Notes on the envrionment variables passed into the container (the non-obvious ones)
   # SBX_HOST_IP_ADDR is the script's best guess of the IP address of the host running the script
-  # this is needed to make golang plugins work on an M1 Mac 'DOCKER_DEFAULT_PLATFORM=linux/amd64'
   docker container create --name $containerName \
     --hostname $label \
     --publish $dashboardPort:3000 \
@@ -576,7 +575,6 @@ function createSandbox {
     --publish $mongoPort:27017 \
     --publish $edpPort:3001 \
     $TIBPort \
-    --env DOCKER_DEFAULT_PLATFORM=linux/amd64 \
     --env TYK_LOGLEVEL=$logLevel \
     --env SBX_GW_PORT=$gatewayPort \
     --env SBX_GW_HOST=$hostFQDN \
