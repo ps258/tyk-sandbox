@@ -21,7 +21,7 @@ access_key=$(/scripts/admin-auth)
 
 if [[ -n $access_key ]]; then
   for API in "$@"; do
-    if $(jq 'has("oas")' $API) == "true"; then
+    if [[ $(jq 'has("oas")' $API) = "true" ]]; then
       mv $API tmpfile
       jq .oas tmpfile > $API
       rm tmpfile
