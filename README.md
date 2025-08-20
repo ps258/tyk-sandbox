@@ -14,7 +14,7 @@
 
 Before creating a first sandbox image list the version the script knows about
 
-	$ ./sbctl build -l
+	$ ./dsbctl build -l
 	Version:   3.2.1
 		Gateway:   3.2.1-1
 		Dashboard: 3.2.1-1
@@ -27,18 +27,18 @@ Before creating a first sandbox image list the version the script knows about
 
 Create an image with for tyk 3.1.2
 
-	$ ./sbctl build -v 3.1.2
+	$ ./dsbctl build -v 3.1.2
 
 List the available images
 
-	$ ./sbctl images
+	$ ./dsbctl images
 	REPOSITORY    TAG       IMAGE ID       CREATED      SIZE
 	tyk-sandbox   3.1.2-1   d78b2ca8c4a2   2 days ago   974MB
 
 Create a sandbox from that image to begin testing/debugging
 This sandbox is ready to connect to via a web browser within seconds
 
-	$ ./sbctl create -v 3.1.2-1 -t myticket_number
+	$ ./dsbctl create -v 3.1.2-1 -t myticket_number
 	[INFO]Creating container sandbox-1
 	7371a8690b34a8a4cc34965a181e9ae43d880b6969e9923cbba3819cd87cd733
 	[INFO]Starting container sandbox-1
@@ -53,7 +53,7 @@ This sandbox is ready to connect to via a web browser within seconds
 
 To remind ourselves of the details of this or other sandboxes later
 
-	$ sbctl info 1
+	$ dsbctl info 1
 	sandbox-1 (running)
 	sandbox.dashurl: http://10.0.0.21:3001/
 	sandbox.gateurl: https://10.0.0.21:5001/
@@ -64,41 +64,50 @@ To remind ourselves of the details of this or other sandboxes later
 
 To get help on various options
 
-	sbctl build -l | -v tyk-gateway-version-number [-r image version]
-			build a sandbox image for that version if its not already available
-			-v version to build ('ALL' to build all versions)
-			-l list versions that images can be made for (incompatible with -v and -r)
-	sbctl create -v tyk-version [-t ticket no] [-i index-number] [-n]
-			create a sandbox with the named version of tyk
-			-i index number (skip for autoallocation of the next free)
-			-l log level. Set to debug, info, warn or error. Defaults to debug
-			-n IGNORE ~/.tyk-sandbox even if it exists
-			You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:
-			These will be used when -n is NOT present
-			SBX_LICENSE=licence string
-			SBX_USER=user email
-			SBX_PASSWORD=base64 encoded password
-			Note: create a base64 encoded password with:
-				echo password | base64
-			-t ticket or comment field
-			-v tyk version of sandbox image. Required
-	sbctl images [-r <image versions to remove|ALL]]
-			list the docker images for creating sandboxes
-			-r image version to remove|ALL. Removes the image version
-	sbctl list|info|status [-v] <index number...>
-			details about the named sandbox or all
-			-v Also echo the org_id and the Admin API key
-	sbctl mdcb <mdcb rpm path> <index number...>
-			install MDCB from the named rpm, configure and start it
-			the edge gateway becomes the gateway for the sandbox
-	sbctl publish api.json <index number...>
-			publish the API in api.json into the sandbox
-	sbctl script scriptfile <index number...>
-			copy the script into the container and run it
-	sbctl shell <index number...>
-			Open a bash shell in the sandboxes named
-	sbctl [start|stop|restart|rm] <index number...>
-			take the action named on the listed sandboxes
+	$ dsbctl
+    [USAGE]:
+    dsbctl build -l <version number>| -v tyk-gateway-version-number
+        Build a sandbox image for that version if its not already available
+        -v Version to build ('all' to build all versions)
+        -l List versions that images can be made for (incompatible with -v and -r)
+           Give version number for details of the named version
+    dsbctl create -v tyk-version [-t ticket no] [-i index-number] [-n]
+        create a sandbox with the named version of tyk
+        -E An environment variable file used to populate the sandboxes environment
+        -i Index number (skip for autoallocation of the next free)
+        -l Log level. Set to debug, info, warn or error. Defaults to debug
+        -n IGNORE ~/.tyk-sandbox even if it exists
+           You can populate ~/.tyk-sandbox with values to bootstrap the sandbox with:
+           These will be used when -n is NOT present
+           SBX_LICENSE=licence string
+           SBX_USER=user email
+           SBX_PASSWORD=base64 encoded password
+           Note: Create a base64 encoded password with:
+               echo password | base64
+           Note: See also -e above
+        -s Deploy standalone (CE) gateway
+        -t Ticket or comment field
+        -v Tyk version of sandbox image. Required and must have already been built
+    dsbctl get <index number> [key|dashboard|desc|gateway|org|mongo|redis|version|admin_secret]
+        print requested info in a way that's useful in other scripts
+    dsbctl images [-r <image versions to remove|all]]
+        List the docker images for creating sandboxes
+        -r Image version to remove|all. Removes the image version
+    dsbctl list|info <index number...>
+        Details about the named sandbox or all
+    dsbctl mdcb tyk-sink-<MDCB version> <index number...>
+        Example version format: tyk-sink-2.7.1
+        Install MDCB from the release tyk_tyk-mdcb-stable, configure and start it
+        Note that only release versions can be installed because of the mess on package cloud
+        The edge gateway becomes the gateway for the sandbox
+    dsbctl publish api.json <index number...>
+        Publish the API in api.json into the sandbox
+    dsbctl script scriptfile <index number...>
+        Copy the script into the container and run it
+    dsbctl shell <index number...>
+        Open a bash shell in the sandboxes named
+    dsbctl [start|stop|restart|rm] <index number...>
+        Take the action named on the listed sandboxes
 
 
 
@@ -107,7 +116,7 @@ To get help on various options
 
 - The file in the host file system `~/.tyk-sandbox` can be populated with environment variables which are passed into any container created. 
 	- If `SBX_LICENSE` is set then the dashboard will be bootstraped. 
-	- If `SBX_USER` and `SBX_PASSWORD` are set then an admin user will be created with those login details. See `sbctl help` for details.
+	- If `SBX_USER` and `SBX_PASSWORD` are set then an admin user will be created with those login details. See `dsbctl help` for details.
 	- If `SBX_GW_CNAME` is set then `override_hostname` will be set to it in `/opt/tyk-dashboard/tyk_analytics.conf`
 	- If `SBX_DSHB_CNAME` is set then `host_config.hostname` and `http_server_options.certificates.domain_name` will be set. Note that `http_server_options.certificates.domain_name` isn't used because the dashboard runs on http not https, but its there if someone needs to change to https.
 	- If `SBX_PTL_CNAME` is set then the portal cname will be set when creating the organisation. Note that because `generate_secure_paths` is true the dashboard menu item 'OPEN YOUR PORTAL' will attempt to open it over https when it's only available on http. I don't see a way around this while keeping the gateway on https.
