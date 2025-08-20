@@ -112,7 +112,7 @@ To get help on various options
 
 
 ### Other details
-- All the images are based on a baseOS image called 'tbi' (Tyk Base Image) this is a centos 7 image with all the extras added that are either needed or handy to have in the sandboxes. It is build first when builds are done then reused for all subsequest images. This means that the first time a build is done it may take quite a bit longer, after that the builds are faster. How long depends on your machine and internet speeds plus the speed of the local mirrors for the yum repos used.
+- All the images are based on a baseOS image called 'tbi' (Tyk Base Image) this is a centos image with all the extras added that are either needed or handy to have in the sandboxes. It is build first when builds are done then reused for all subsequest images. This means that the first time a build is done it may take quite a bit longer, after that the builds are faster. How long depends on your machine and internet speeds plus the speed of the local mirrors for the yum repos used.
 
 - The file in the host file system `~/.tyk-sandbox` can be populated with environment variables which are passed into any container created. 
 	- If `SBX_LICENSE` is set then the dashboard will be bootstraped. 
