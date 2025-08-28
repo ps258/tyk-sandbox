@@ -69,6 +69,10 @@ then
 	#curl -X PUT --silent --header "admin-auth: $ADMIN_SECRET" \
   #  http://localhost:3000/admin/users/$USERID/actions/disallow_reset_passwords
 
+  # setup a default classic portal page because from 5.9.0 the classic portal won't show unless we do this
+  curl --silent --header 'Content-Type: application/json' --header "Authorization: $ACCESS_TOKEN" \
+    --data '{"fields":{"JumboCTALink":"JumboCTALink","JumboCTALinkTitle":"JumboCTALinkTitle","JumboCTATitle":"JumboCTATitle","PanelOneContent":"PanelOneContent","PanelOneLink":"PanelOneLink","PanelOneLinkTitle":"PanelOneLinkTitle","PanelOneTitle":"PanelOneTitle","PanelThreeContent":"PanelThreeContent","PanelThreeLink":"PanelThreeLink","PanelThreeLinkTitle":"PanelThreeLinkTitle","PanelThreeTitle":"PanelThreeTitle","PanelTwoContent":"PanelTwoContent","PanelTwoLink":"PanelTwoLink","PanelTwoLinkTitle":"PanelTwoLinkTitle","PanelTwoTitle":"PanelTwoTitle","SubHeading":"SubHeading"},"is_homepage":true,"org_id":"'$ORG_ID'","page_settings":{},"slug":"home","template_name":"","title":"home"}' http://localhost:3000/api/portal/pages
+
   # Save the details for later use
   echo SBX_USER=$SBX_USER >> /initial_credentials.txt
   echo "# SBX_PASSWD is base64 encoded"
