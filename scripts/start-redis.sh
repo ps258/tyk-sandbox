@@ -14,7 +14,11 @@ PID=
 function isRunning {
 	# check if there's a process listening on the expected port
 	# also populates $PID
-	PID=$(ss -lnptuH  "( sport = :$PORT )" | awk '/pid=/ {print $NF}' | cut -d, -f 2 | cut -d= -f 2 | sort -u)
+  if [[ -f /usr/sbin/ss ]]; then
+    PID=$(ss -lnptuH  "( sport = :$PORT )" | awk '/pid=/ {print $NF}' | cut -d, -f 2 | cut -d= -f 2 | sort -u)
+  else
+    PID=$(netstat -lptuna | grep LISTEN | awk '$4 ~ ":'$PORT'" {print $7}' | cut -d/ -f1)
+  fi
 	if [[ ! -z $PID ]]
 	then
 		return $TRUE
