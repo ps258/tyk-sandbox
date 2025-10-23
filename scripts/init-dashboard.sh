@@ -79,8 +79,10 @@ then
   echo SBX_PASSWD=$SBX_PASSWORD >> /initial_credentials.txt
   echo SBX_ADMIN_API_KEY=$(admin-auth) >> /initial_credentials.txt
 
-  # publish all apis from /assets/APIs
-  /scripts/publish-apis /assets/APIs/*.json
+  if [[ $SBX_PUBLISH_APIS == 'true' ]]; then
+    # publish all apis from /assets/APIs
+    /scripts/publish-apis /assets/APIs/*.json
+  fi
 fi
 
 touch /initialised 
