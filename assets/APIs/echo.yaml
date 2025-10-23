@@ -42,10 +42,7 @@ paths:
           description: ''
 x-tyk-api-gateway:
   info:
-    dbId: 68f792231628e8000166f0ec
-    id: 218ba86964a44850726719c724f02257
     name: echo
-    orgId: 68f792131628e8000166f0e0
     state:
       active: true
   middleware:

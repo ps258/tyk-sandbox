@@ -6,10 +6,7 @@ openapi: 3.0.6
 paths: {}
 x-tyk-api-gateway:
   info:
-    dbId: 68f792231628e8000166f0ee
-    id: 96456933a479435669d6b5fd331f8f24
     name: httpbin
-    orgId: 68f792131628e8000166f0e0
     state:
       active: true
   middleware:
