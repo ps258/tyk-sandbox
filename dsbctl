@@ -640,16 +640,20 @@ function listRunningNames {
   typeset name
   typeset list
   list=""
-  if [[ $1 == "all" ]]; then
-    docker container list | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
+  if [[ $# -lt 1 ]]; then
+    echo "[FATAL]Must provide a sandbox name or number" 1>&2
   else
-    for name in $*; do
-      if echo $name | grep -iq sandbox-; then
-        name=$(echo $name | cut -d\- -f2)
-      fi
-      list="$list $name"
-    done
-    echo $list
+    if [[ $1 == "all" ]]; then
+      docker container list | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
+    else
+      for name in $*; do
+        if echo $name | grep -iq sandbox-; then
+          name=$(echo $name | cut -d\- -f2)
+        fi
+        list="$list $name"
+      done
+      echo $list
+    fi
   fi
 }
 
