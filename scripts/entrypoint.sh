@@ -72,6 +72,8 @@ if [[ ! -f /initialised ]]; then
 		issuerAltName          = issuer:copy
 		EOF
 		openssl x509 -req -in /opt/tyk-certificates/certificate.csr -signkey /opt/tyk-certificates/gateway-key.pem -out /opt/tyk-certificates/gateway-certificate.pem -days 3650 -sha256 -extfile /opt/tyk-certificates/extfile.ext
+    ln -s /opt/tyk-certificates/gateway-certificate.pem /opt/tyk-certificates/dashboard-certificate.pem
+    ln -s /opt/tyk-certificates/gateway-key.pem /opt/tyk-certificates/dashboard-key.pem
 	fi
 fi
 
