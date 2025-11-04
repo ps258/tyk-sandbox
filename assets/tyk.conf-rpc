@@ -19,6 +19,7 @@
   "close_connections": false,
   "close_idle_connections": false,
   "control_api_hostname": "",
+  "control_api_port": "443",
   "coprocess_options": {
     "enable_coprocess": true,
     "python_path_prefix": "/opt/tyk-gateway"
@@ -88,7 +89,7 @@
     "policy_source": "rpc"
   },
   "proxy_ssl_insecure_skip_verify": true,
-  "public_key_path": "/pubkey.pem",
+  "_public_key_path": "/pubkey.pem",
   "secret": "Secret",
   "slave_options": {
     "api_key": "SBX_ADMIN_API_KEY",
