@@ -519,14 +519,12 @@ function createSandbox {
   if ! echo $imageVersion | grep -q -- -; then
     imageVersion=$imageVersion-$(latestImageRev $imageVersion)
   fi
-  echo PWD=$PWD '************************************************************'
   if ! docker image inspect tyk-sandbox:$imageVersion >/dev/null 2>&1; then
     echo "[WARN]tyk-sandbox:$(echo $imageVersion | sed -e 's/-$//') does not exist. Building it now"
     buildSandboxImage -v $(echo $imageVersion | sed -e 's/-$//')
     echo 
     imageVersion=${imageVersion}1
   fi
-  echo PWD=$PWD '############################################################'
   if [[ -z $logLevel ]]; then
     logLevel="debug"
   fi
