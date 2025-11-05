@@ -587,6 +587,7 @@ function createSandbox {
     --publish $edpPort:3001 \
     $TIBPort \
     --env TYK_LOGLEVEL=$logLevel \
+    --env TYK_GW_OPENTELEMETRY_RESOURCENAME=sandbox-$index
     --env SBX_GW_PORT=$gatewayPort \
     --env SBX_GW_HOST=$hostFQDN \
     --env SBX_DSHB_HOST=$hostFQDN \
