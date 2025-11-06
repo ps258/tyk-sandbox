@@ -262,6 +262,21 @@ function loadVersionFile {
   done
 }
 
+function getSSHportForwards {
+  typeset containerName
+  typeset port
+  containerName="$1"
+  if [[ $(docker container inspect -f '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
+    :
+  else
+    for port in $(docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | awk -F: '/url/ {print $NF}'); do
+      port=$(echo $port | tr -d /)
+      echo -n " -L localhost:$port:$IP_addr:$port"
+    done
+    echo
+  fi
+}
+
 # Report the details of a sandbox container
 function getVerboseSandboxInfo {
   typeset index
@@ -278,6 +293,9 @@ function getVerboseSandboxInfo {
   fi
   if [[ $containerStatus = 'running' ]]; then
     docker container exec $containerName awk '/SBX_ORG_ID|SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed  -e 's/SBX_ORG_ID=/sandbox.OrgId: /' -e 's/SBX_ADMIN_API_KEY=/sandbox.AdminKey: /'
+  fi
+  if [[ $(cat /sys/devices/virtual/dmi/id/board_vendor) == "Amazon EC2" ]]; then
+    getSSHportForwards $containerName
   fi
   echo
 }
