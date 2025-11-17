@@ -94,7 +94,7 @@ function rmSandboxImages {
   typeset removeList
   removeList=""
   if echo $* | grep -qw all; then
-    for version in $(docker image list tyk-sandbox | awk '!/REPOSITORY/ {print $2}'); do
+    for version in $(docker image list tyk-sandbox --format "{{.ID}}"); do
       removeList="$removeList tyk-sandbox:$version"
     done
   else
@@ -266,10 +266,10 @@ function getSSHportForwards {
   typeset containerName
   typeset port
   containerName="$1"
-  if [[ $(docker container inspect -f '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
+  if [[ $(docker container inspect --format '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
     :
   else
-    for port in $(docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | awk -F: '/url/ {print $NF}'); do
+    for port in $(docker container inspect --format '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | awk -F: '/url/ {print $NF}'); do
       port=$(echo $port | tr -d /)
       echo -n " -L localhost:$port:$IP_addr:$port"
     done
@@ -284,12 +284,12 @@ function getVerboseSandboxInfo {
   typeset containerStatus
   index=$1
   containerName=sandbox-$index
-  containerStatus=$(docker container inspect -f '{{ .State.Status }}' $containerName)
+  containerStatus=$(docker container inspect --format '{{ .State.Status }}' $containerName)
   echo $containerName \($containerStatus\)
-  if [[ $(docker container inspect -f '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
-    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.dashurl|sandbox.edpurl'
+  if [[ $(docker container inspect --format '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
+    docker container inspect --format '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.dashurl|sandbox.edpurl'
   else
-    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.mode'
+    docker container inspect --format '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.mode'
   fi
   if [[ $containerStatus = 'running' ]]; then
     docker container exec $containerName awk '/SBX_ORG_ID|SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed  -e 's/SBX_ORG_ID=/sandbox.OrgId: /' -e 's/SBX_ADMIN_API_KEY=/sandbox.AdminKey: /'
@@ -306,11 +306,11 @@ function getSandboxInfo {
   typeset containerName
   index=$1
   containerName=sandbox-$index
-  echo $containerName \($(docker container inspect -f '{{ .State.Status }}' $containerName)\)
-  if [[ $(docker container inspect -f '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
-    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.dashurl'
+  echo $containerName \($(docker container inspect --format '{{ .State.Status }}' $containerName)\)
+  if [[ $(docker container inspect --format '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
+    docker container inspect --format '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.dashurl'
   else
-    docker container inspect -f '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.mode'
+    docker container inspect --format '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | grep sandbox | egrep -v 'sandbox.index|sandbox.label|sandbox.mode'
   fi
   echo
 }
@@ -319,7 +319,7 @@ function getSandboxInfo {
 function getAllSandboxInfo {
   typeset existing
   typeset index
-  existing=$(docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n)
+  existing=$(docker container list -a --format "{{.Names}}" | awk '/^sandbox-/' | cut -d \- -f2 | sort -n)
   for index in $existing; do
     getSandboxInfo $index
   done
@@ -330,7 +330,7 @@ function latestImageRev {
   typeset version
   typeset existing
   version=$1
-  existing=$(docker image list tyk-sandbox | awk '$2 ~ /'$version-'/ {print $2}' | sort -V | tail -1)
+  existing=$(docker image list tyk-sandbox --format "{{.Tag}}" | awk '$1 ~ /'$version-'/' | sort -V | tail -1)
   if [[ ! -z $existing ]]; then
     echo $existing | cut -d- -f2
   fi
@@ -356,7 +356,7 @@ function nextFreeImageRev {
 function nextFreeContainer {
   typeset existing
   typeset i
-  existing=$(docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}')
+  existing=$(docker container list -a --format "{{.Names}}" | awk '/^sandbox-/')
   for i in $(seq 1 1000); do
     test="sandbox-$i"
     if ! echo $existing | grep -qw $test; then
@@ -393,7 +393,7 @@ function setTbiVersions {
 # build the TBI to save build time with lots of images
 function buildTykBaseImage {
   setTbiVersions $1
-  existing=$(docker image list $TBI_IMAGE | awk '/tbi/')
+  existing=$(docker image list $TBI_IMAGE --format "{{.Repository}}:{{.Tag}}" | awk '/tbi/')
   if [[ -z $existing ]]; then
     cd tbi
     docker image build --build-arg BASE_UBI=$BASE_UBI --no-cache --progress=plain --tag $TBI_IMAGE .
@@ -646,7 +646,7 @@ function listNames {
   typeset list
   list=""
   if [[ $# -eq 0 || $1 == "all" ]]; then
-    docker container list -a | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
+    docker container list -a --format "{{.Names}}" | awk '/^sandbox-/' | cut -d \- -f2 | sort -n
   else
     for name in $*; do
       if echo $name | grep -iq sandbox-; then
@@ -667,7 +667,7 @@ function listRunningNames {
     echo "[FATAL]Must provide a sandbox name or number" 1>&2
   else
     if [[ $1 == "all" ]]; then
-      docker container list | awk '$NF ~ /^sandbox-/ {print $NF}' | cut -d \- -f2 | sort -n
+      docker container list -a --format "{{.Names}}" | awk '/^sandbox-/' | cut -d \- -f2 | sort -n
     else
       for name in $*; do
         if echo $name | grep -iq sandbox-; then
@@ -750,29 +750,29 @@ case $1 in
           docker container exec $containerName jq -r .admin_secret /opt/tyk-dashboard/tyk_analytics.conf
           ;;
         [Dd]ash*)
-          docker container inspect -f '{{ index .Config.Labels "sandbox.dashurl" }}' $containerName
+          docker container inspect --format '{{ index .Config.Labels "sandbox.dashurl" }}' $containerName
           ;;
         [Dd]esc*|[Tt]ick*)
-          docker container inspect -f '{{ index .Config.Labels "sandbox.ticket" }}' $containerName
+          docker container inspect --format '{{ index .Config.Labels "sandbox.ticket" }}' $containerName
           ;;
         [Gg]*)
-          docker container inspect -f '{{ index .Config.Labels "sandbox.gateurl" }}' $containerName
+          docker container inspect --format '{{ index .Config.Labels "sandbox.gateurl" }}' $containerName
           ;;
         [Oo]*)
           docker container exec $containerName awk '/SBX_ORG_ID/' /initial_credentials.txt | sed  -e 's/SBX_ORG_ID=//'
           ;;
         [Mm]*)
-          docker container inspect -f '{{ index .Config.Labels "sandbox.mongo" }}' $containerName | awk '{print $3, $4, $5, $6}'
+          docker container inspect --format '{{ index .Config.Labels "sandbox.mongo" }}' $containerName | awk '{print $3, $4, $5, $6}'
           ;;
         [Rr]*)
-          docker container inspect -f '{{ index .Config.Labels "sandbox.redis" }}' $containerName | awk '{print $2, $3, $4, $5}'
+          docker container inspect --format '{{ index .Config.Labels "sandbox.redis" }}' $containerName | awk '{print $2, $3, $4, $5}'
           ;;
         [Ss]ecret)
           # secret (gateway secret)
           docker container exec $containerName jq -r .secret /opt/tyk-gateway/tyk.conf
           ;;
         [Vv]*)
-          docker container inspect -f '{{ index .Config.Labels "sandbox.version" }}' $containerName
+          docker container inspect --format '{{ index .Config.Labels "sandbox.version" }}' $containerName
           ;;
         *)
           echo "[FATAL]Unknown option '$1'"
@@ -794,8 +794,8 @@ case $1 in
         rmSandboxImages $*
       fi
     else
-      # note the almost magical pipe feature of awk used here. It sorts the versions but not the header
-      docker image list tyk-sandbox | awk '/REPOSITORY/ {print $0; next} {print $0 | "sort -Vr"}'
+      #docker image list tyk-sandbox --format "{{.Repository}}:{{.Tag}}\t{{.ID}}\t{{.Size}}"
+      docker image list tyk-sandbox 
     fi
     ;;
 
