@@ -207,8 +207,9 @@ function listVersions {
         echo "Version:   $version"
         echo "    Gateway:   $gwVers"
         [[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
-        [[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
         [[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
+        [[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
+        [[ -n ${SYNC[$version]} ]] && echo "    Sync:      ${SYNC[$version]}"
         [[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
         [[ -n ${EDP[$version]} ]] && echo "    EDP:       ${EDP[$version]}"
       else
@@ -217,14 +218,15 @@ function listVersions {
       fi
     done
   else
-    for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | sort -rV); do
+    for version in $(echo ${!GATEWAY[@]} | xargs -n 1 | grep -vE '_ee|_fips' | sort -rV); do
       gwVers=${GATEWAY[$version]}
       echo "Version:   $version"
       echo "    Gateway:   $gwVers"
       [[ -n ${DASHBOARD[$version]} ]] && echo "    Dashboard: ${DASHBOARD[$version]}"
-      [[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
       [[ -n ${PUMP[$version]} ]] && echo "    Pump:      ${PUMP[$version]}"
+      [[ -n ${TIB[$version]} ]] && echo "    TIB:       ${TIB[$version]}"
       [[ -n ${MDCB[$version]} ]] && echo "    MDCB:      ${MDCB[$version]}"
+      [[ -n ${SYNC[$version]} ]] && echo "    Sync:      ${SYNC[$version]}"
       [[ -n ${EDP[$version]} ]] && echo "    EDP:       ${EDP[$version]}"
     done
   fi
