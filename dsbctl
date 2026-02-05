@@ -276,7 +276,7 @@ function getSSHportForwards {
       port=$(echo $port | tr -d /)
       echo -n " -L localhost:$port:$IP_addr:$port"
     done
-    echo '<aws hostname>'
+    echo ' <aws hostname>'
   fi
 }
 
