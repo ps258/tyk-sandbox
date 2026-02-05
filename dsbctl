@@ -271,11 +271,12 @@ function getSSHportForwards {
   if [[ $(docker container inspect --format '{{ index .Config.Labels "sandbox.mode" }}' $containerName) == "CE" ]]; then
     :
   else
+    echo -n ssh
     for port in $(docker container inspect --format '{{ range $k, $v := .Config.Labels }}{{ $k }}: {{ println $v }}{{ end }}' $containerName | awk -F: '/url/ {print $NF}'); do
       port=$(echo $port | tr -d /)
       echo -n " -L localhost:$port:$IP_addr:$port"
     done
-    echo
+    echo '<aws hostname>'
   fi
 }
 
