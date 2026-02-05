@@ -615,6 +615,7 @@ function createSandbox {
     --env SBX_HOST_IP_ADDR=$IP_addr \
     --env SBX_MODE=$SBX_MODE \
     --env SBX_PUBLISH_APIS=$SBX_PUBLISH_APIS \
+    --env GODEBUG=gctrace=1 \
     --env HISTFILE=/.bash_history \
     --env HISTFILESIZE=1000000 \
     --env HISTSIZE=100000 \
