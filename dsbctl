@@ -95,7 +95,7 @@ function rmSandboxImages {
   removeList=""
   if echo $* | grep -qw all; then
     for version in $(docker image list tyk-sandbox --format "{{.ID}}"); do
-      removeList="$removeList tyk-sandbox:$version"
+      removeList="$removeList $version"
     done
   else
     for version in $*; do
