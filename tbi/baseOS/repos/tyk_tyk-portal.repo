@@ -7,5 +7,5 @@ enabled=1
 gpgkey=https://packagecloud.io/tyk/portal/gpgkey
 sslverify=0
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
-metadata_expire=86400
+metadata_expire=7d
 mirrorlist_expire=86400
