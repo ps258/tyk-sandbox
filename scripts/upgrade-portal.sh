@@ -1,8 +1,8 @@
 #!/bin/bash
 
-SERVICE=gateway
-PRODUCT=tyk-$SERVICE
-BINARY=tyk
+SERVICE=portal
+PRODUCT=$SERVICE
+BINARY=dev-portal
 BASEDIR=/opt/$PRODUCT
 
 if [[ $# -lt 1 ]]

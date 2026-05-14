@@ -28,10 +28,12 @@ else
 	fi
 	# install the new version
   yum -y install $PRODUCT-$1
-  if [[ -f $BASEDIR/$BINARY ]]
+  if [[ -f $BASEDIR/$BINARY && ! -L $BASEDIR/$BINARY ]]
   then
     mv $BASEDIR/$BINARY $BASEDIR/$PRODUCT-$1
     ln -sf $BASEDIR/$PRODUCT-$1 $BASEDIR/$BINARY
     restart $SERVICE
+  else
+    echo Unable to install $PRODUCT-$1
   fi
 fi
