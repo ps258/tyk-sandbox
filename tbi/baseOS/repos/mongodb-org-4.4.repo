@@ -5,4 +5,3 @@ gpgcheck=0
 enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-4.4.asc
 metadata_expire=7d
-mirrorlist_expire=86400
