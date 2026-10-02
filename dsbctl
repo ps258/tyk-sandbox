@@ -636,6 +636,7 @@ function createSandbox {
     $tibURL \
     --label sandbox.index=$index \
     --volume $SandboxPluginDir/$imageVersion:/opt/tyk-plugins \
+    --add-host=host.docker.internal:host-gateway \
     tyk-sandbox:$imageVersion
   if [[ $? -eq 0 ]]; then
     echo "[INFO]Starting container $containerName"
