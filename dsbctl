@@ -85,7 +85,7 @@ function help {
   echo "        Copy the script into the container and run it"
   echo "$name shell <index number...>"
   echo "        Open a bash shell in the sandboxes named"
-  echo "$name [start|stop|restart|rm] <index number...>"
+  echo "$name [start|stop|restart|delete] <index number...>"
   echo "        Take the action named on the listed sandboxes"
 }
 
@@ -297,8 +297,10 @@ function getVerboseSandboxInfo {
   if [[ $containerStatus = 'running' ]]; then
     docker container exec $containerName awk '/SBX_ORG_ID|SBX_ADMIN_API_KEY/' /initial_credentials.txt | sed  -e 's/SBX_ORG_ID=/sandbox.OrgId: /' -e 's/SBX_ADMIN_API_KEY=/sandbox.AdminKey: /'
   fi
-  if [[ $(cat /sys/devices/virtual/dmi/id/board_vendor) == "Amazon EC2" ]]; then
-    getSSHportForwards $containerName
+  if [[ -d /sys/devices/virtual/dmi/id ]]; then
+    if [[ $(cat /sys/devices/virtual/dmi/id/board_vendor) == "Amazon EC2" ]]; then
+      getSSHportForwards $containerName
+    fi
   fi
   echo
 }
@@ -360,7 +362,7 @@ function nextFreeContainer {
   typeset existing
   typeset i
   existing=$(docker container list -a --format "{{.Names}}" | awk '/^sandbox-/')
-  for i in $(seq 1 1000); do
+  for i in $(seq 1 100); do
     test="sandbox-$i"
     if ! echo $existing | grep -qw $test; then
       echo $i
@@ -546,6 +548,11 @@ function createSandbox {
     echo 
     imageVersion=${imageVersion}1
   fi
+  # if it still doesn't exist, give up
+  if ! docker image inspect tyk-sandbox:$imageVersion >/dev/null 2>&1; then
+    echo "[FATAL]Unable to build $(echo $imageVersion | sed -e 's/-$//'). Giving up"
+    exit 1
+  fi
   if [[ -z $logLevel ]]; then
     logLevel="debug"
   fi
@@ -650,7 +657,7 @@ function listNames {
   typeset name
   typeset list
   list=""
-  if [[ $# -eq 0 || $1 == "all" ]]; then
+  if [[ $# -eq 0 || $1 == "ALL" ]]; then
     docker container list -a --format "{{.Names}}" | awk '/^sandbox-/' | cut -d \- -f2 | sort -n
   else
     for name in $*; do
@@ -672,7 +679,7 @@ function listRunningNames {
     echo "[FATAL]Must provide a sandbox name or number" 1>&2
   else
     if [[ $1 == "all" ]]; then
-      docker container list -a --format "{{.Names}}" | awk '/^sandbox-/' | cut -d \- -f2 | sort -n
+      docker container list -a --filter status=running --format "{{.Names}}" | awk '/^sandbox-/' | cut -d \- -f2 | sort -n
     else
       for name in $*; do
         if echo $name | grep -iq sandbox-; then
@@ -893,6 +900,7 @@ case $1 in
   *)
     echo "[FATAL]Unknown option \"$1\"" 1>&2
     help
+    exit 1
     ;;
 
 esac
