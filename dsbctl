@@ -657,7 +657,7 @@ function listNames {
   typeset name
   typeset list
   list=""
-  if [[ $# -eq 0 || $1 == "ALL" ]]; then
+  if [[ $# -eq 0 || $1 == "ALL" || $1 == 'all' ]]; then
     docker container list -a --format "{{.Names}}" | awk '/^sandbox-/' | cut -d \- -f2 | sort -n
   else
     for name in $*; do
@@ -678,7 +678,7 @@ function listRunningNames {
   if [[ $# -lt 1 ]]; then
     echo "[FATAL]Must provide a sandbox name or number" 1>&2
   else
-    if [[ $1 == "all" ]]; then
+    if [[ $1 == "ALL" || $1 == 'all' ]]; then
       docker container list -a --filter status=running --format "{{.Names}}" | awk '/^sandbox-/' | cut -d \- -f2 | sort -n
     else
       for name in $*; do
