@@ -379,7 +379,7 @@ function setTbiVersions {
       TBI_SECOND_TAG=saintpeter/tbi7:$(date +%Y%m%d)
       ;;
     4*|5.0.*)
-      BASE_UBI=centos:8
+      BASE_UBI=almalinux:8
       TBI_IMAGE=saintpeter/tbi8:latest
       TBI_SECOND_TAG=saintpeter/tbi8:$(date +%Y%m%d)
       ;;

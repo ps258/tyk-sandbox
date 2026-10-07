@@ -39,7 +39,7 @@ if grep -q 'release 7' /etc/redhat-release; then
   yum -y install nano procps-ng iputils net-tools vim-enhanced wget curl python3 jq diffutils
 fi
 
-# centos 8 for gateway 3.x and 4.x
+# almalinux 8 for gateway 3.x and 4.x
 if grep -q 'release 8' /etc/redhat-release; then
   # only want the mongo 5 repo
   rm /etc/yum.repos.d/mongo*.repo
