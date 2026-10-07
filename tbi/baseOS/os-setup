@@ -54,7 +54,6 @@ if grep -q 'release 9' /etc/redhat-release; then
   # only want the mongo 7 repo
   rm /etc/yum.repos.d/mongo*.repo
   cp $SOURCE_DIR/repos/mongodb-org-7.0.repo /etc/yum.repos.d/
-  sed -i 's/$releasever/8/' /etc/yum.repos.d/mongodb-org-5.0.repo
   yum -y install bash nano procps-ng iputils iproute net-tools vim-enhanced wget python3 jq diffutils
   yum -y install sqlite sqlite-devel sqlite-libs
 fi
