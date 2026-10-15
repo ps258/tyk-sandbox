@@ -67,7 +67,7 @@ function help {
 	echo "        -s Deploy standalone (CE) gateway"
   echo "        -t Ticket or comment field"
   echo "        -v Tyk version of sandbox image. Required and must have already been built"
-  echo "$name get <index number> [key|dashboard|desc|gateway|org|mongo|redis|version|admin_secret]"
+  echo "$name get <index number> [key (admin access key)|dashboard|desc|gateway|org|mongo|redis|version|admin_secret]"
   echo "        print requested info in a way that's useful in other scripts"
   echo "$name images [-r <image versions to remove|all]]"
   echo "        List the docker images for creating sandboxes"
@@ -754,7 +754,7 @@ case $1 in
     if [[ $# -gt 0 ]]; then
       case $1 in
         [Aa]cc*|[Kk]*)
-          # access key or key
+          # access key or key (admin auth token)
           docker container exec $containerName /scripts/admin-auth
           ;;
         [Aa]dmin_s*|[Aa]dmins*)
@@ -762,21 +762,27 @@ case $1 in
           docker container exec $containerName jq -r .admin_secret /opt/tyk-dashboard/tyk_analytics.conf
           ;;
         [Dd]ash*)
+          # dashboard URL
           docker container inspect --format '{{ index .Config.Labels "sandbox.dashurl" }}' $containerName
           ;;
         [Dd]esc*|[Tt]ick*)
+          # description
           docker container inspect --format '{{ index .Config.Labels "sandbox.ticket" }}' $containerName
           ;;
         [Gg]*)
+          # gateway URL
           docker container inspect --format '{{ index .Config.Labels "sandbox.gateurl" }}' $containerName
           ;;
         [Oo]*)
+          # orgid
           docker container exec $containerName awk '/SBX_ORG_ID/' /initial_credentials.txt | sed  -e 's/SBX_ORG_ID=//'
           ;;
         [Mm]*)
+          # mongo url
           docker container inspect --format '{{ index .Config.Labels "sandbox.mongo" }}' $containerName | awk '{print $3, $4, $5, $6}'
           ;;
         [Rr]*)
+          # redis url
           docker container inspect --format '{{ index .Config.Labels "sandbox.redis" }}' $containerName | awk '{print $2, $3, $4, $5}'
           ;;
         [Ss]ecret)
@@ -784,6 +790,7 @@ case $1 in
           docker container exec $containerName jq -r .secret /opt/tyk-gateway/tyk.conf
           ;;
         [Vv]*)
+          # sandbox version
           docker container inspect --format '{{ index .Config.Labels "sandbox.version" }}' $containerName
           ;;
         *)
