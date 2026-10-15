@@ -10,12 +10,12 @@ if [[ ! -f /initialised ]]; then
 	if [[ -d /opt/tyk-identity-broker ]]; then
 		# TIB is installed, we need to use the tib enabled tyk_analytics.conf
 		cp -f /assets/tyk_analytics-tib.conf /opt/tyk-dashboard/tyk_analytics.conf
-		cp -f /assets/tib.conf /opt/tyk-identity-broker/
+		cp -f /assets/tib.conf /opt/tyk-identity-broker/tib.conf
 	else
-		cp -f /assets/tyk_analytics.conf /opt/tyk-dashboard
+		cp -f /assets/tyk_analytics.conf /opt/tyk-dashboard/tyk_analytics.conf
 	fi
-	cp -f /assets/tyk.conf /opt/tyk-gateway/
-	cp -f /assets/pump.conf /opt/tyk-pump/
+	cp -f /assets/tyk.conf /opt/tyk-gateway/tyk.conf
+	cp -f /assets/pump.conf /opt/tyk-pump/pump.conf
 
   if [[ -d /opt/portal ]]; then
     cp -f /assets/portal.conf /opt/portal/portal.conf
