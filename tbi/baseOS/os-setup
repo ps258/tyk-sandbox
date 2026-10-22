@@ -104,8 +104,9 @@ else
 	echo "[FATAL]Cannot find redis config file. Checked /etc/redis.conf and /etc/redis/redis.conf but didn't find them"
 fi
 
-# open redis up to the world! Beware!!!
 if [[ ! -z $REDIS_CONFIG ]]; then
+  sed -Ei 's/^#[[:space:]]*(save[[:space:]]+[0-9]+[[:space:]]+[0-9]+[[:space:]]*)$/\1/' $REDIS_CONFIG
+  # open redis up to the world! Beware!!!
   sed -i 's/^protected-mode yes/protected-mode no/' $REDIS_CONFIG
   sed -i 's/^bind 127.0.0.1/#bind 127.0.0.1/' $REDIS_CONFIG
 fi
