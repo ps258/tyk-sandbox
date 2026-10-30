@@ -15,7 +15,7 @@ then
 fi
 
 # startup
-$command --conf $conf &>> $log &
+$command -c $conf &>> $log &
 err=$?
 sleep 1
 
