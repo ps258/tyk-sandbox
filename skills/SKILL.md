@@ -182,15 +182,15 @@ them from their laptop through an SSH tunnel.
 To help with that, `dsbctl info` / `list` (the verbose output) adds a ready-made command at the
 end of each non-CE sandbox's block, for example:
 ```
-ssh -g -L localhost:3001:<private-ip>:3001 -g -L localhost:5001:<private-ip>:5001 -g -L localhost:3101:<private-ip>:3101 <aws hostname>
+ssh -g -L localhost:3001:<private-ip>:3001 -L localhost:5001:<private-ip>:5001 -L localhost:3101:<private-ip>:3101 <aws hostname>
 ```
 - It is built from every container label whose line contains `url`: `dashurl`, `gateurl`,
   `edpurl`, and `tiburl` on 2.x images. Redis and Mongo ports are **not** forwarded; add
   `-L localhost:600N:<private-ip>:600N` by hand if the user needs them.
 - `<aws hostname>` is a literal placeholder. The user swaps in the instance's public DNS or ssh
   config alias. The command runs **on the user's laptop**, not on the instance.
-- `-g` lets other machines on the laptop's network use the forwarded ports. Added in commit
-  e50f5ee.
+- `-g` (given once, straight after `ssh`) lets other machines on the laptop's network use the
+  forwarded ports.
 - Once the tunnel is up, the URLs are `http://localhost:3001/` (dashboard) and
   `https://localhost:5001/` (gateway, `-k`), with the port numbers matching the sandbox index.
 - CE (`-s`) sandboxes get no ssh line. `create` prints the short info without the ssh line, so
