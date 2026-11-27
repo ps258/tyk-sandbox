@@ -20,8 +20,18 @@ fi
 # startup
 cd /opt/portal
 if [[ ! -f .bootstrapped ]]; then
+  source /initial_credentials.txt
+  # Connect the portal to this sandbox's dashboard
+  # Build the provider json
+  provider=()
+  if [[ -n $SBX_ADMIN_API_KEY && -n $SBX_ORG_ID ]]; then
+    provider=(-provider-name $HOSTNAME -provider-type tyk-pro
+      -provider-data "{\"URL\":\"http://localhost:3000\",\"Secret\":\"$SBX_ADMIN_API_KEY\",\"OrgID\":\"$SBX_ORG_ID\"}")
+  else
+    echo "[WARN]No dashboard admin key or org id in /initial_credentials.txt, bootstrapping the portal without a provider"
+  fi
   echo -user $SBX_USER -pass $(echo $SBX_PASSWORD | base64 -d) >> .bootstrapped
-  $command -bootstrap -first Tyk -last Admin -user $SBX_USER -pass $(echo $SBX_PASSWORD | base64 -d) --conf $conf &>> $log &
+  $command -bootstrap -first Tyk -last Admin -user $SBX_USER -pass $(echo $SBX_PASSWORD | base64 -d) "${provider[@]}" --conf $conf &>> $log &
 else
   $command --conf $conf &>> $log &
 fi
